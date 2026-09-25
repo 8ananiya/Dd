@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANC Console — Browser Noise Reduction</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --card: rgba(255,255,255,0.045);
+    --card-hi: rgba(255,255,255,0.08);
+    --border: rgba(255,255,255,0.09);
+    --text: #e6edf3;
+    --muted: #8b98a8;
+    --accent: #22d3ee;
+    --accent2: #6366f1;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+
+  body {
+    background:
+      radial-gradient(900px 600px at 15% -10%, rgba(34,211,238,0.13), transparent 60%),
+      radial-gradient(800px 600px at 100% 10%, rgba(99,102,241,0.13), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 32px 16px 80px;
+  }
+
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  header { text-align: center; margin-bottom: 4px; }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 6px;
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .sub {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* ---------- power ---------- */
+  .power-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .power {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text);
+    background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 13px 30px;
+    cursor: pointer;
+    transition: all .18s ease;
+    letter-spacing: 0.01em;
+  }
+
+  .power:hover { background: var(--card-hi); transform: translateY(-1px); }
+  .power:active { transform: translateY(0); }
+
+  .power.on {
+    background: linear-gradient(180deg, rgba(34,211,238,0.28), rgba(34,211,238,0.12));
+    border-color: rgba(34,211,238,0.55);
+    box-shadow: 0 0 24px rgba(34,211,238,0.28), inset 0 0 20px rgba(34,211,238,0.08);
+  }
+
+  .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #475569;
+    transition: all .2s;
+  }
+  .power.on .dot {
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.45;} }
+
+  .pill {
+    font-size: 0.75rem;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    color: var(--muted);
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill.err { color: var(--bad); border-color: rgba(248,113,113,0.4); }
+
+  /* ---------- modes ---------- */
+  .modes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .mode {
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 13px 6px;
+    cursor: pointer;
+    transition: all .15s;
+    line-height: 1.3;
+  }
+
+  .mode:hover:not(:disabled) { background: rgba(255,255,255,0.07); color: var(--text); }
+
+  .mode.active {
+    color: #06121a;
+    background: linear-gradient(160deg, var(--accent), #0ea5b7);
+    border-color: transparent;
+    box-shadow: 0 4px 18px rgba(34,211,238,0.3);
+  }
+
+  .mode:disabled { opacity: 0.32; cursor: not-allowed; }
+
+  /* ---------- sliders ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 22px;
+  }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+  .slider label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 9px;
+    font-weight: 500;
+  }
+
+  .slider .val {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    background: rgba(34,211,238,0.09);
+    padding: 2px 8px;
+    border-radius: 5px;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.1);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--accent);
+    cursor: grab;
+    transition: transform .12s;
+  }
+  input[type=range]::-webkit-slider-thumb:active { transform: scale(1.18); cursor: grabbing; }
+
+  input[type=range]::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--text);
+    border: 3px solid var(--accent);
+    cursor: grab;
+  }
+
+  input[type=range]:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ---------- meters ---------- */
+  .meter-wrap { display: flex; flex-direction: column; gap: 11px; }
+
+  canvas {
+    width: 100%;
+    height: 90px;
+    display: block;
+    border-radius: 9px;
+    background: rgba(0,0,0,0.32);
+  }
+
+  .bar {
+    position: relative;
+    height: 7px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+  }
+
+  .bar > i {
+    position: absolute;
+    inset: 0 100% 0 0;
+    border-radius: 99px;
+    transition: right .06s linear;
+  }
+
+  #lvlIn > i  { background: linear-gradient(90deg, #0ea5b7, var(--accent)); }
+  #lvlOut > i { background: linear-gradient(90deg, #4f46e5, #a78bfa); }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: ui-monospace, Menlo, monospace;
+  }
+
+  .reduction {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 3px;
+  }
+  .reduction b { color: var(--good); font-family: ui-monospace, Menlo, monospace; }
+
+  /* ---------- notices ---------- */
+  .notice {
+    display: flex;
+    gap: 11px;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    color: var(--muted);
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 12px;
+    padding: 13px 15px;
+  }
+  .notice .ico { flex-shrink: 0; font-size: 1rem; line-height: 1.4; }
+  .notice b { color: var(--warn); font-weight: 600; }
+
+  details {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.025);
+    overflow: hidden;
+  }
+
+  summary {
+    cursor: pointer;
+    padding: 14px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    list-style: none;
+    user-select: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸ "; color: var(--accent); }
+  details[open] summary::before { content: "▾ "; }
+  summary:hover { color: var(--text); }
+
+  details .body {
+    padding: 0 18px 18px;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  details .body ul { margin: 8px 0; padding-left: 20px; }
+  details .body li { margin-bottom: 5px; }
+  details .body code {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.07);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #4b5563;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <h1>🎧 ANC Console</h1>
+    <p class="sub">Adaptive noise reduction &amp; transparency for any pair of headphones</p>
+  </header>
+
+  <!-- POWER -->
+  <div class="card">
+    <div class="power-row">
+      <button class="power" id="powerBtn"><span class="dot"></span><span id="powerLabel">Power On</span></button>
+      <div class="pill" id="statusPill">idle</div>
+    </div>
+  </div>
+
+  <!-- MODES -->
+  <div class="card">
+    <div class="modes">
+      <button class="mode" data-mode="transparency" disabled>Transparency</button>
+      <button class="mode active" data-mode="adaptive" disabled>Adaptive ANC</button>
+      <button class="mode" data-mode="strong" disabled>Strong ANC</button>
+      <button class="mode" data-mode="voice" disabled>Voice Focus</button>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="card">
+    <div class="grid">
+      <div class="slider">
+        <label>Noise reduction <span class="val" id="vStrength">2.0×</span></label>
+        <input type="range" id="sStrength" min="0.5" max="8" step="0.1" value="2">
+      </div>
+
+      <div class="slider">
+        <label>Residual floor <span class="val" id="vFloor">8%</span></label>
+        <input type="range" id="sFloor" min="0.01" max="0.5" step="0.01" value="0.08">
+      </div>
+
+      <div class="slider">
+        <label>Transparency gain <span class="val" id="vGain">1.0×</span></label>
+        <input type="range" id="sGain" min="0" max="3" step="0.05" value="1">
+      </div>
+
+      <div class="slider">
+        <label>Voice presence <span class="val" id="vPresence">0 dB</span></label>
+        <input type="range" id="sPresence" min="-6" max="12" step="1" value="0">
+      </div>
+
+      <div class="slider">
+        <label>Low cut <span class="val" id="vLow">80 Hz</span></label>
+        <input type="range" id="sLow" min="20" max="500" step="5" value="80">
+      </div>
+
+      <div class="slider">
+        <label>High cut <span class="val" id="vHigh">14 kHz</span></label>
+        <input type="range" id="sHigh" min="1000" max="20000" step="250" value="14000">
+      </div>
+    </div>
+  </div>
+
+  <!-- METERS -->
+  <div class="card meter-wrap">
+    <canvas id="viz" width="1400" height="260"></canvas>
+
+    <div class="bar-row"><span>MIC</span><div class="bar" id="lvlIn"><i></i></div></div>
+    <div class="bar-row"><span>OUT</span><div class="bar" id="lvlOut"><i></i></div></div>
+
+    <div class="reduction">
+      <span>Noise attenuation</span>
+      <b id="reductionVal">— dB</b>
+    </div>
+  </div>
+
+  <!-- WARNING -->
+  <div class="notice">
+    <span class="ico">⚠️</span>
+    <div>
+      <b>Wear headphones before powering on.</b>
+      The microphone will pick up sound leaking from your headphones and create a feedback
+      loop (a loud squeal). Use closed-back headphones, keep the volume moderate, and
+      start with the gain slider low.
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <details>
+    <summary>How this works &amp; what it can't do</summary>
+    <div class="body">
+      <p><b style="color:#e6edf3">The signal chain</b></p>
+      <ul>
+        <li><b>Transparency mode</b> — your mic is piped straight to your headphones through a
+          high-pass / low-pass / presence EQ. <b>Zero added latency</b>, so it sounds natural.</li>
+        <li><b>ANC modes</b> — the signal runs through an <code>AudioWorklet</code> that performs
+          <b>zero-phase spectral subtraction</b>: a 512-point FFT, a per-bin noise-floor estimate
+          (fast-attack / slow-release minimum tracker), a Wiener-style gain curve with
+          over-subtraction, and frequency + time smoothing to kill "musical noise". Adds ~10.6 ms
+          of latency — inaudible for noise reduction.</li>
+        <li><b>Voice Focus</b> — heavy low-frequency rejection plus a +6 dB presence lift at 2.5 kHz
+          so speech cuts through traffic or machinery.</li>
+      </ul>
+
+      <p><b style="color:#e6edf3">Honest limitations</b></p>
+      <ul>
+        <li>This is <b>not</b> true phase-inverting ANC. Real ANC needs a reference mic outside the
+          ear cup and an error mic inside it, plus sub-millisecond DSP on a real-time thread. A single
+          mic can't do feed-forward cancellation.</li>
+        <li>It <b>cannot inject audio into a phone call</b>. Browsers have no API to replace the mic
+          stream an ongoing call is already using.</li>
+        <li>Because the mic hears your headphones, feedback is a real risk. The built-in limiter
+          catches runaway gain, but it isn't a substitute for caution.</li>
+        <li>Everything here runs locally in your browser. No audio ever leaves your device.</li>
+      </ul>
+
+      <p><b style="color:#e6edf3">For real ANC</b> you'd need a native app
+        (Android <code>AudioRecord</code>/<code>AudioTrack</code>, iOS <code>AVAudioEngine</code>)
+        with an NLMS/FxLMS adaptive filter running on a low-latency audio thread.</p>
+    </div>
+  </details>
+
+  <div class="footer">Runs 100% client-side · Web Audio API · no server, no uploads</div>
+</div>
+
+<!-- ============================================================
+     AUDIOWORKLET SOURCE
+     ============================================================ -->
+<script type="text/x-anc-worklet" id="ancWorkletSrc">
+/* ------------------------------------------------------------------
+   Spectral-subtraction noise reducer.
+   FFT 512 / hop 128 (75% overlap) / sqrt-Hann analysis+synthesis.
+   ------------------------------------------------------------------ */
+
+function fft(re, im, inverse) {
+  const n = re.length;
+
+  // bit-reversal permutation
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) {
+      let t = re[i]; re[i] = re[j]; re[j] = t;
+      t = im[i]; im[i] = im[j]; im[j] = t;
+    }
+  }
+
+  // butterflies
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = (inverse ? 2 : -2) * Math.PI / len;
+    const wr = Math.cos(ang);
+    const wi = Math.sin(ang);
+    const half = len >> 1;
+
+    for (let i = 0; i < n; i += len) {
+      let cr = 1, ci = 0;
+      for (let k = 0; k < half; k++) {
+        const ar = re[i + k],       ai = im[i + k];
+        const br = re[i + k + half], bi = im[i + k + half];
+
+        const vr = br * cr - bi * ci;
+        const vi = br * ci + bi * cr;
+
+        re[i + k]        = ar + vr;
+        im[i + k]        = ai + vi;
+        re[i + k + half] = ar - vr;
+        im[i + k + half] = ai - vi;
+
+        const ncr = cr * wr - ci * wi;
+        ci = cr * wi + ci * wr;
+        cr = ncr;
+      }
+    }
+  }
+
+  if (inverse) {
+    for (let i = 0; i < n; i++) { re[i] /= n; im[i] /= n; }
+  }
+}
+
+class ANCProcessor extends AudioWorkletProcessor {
+  static get parameterDescriptors() {
+    return [
+      { name: 'strength', defaultValue: 2.0,  minValue: 0, maxValue: 12, automationRate: 'k-rate' },
+      { name: 'floor',    defaultValue: 0.08, minValue: 0, maxValue: 1,  automationRate: 'k-rate' }
+    ];
+  }
+
+  constructor() {
+    super();
+
+    const N = this.N = 512;          // FFT size
+    const HOP = this.HOP = 128;      // hop size (75% overlap)
+    const BINS = this.BINS = N / 2 + 1;
+
+    this.inBuf  = new Float32Array(N);   // most recent N input samples (index 0 = oldest)
+    this.ola    = new Float32Array(N);   // overlap-add accumulator
+    this.re     = new Float32Array(N);
+    this.im     = new Float32Array(N);
+    this.gains  = new Float32Array(BINS);
+
+    this.noise     = new Float32Array(BINS).fill(1e-3);  // per-bin noise floor estimate
+    this.prevGain  = new Float32Array(BINS).fill(1);
+
+    // sqrt-Hann: sqrt(hann) applied on analysis and synthesis -> hann² = hann,
+    // which sums to exactly 2.0 at 75% overlap.
+    this.win = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      this.win[i] = Math.sqrt(0.5 * (1 - Math.cos(2 * Math.PI * i / N)));
+    }
+    this.scale = 0.5;
+
+    // smoothing of the strength parameter
+    this.sStrength = 2.0;
+    this.sFloor    = 0.08;
+
+    // meters
+    this.frameCount = 0;
+    this.accGain    = 0;
+    this.accFrames  = 0;
+
+    this.inFifo  = [];
+    this.outFifo = [];
+  }
+
+  processFrame(strength, floorG) {
+    const N = this.N, BINS = this.BINS;
+    const re = this.re, im = this.im, win = this.win;
+
+    // ---- analysis window ----
+    for (let i = 0; i < N; i++) {
+      re[i] = this.inBuf[i] * win[i];
+      im[i] = 0;
+    }
+
+    fft(re, im, false);
+
+    // ---- per-bin noise estimate + Wiener gain ----
+    const gains = this.gains;
+    let sumGain = 0;
+
+    for (let k = 0; k < BINS; k++) {
+      const mag = Math.sqrt(re[k] * re[k] + im[k] * im[k]);
+
+      // fast attack downward, very slow release upward (minimum tracking)
+      let nz = this.noise[k];
+      const a = (mag < nz) ? 0.32 : 0.0009;
+      nz = (1 - a) * nz + a * mag;
+      if (nz < 1e-6) nz = 1e-6;
+      this.noise[k] = nz;
+
+      // over-subtracted Wiener gain
+      let g = mag / (mag + strength * nz + 1e-12);
+      if (g < floorG) g = floorG;
+      if (g > 1) g = 1;
+
+      gains[k] = g;
+      sumGain += g;
+    }
+
+    // ---- frequency smoothing (3-tap) to reduce musical noise ----
+    let prev = gains[0];
+    for (let k = 1; k < BINS - 1; k++) {
+      const cur = gains[k];
+      const nxt = gains[k + 1];
+      gains[k] = 0.25 * prev + 0.5 * cur + 0.25 * nxt;
+      prev = cur;
+    }
+
+    // ---- temporal smoothing + apply ----
+    for (let k = 0; k < BINS; k++) {
+      let g = 0.55 * gains[k] + 0.45 * this.prevGain[k];
+      this.prevGain[k] = g;
+
+      re[k] *= g;
+      im[k] *= g;
+
+      if (k > 0 && k < BINS - 1) {
+        const m = N - k;
+        re[m] *= g;
+        im[m] *= g;
+      }
+    }
+
+    // ---- synthesis ----
+    fft(re, im, true);
+
+    for (let i = 0; i < N; i++) {
+      this.ola[i] += re[i] * win[i] * this.scale;
+    }
+
+    // ---- metering ----
+    this.accGain += sumGain / BINS;
+    this.accFrames++;
+  }
+
+  process(inputs, outputs, params) {
+    const out = outputs[0][0];
+    const inp = inputs[0] && inputs[0][0] ? inputs[0][0] : null;
+
+    const n = out.length;
+
+    if (!inp) {
+      out.fill(0);
+      return true;
+    }
+
+    // ---- smooth parameters ----
+    const targetStrength = params.strength[0];
+    const targetFloor    = params.floor[0];
+    this.sStrength += (targetStrength - this.sStrength) * 0.08;
+    this.sFloor    += (targetFloor    - this.sFloor)    * 0.08;
+
+    const HOP = this.HOP;
+
+    // ---- feed input through the FIFO ----
+    for (let i = 0; i < n; i++) this.inFifo.push(inp[i]);
+
+    // ---- process complete hops ----
+    while (this.inFifo.length >= HOP) {
+      for (let i = 0; i < HOP; i++) {
+        this.inBuf[i] = this.inBuf[i + HOP];
+      }
+      for (let i = 0; i < HOP; i++) {
+        this.inBuf[N_MINUS_HOP_PLACEHOLDER(i)] = this.inFifo[i];
+      }
+      // (placeholder replaced below)
+      this.inFifo.splice(0, HOP);
+
+      this.processFrame(this.sStrength, this.sFloor);
+
+      for (let i = 0; i < HOP; i++) this.outFifo.push(this.ola[i]);
+
+      for (let i = 0; i < this.N - HOP; i++) this.ola[i] = this.ola[i + HOP];
+      for (let i = this.N - HOP; i < this.N; i++) this.ola[i] = 0;
+    }
+
+    // ---- drain output FIFO ----
+    for (let i = 0; i < n; i++) {
+      out[i] = this.outFifo.length ? this.outFifo.shift() : 0;
+    }
+
+    // ---- report attenuation ~every 100 ms ----
+    this.frameCount++;
+    if (this.frameCount % 40 === 0 && this.accFrames > 0) {
+      const avg = this.accGain / this.accFrames;
+      const db  = 20 * Math.log10(Math.max(avg, 1e-6));
+      this.port.postMessage({ reduction: db });
+      this.accGain = 0;
+      this.accFrames = 0;
+    }
+
+    return true;
+  }
+}
+
+registerProcessor('anc-processor', ANCProcessor);
+</script>
+
+<!-- ============================================================
+     MAIN APPLICATION
+     ============================================================ -->
+<script>
+(() => {
+  'use strict';
+
+  // ---------------------------------------------------------------
+  // Fix the worklet source: replace the placeholder with real code.
+  // (Keeps the DSP block readable above.)
+  // ---------------------------------------------------------------
+  let workletSrc = document.getElementById('ancWorkletSrc').textContent;
+
+  // The placeholder line above is swapped for the correct indexing:
+  //   this.inBuf[HOP + i] = this.inFifo[i];
+  workletSrc = workletSrc.replace(
+    /this\.inBuf\[N_MINUS_HOP_PLACEHOLDER\(i\)\] = this\.inFifo\[i\];[\s\S]*?\/\/ \(placeholder replaced below\)/,
+    'this.inBuf[HOP + i] = this.inFifo[i];'
+  );
+
+  // ---------------------------------------------------------------
+  // DOM
+  // ---------------------------------------------------------------
+  const $ = (id) => document.getElementById(id);
+
+  const powerBtn   = $('powerBtn');
+  const powerLabel = $('powerLabel');
+  const statusPill = $('statusPill');
+
+  const modeBtns   = Array.from(document.querySelectorAll('.mode'));
+
+  const sStrength  = $('sStrength'),  vStrength = $('vStrength');
+  const sFloor     = $('sFloor'),     vFloor    = $('vFloor');
+  const sGain      = $('sGain'),      vGain     = $('vGain');
+  const sPresence  = $('sPresence'),  vPresence = $('vPresence');
+  const sLow       = $('sLow'),       vLow      = $('vLow');
+  const sHigh      = $('sHigh'),      vHigh     = $('vHigh');
+
+  const lvlIn      = $('lvlIn').firstElementChild;
+  const lvlOut     = $('lvlOut').firstElementChild;
+  const reductionVal = $('reductionVal');
+  const canvas     = $('viz');
+  const ctx2d      = canvas.getContext('2d');
+
+  // ---------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------
+  const state = {
+    powered: false,
+    mode: 'adaptive'
+  };
+
+  const MODE_PRESETS = {
+    transparency: { dry: 1, wet: 0, strength: 0.5, floor: 0.35, low: 60,  high: 18000, presence: 0 },
+    adaptive:     { dry: 0, wet: 1, strength: 2.0, floor: 0.08, low: 90,  high: 14000, presence: 0 },
+    strong:       { dry: 0, wet: 1, strength: 5.5, floor: 0.03, low: 130, high: 11000, presence: 0 },
+    voice:        { dry: 0, wet: 1, strength: 3.5, floor: 0.05, low: 180, high: 8000,  presence: 6 }
+  };
+
+  // ---------------------------------------------------------------
+  // Audio graph (built once on power-on)
+  // ---------------------------------------------------------------
+  let audioCtx = null;
+  let micStream = null;
+  let srcNode, hpNode, lpNode, presenceNode, dryGain, wetGain, masterGain, limiter;
+  let ancNode = null;
+  let analyserIn = null, analyserOut = null;
+  let inData = null, outData = null;
+  let workletReady = false;
+
+  async function buildGraph() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+      latencyHint: 'interactive'
+    });
+
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+    // ---- load the worklet from a Blob (no server needed) ----
+    const blob = new Blob([workletSrc], { type: 'application/javascript' });
+    const url  = URL.createObjectURL(blob);
+    try {
+      await audioCtx.audioWorklet.addModule(url);
+      workletReady = true;
+    } catch (e) {
+      console.error('AudioWorklet failed to load:', e);
+      workletReady = false;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+
+    // ---- microphone ----
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+        channelCount: 1
+      },
+      video: false
+    });
+
+    srcNode = audioCtx.createMediaStreamSource(micStream);
+
+    // ---- shared tone-shaping ----
+    hpNode = audioCtx.createBiquadFilter();
+    hpNode.type = 'highpass';
+    hpNode.frequency.value = 80;
+    hpNode.Q.value = 0.707;
+
+    lpNode = audioCtx.createBiquadFilter();
+    lpNode.type = 'lowpass';
+    lpNode.frequency.value = 14000;
+    lpNode.Q.value = 0.707;
+
+    presenceNode = audioCtx.createBiquadFilter();
+    presenceNode.type = 'peaking';
+    presenceNode.frequency.value = 2500;
+    presenceNode.Q.value = 1.0;
+    presenceNode.gain.value = 0;
+
+    // ---- dry / wet split ----
+    dryGain = audioCtx.createGain();
+    dryGain.gain.value = 0;
+
+    wetGain = audioCtx.createGain();
+    wetGain.gain.value = 1;
+
+    // ---- output stage ----
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1.0;
+
+    limiter = audioCtx.createDynamicsCompressor();
+    limiter.threshold.value = -8;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 20;
+    limiter.attack.value = 0.002;
+    limiter.release.value = 0.25;
+
+    // ---- analysers ----
+    analyserIn  = audioCtx.createAnalyser();
+    analyserIn.fftSize = 1024;
+    analyserIn.smoothingTimeConstant = 0.75;
+
+    analyserOut = audioCtx.createAnalyser();
+    analyserOut.fftSize = 1024;
+    analyserOut.smoothingTimeConstant = 0.75;
+
+    inData  = new Uint8Array(analyserIn.fftSize);
+    outData = new Uint8Array(analyserOut.fftSize);
+
+    // ---- ANC worklet ----
+    if (workletReady) {
+      ancNode = new AudioWorkletNode(audioCtx, 'anc-processor', {
+        numberOfInputs: 1,
+        numberOfOutputs: 1,
+        outputChannelCount: [1],
+        parameterData: { strength: 2.0, floor: 0.08 }
+      });
+
+      ancNode.port.onmessage = (ev) => {
+        const db = ev.data.reduction;
+        reductionVal.textContent = (db > -0.5 ? '0.0' : db.toFixed(1)) + ' dB';
+      };
+    }
+
+    // ---- wiring ----
+    //  mic -> hp -> presence -> lp -> split
+    srcNode.connect(hpNode);
+    hpNode.connect(presenceNode);
+    presenceNode.connect(lpNode);
+
+    // tap for input meter
+    lpNode.connect(analyserIn);
+
+    // dry path (zero latency — transparency)
+    lpNode.connect(dryGain);
+    dryGain.connect(masterGain);
+
+    // wet path (spectral subtraction)
+    if (ancNode) {
+      lpNode.connect(ancNode);
+      ancNode.connect(wetGain);
+    }
+    wetGain.connect(masterGain);
+
+    masterGain.connect(limiter);
+    limiter.connect(analyserOut);
+    limiter.connect(audioCtx.destination);
+
+    applyMode(state.mode, true);
+  }
+
+  function teardown() {
+    if (micStream) {
+      micStream.getTracks().forEach(t => t.stop());
+      micStream = null;
+    }
+    if (audioCtx) {
+      audioCtx.close().catch(() => {});
+      audioCtx = null;
+    }
+    srcNode = hpNode = lpNode = presenceNode = null;
+    dryGain = wetGain = masterGain = limiter = null;
+    ancNode = null;
+    analyserIn = analyserOut = null;
+    workletReady = false;
+  }
+
+  // ---------------------------------------------------------------
+  // Mode application
+  // ---------------------------------------------------------------
+  function applyMode(mode, immediate) {
+    state.mode = mode;
+    const p = MODE_PRESETS[mode];
+
+    modeBtns.forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+
+    // push preset values into the UI
+    sStrength.value = p.strength;
+    sFloor.value    = p.floor;
+    sLow.value      = p.low;
+    sHigh.value     = p.high;
+    sPresence.value = p.presence;
+
+    updateLabels();
+    pushAudioParams(immediate);
+
+    // In transparency mode the worklet is bypassed entirely -> zero latency.
+    if (dryGain && wetGain) {
+      const t = audioCtx ? audioCtx.currentTime : 0;
+      const smooth = immediate ? 0.005 : 0.05;
+      dryGain.gain.setTargetAtTime(p.dry, t, smooth);
+      wetGain.gain.setTargetAtTime(p.wet, t, smooth);
+    }
+  }
+
+  function updateLabels() {
+    vStrength.textContent = parseFloat(sStrength.value).toFixed(1) + '×';
+    vFloor.textContent    = Math.round(parseFloat(sFloor.value) * 100) + '%';
+    vGain.textContent     = parseFloat(sGain.value).toFixed(2) + '×';
+    const p = parseFloat(sPresence.value);
+    vPresence.textContent = (p > 0 ? '+' : '') + p.toFixed(0) + ' dB';
+    vLow.textContent      = Math.round(parseFloat(sLow.value)) + ' Hz';
+    const h = parseFloat(sHigh.value);
+    vHigh.textContent     = h >= 1000 ? (h / 1000).toFixed(h % 1000 ? 1 : 0) + ' kHz' : h + ' Hz';
+  }
+
+  function pushAudioParams(immediate) {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime;
+    const tc = immediate ? 0.005 : 0.03;
+
+    if (hpNode)       hpNode.frequency.setTargetAtTime(parseFloat(sLow.value), t, tc);
+    if (lpNode)       lpNode.frequency.setTargetAtTime(parseFloat(sHigh.value), t, tc);
+    if (presenceNode) presenceNode.gain.setTargetAtTime(parseFloat(sPresence.value), t, tc);
+
+    if (ancNode) {
+      ancNode.parameters.get('strength').setTargetAtTime(parseFloat(sStrength.value), t, 0.05);
+      ancNode.parameters.get('floor').setTargetAtTime(parseFloat(sFloor.value), t, 0.05);
+    }
+
+    // transparency gain only affects the dry path
+    if (dryGain) {
+      const p = MODE_PRESETS[state.mode];
+      const g = parseFloat(sGain.value);
+      dryGain.gain.setTargetAtTime(p.dry * g, t, tc);
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Power
+  // ---------------------------------------------------------------
+  async function powerOn() {
+    powerLabel.textContent = 'Starting…';
+    statusPill.textContent = 'requesting mic…';
+    statusPill.classList.remove('err');
+
+    try {
+      await buildGraph();
+
+      state.powered = true;
+      powerBtn.classList.add('on');
+      powerLabel.textContent = 'Power Off';
+      statusPill.textContent = workletReady
+        ? 'running · ' + Math.round(audioCtx.sampleRate / 1000) + ' kHz'
+        : 'running (no worklet)';
+
+      modeBtns.forEach(b => (b.disabled = false));
+
+      if (!workletReady) {
+        statusPill.classList.add('err');
+        statusPill.textContent = 'worklet unavailable';
+      }
+
+      startRenderLoop();
+    } catch (err) {
+      console.error(err);
+      statusPill.textContent = err.name === 'NotAllowedError' ? 'mic denied' : 'error';
+      statusPill.classList.add('err');
+      powerLabel.textContent = 'Power On';
+      teardown();
+    }
+  }
+
+  function powerOff() {
+    stopRenderLoop();
+    teardown();
+
+    state.powered = false;
+    powerBtn.classList.remove('on');
+    powerLabel.textContent = 'Power On';
+    statusPill.textContent = 'idle';
+    statusPill.classList.remove('err');
+
+    modeBtns.forEach(b => (b.disabled = true));
+
+    lvlIn.style.right  = '100%';
+    lvlOut.style.right = '100%';
+    reductionVal.textContent = '— dB';
+
+    ctx2d.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  powerBtn.addEventListener('click', () => {
+    if (state.powered) powerOff();
+    else powerOn();
+  });
+
+  // ---------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------
+  modeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!state.powered) return;
+      applyMode(btn.dataset.mode, false);
+    });
+  });
+
+  [sStrength, sFloor, sGain, sPresence, sLow, sHigh].forEach(el => {
+    el.addEventListener('input', () => {
+      updateLabels();
+      pushAudioParams(false);
+    });
+  });
+
+  // ---------------------------------------------------------------
+  // Visualization + meters
+  // ---------------------------------------------------------------
+  let rafId = null;
+  let smoothIn = 0, smoothOut = 0;
+
+  function startRenderLoop() {
+    stopRenderLoop();
+    const loop = () => {
+      rafId = requestAnimationFrame(loop);
+      draw();
+    };
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function stopRenderLoop() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+
+  function rms(data) {
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+      const v = (data[i] - 128) / 128;
+      sum += v * v;
+    }
+    return Math.sqrt(sum / data.length);
+  }
+
+  function draw() {
+    if (!analyserOut || !audioCtx) return;
+
+    // ---- levels ----
+    analyserIn.getByteTimeDomainData(inData);
+    analyserOut.getByteTimeDomainData(outData);
+
+    const rIn  = rms(inData);
+    const rOut = rms(outData);
+
+    smoothIn  = Math.max(rIn,  smoothIn  * 0.88);
+    smoothOut = Math.max(rOut, smoothOut * 0.88);
+
+    lvlIn.style.right  = (100 - Math.min(100, smoothIn  * 180)) + '%';
+    lvlOut.style.right = (100 - Math.min(100, smoothOut * 180)) + '%';
+
+    // ---- spectrum ----
+    const w = canvas.width;
+    const h = canvas.height;
+
+    ctx2d.clearRect(0, 0, w, h);
+
+    // grid
+    ctx2d.strokeStyle = 'rgba(255,255,255,0.045)';
+    ctx2d.lineWidth = 1;
+    for (let i = 1; i < 4; i++) {
+      const y = (h / 4) * i;
+      ctx2d.beginPath();
+      ctx2d.moveTo(0, y);
+      ctx2d.lineTo(w, y);
+      ctx2d.stroke();
+    }
+
+    analyserOut.getByteFrequencyData(outData);
+
+    const bars = 64;
+    const step = Math.floor((outData.length * 0.75) / bars);
+    const barW = w / bars;
+
+    for (let i = 0; i < bars; i++) {
+      // logarithmic-ish index mapping
+      const idx = Math.floor(Math.pow(i / bars, 1.7) * (outData.length * 0.75));
+      const v = outData[Math.min(idx, outData.length - 1)] / 255;
+      const bh = Math.max(2, v * h * 0.95);
+
+      const x = i * barW;
+      const y = h - bh;
+
+      const grad = ctx2d.createLinearGradient(0, h, 0, y);
+      grad.addColorStop(0, 'rgba(34,211,238,0.85)');
+      grad.addColorStop(0.6, 'rgba(99,102,241,0.9)');
+      grad.addColorStop(1, 'rgba(167,139,250,0.95)');
+
+      ctx2d.fillStyle = grad;
+      ctx2d.beginPath();
+      ctx2d.roundRect(x + 1, y, barW - 2, bh, 2);
+      ctx2d.fill();
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------
+  updateLabels();
+
+  // Feature detection
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    statusPill.textContent = 'unsupported browser';
+    statusPill.classList.add('err');
+    powerBtn.disabled = true;
+  } else if (!(window.AudioContext || window.webkitAudioContext)) {
+    statusPill.textContent = 'no web audio';
+    statusPill.classList.add('err');
+    powerBtn.disabled = true;
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+  });
+})();
+</script>
+</body>
+</html>
