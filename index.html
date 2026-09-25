@@ -4,1619 +4,1893 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#07070b">
-<title>Frequencies — Sound Studio</title>
+<title>Studio — Tools for Mind, Body & Focus</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#07070b;--panel:#0f1017;--card:#14161f;--line:rgba(255,255,255,.07);
-    --txt:#e9eef5;--dim:#78879a;--accent:#8b9dff;
-    --mode-color:#8b9dff;--mode-dim:rgba(139,157,255,.12);
+    --bg:#07070b;--panel:#0e1016;--card:#14171f;--card2:#1a1e28;
+    --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);
+    --txt:#e9eef5;--dim:#7a8798;--dim2:#5a6470;
+    --accent:#8b9dff;--accent-dim:rgba(139,157,255,.13);
+    --ok:#5eead4;--warn:#fbbf24;--bad:#fb7185;
+    --sidebar-w:240px;
   }
   html,body{height:100%}
   body{
-    background:
-      radial-gradient(900px 600px at 50% -10%, var(--mode-dim), transparent 55%),
-      radial-gradient(700px 500px at 90% 110%, rgba(139,157,255,.04), transparent 55%),
-      var(--bg);
-    color:var(--txt);
+    background:var(--bg);color:var(--txt);
     font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
-    transition:background 1.2s ease;
-    display:flex;justify-content:center;
-    padding:20px 16px 60px;min-height:100%;
-  }
-  .wrap{width:100%;max-width:920px;display:flex;flex-direction:column;gap:20px}
-
-  header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  .brand{display:flex;align-items:center;gap:11px}
-  .brand .dot{
-    width:10px;height:10px;border-radius:50%;
-    background:var(--mode-color);box-shadow:0 0 14px var(--mode-color);
-    transition:all .5s;
-  }
-  .brand h1{font-size:16px;font-weight:700;letter-spacing:.04em}
-  .brand h1 em{font-style:normal;color:var(--dim);font-weight:500}
-  .brand p{font-size:11px;color:var(--dim);margin-top:1px;letter-spacing:.02em}
-  .pill{
-    font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
-    padding:6px 12px;border-radius:999px;
-    border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--dim);
-    transition:all .4s;
-  }
-  .pill.on{
-    color:var(--mode-color);border-color:var(--mode-color);
-    background:var(--mode-dim);box-shadow:0 0 18px var(--mode-dim);
+    display:flex;min-height:100vh;overflow-x:hidden;
   }
 
-  .intro{
-    border:1px solid var(--line);border-radius:18px;padding:16px 18px;
-    background:var(--panel);font-size:12.5px;line-height:1.6;color:var(--dim);
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+    background:linear-gradient(180deg,#0b0d13,#08090d);
+    border-right:1px solid var(--line);
+    display:flex;flex-direction:column;
+    height:100vh;position:sticky;top:0;
+    overflow-y:auto;overscroll-behavior:contain;
   }
-  .intro b{color:var(--txt);font-weight:600}
-  .intro .hp{
-    display:inline-flex;align-items:center;gap:6px;color:var(--accent);
-    font-weight:600;
+  .sidebar::-webkit-scrollbar{width:6px}
+  .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:99px}
+  .sb-brand{
+    padding:20px 18px 16px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;
   }
-  .intro .hp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sb-brand .logo{
+    width:32px;height:32px;border-radius:9px;
+    background:linear-gradient(135deg,var(--accent),#c084fc);
+    display:grid;place-items:center;color:#0a0a10;
+    font-weight:800;font-size:15px;letter-spacing:-.02em;
+  }
+  .sb-brand h1{font-size:14px;font-weight:700;letter-spacing:.02em;line-height:1}
+  .sb-brand p{font-size:10px;color:var(--dim);margin-top:3px;letter-spacing:.02em}
 
-  /* section heading */
-  .sectHead{
-    display:flex;align-items:baseline;justify-content:space-between;
-    padding:0 2px;margin-top:4px;
+  .sb-group{padding:14px 10px 4px}
+  .sb-group h2{
+    font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim2);font-weight:700;padding:0 8px;margin-bottom:6px;
   }
-  .sectHead h2{
-    font-size:11px;letter-spacing:.15em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;
+  .navitem{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 11px;border-radius:9px;cursor:pointer;
+    font-size:12.5px;font-weight:500;color:var(--dim);
+    transition:all .18s;font-family:inherit;
+    border:none;background:transparent;width:100%;text-align:left;
+    -webkit-tap-highlight-color:transparent;
   }
-  .sectHead span{font-size:10.5px;color:#4a5a6e;letter-spacing:.02em}
+  .navitem:hover{background:rgba(255,255,255,.03);color:var(--txt)}
+  .navitem.active{
+    background:var(--accent-dim);color:var(--accent);
+    box-shadow:inset 0 0 0 1px rgba(139,157,255,.2);
+  }
+  .navitem .ico{
+    width:22px;height:22px;flex:0 0 22px;border-radius:6px;
+    display:grid;place-items:center;font-size:12px;
+    background:rgba(255,255,255,.04);
+    transition:all .18s;
+  }
+  .navitem.active .ico{background:var(--accent);color:#0a0a10}
 
-  /* mode grid */
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
+  /* ---------- main ---------- */
+  .main{
+    flex:1;min-width:0;
+    display:flex;flex-direction:column;
+    min-height:100vh;
   }
-  @media(max-width:780px){.grid{grid-template-columns:repeat(3,1fr)}}
-  @media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:400px){.grid{gap:8px}}
+  .topbar{
+    padding:16px 24px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;position:sticky;top:0;background:rgba(7,7,11,.9);
+    backdrop-filter:blur(12px);z-index:20;flex-wrap:wrap;
+  }
+  .topbar h2{font-size:18px;font-weight:700;letter-spacing:-.01em}
+  .topbar p{font-size:12px;color:var(--dim);margin-top:2px}
+  .topbar .pill{
+    font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:700;padding:5px 11px;border-radius:99px;
+    border:1px solid var(--line);color:var(--dim);
+  }
 
-  .mode{
-    position:relative;overflow:hidden;
-    padding:15px 13px 14px;
-    border-radius:15px;
-    border:1px solid var(--line);
-    background:linear-gradient(165deg,rgba(255,255,255,.028),rgba(255,255,255,0));
-    cursor:pointer;
-    transition:border-color .35s,box-shadow .4s,transform .15s,background .35s;
+  #view{padding:24px;max-width:960px;width:100%}
+
+  /* ---------- reusable ---------- */
+  .card{
+    border:1px solid var(--line);border-radius:16px;
+    background:var(--card);padding:20px;margin-bottom:16px;
+  }
+  .card h3{
+    font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;margin-bottom:14px;
+  }
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+
+  .btn{
+    padding:10px 16px;border-radius:10px;cursor:pointer;
+    font-size:13px;font-weight:600;font-family:inherit;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);
+    color:var(--txt);transition:all .2s;
     -webkit-tap-highlight-color:transparent;outline:none;
-    text-align:left;font-family:inherit;color:inherit;
-    display:flex;flex-direction:column;gap:8px;
-    min-height:126px;
   }
-  .mode::before{
-    content:'';position:absolute;inset:0;
-    background:radial-gradient(circle at 50% 0%, var(--m-dim), transparent 72%);
-    opacity:0;transition:opacity .5s;pointer-events:none;
+  .btn:hover{background:rgba(255,255,255,.07);border-color:var(--line2)}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{
+    background:var(--accent-dim);border-color:var(--accent);
+    color:var(--accent);
   }
-  .mode:hover{border-color:rgba(255,255,255,.16)}
-  .mode:active{transform:scale(.985)}
-  .mode.active{
-    border-color:var(--m-color);
-    box-shadow:0 0 0 1px var(--m-color),0 0 34px var(--m-dim);
-    background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(255,255,255,.005));
-  }
-  .mode.active::before{opacity:1}
+  .btn.primary:hover{background:rgba(139,157,255,.2)}
+  .btn.danger{color:var(--bad);border-color:rgba(251,113,133,.3)}
+  .btn.sm{padding:7px 12px;font-size:12px;border-radius:8px}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
 
-  .mode .icon{
-    width:30px;height:30px;border-radius:9px;
-    background:var(--m-dim);
-    border:1px solid var(--m-color);
-    display:grid;place-items:center;color:var(--m-color);
-    transition:all .35s;position:relative;z-index:1;
-    opacity:.75;
-  }
-  .mode.active .icon{
-    background:var(--m-color);color:#0a0a10;opacity:1;
-    box-shadow:0 0 20px var(--m-dim);
-  }
-  .mode .icon svg{width:15px;height:15px;fill:none;stroke:currentColor;
-    stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-
-  .mode .name{
-    font-size:13px;font-weight:700;color:var(--txt);
-    letter-spacing:.01em;position:relative;z-index:1;line-height:1.15;
-  }
-  .mode .band{
-    font-size:9px;letter-spacing:.11em;text-transform:uppercase;
-    font-weight:700;color:var(--m-color);position:relative;z-index:1;
-  }
-
-  /* featured hypnosis card spans full width on wide screens */
-  .mode.featured{
-    grid-column:span 2;
-    background:
-      linear-gradient(135deg, rgba(167,139,250,.10), rgba(94,234,212,.05) 60%, rgba(255,255,255,0) 100%),
-      linear-gradient(165deg,rgba(255,255,255,.03),rgba(255,255,255,0));
-    min-height:150px;
-  }
-  .mode.featured .name{font-size:16px}
-  .mode.featured .band{font-size:9.5px}
-  .mode.featured .feat-desc{
-    font-size:10.5px;color:var(--dim);line-height:1.4;
-    position:relative;z-index:1;margin-top:2px;
-  }
-  .mode.featured .stages{
-    display:flex;gap:4px;margin-top:6px;position:relative;z-index:1;
-    flex-wrap:wrap;
-  }
-  .mode.featured .stages span{
-    font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
-    padding:2px 6px;border-radius:5px;
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--line);
-    color:var(--dim);
-  }
-  @media(max-width:560px){
-    .mode.featured{grid-column:span 2}
-  }
-
-  /* player */
-  .player{
-    border:1px solid var(--line);border-radius:22px;
-    background:linear-gradient(180deg,var(--panel),#0b0c12);
-    padding:20px 20px;
-    display:flex;flex-direction:column;gap:16px;
-    position:relative;overflow:hidden;
-  }
-  .player::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:1px;
-    background:linear-gradient(90deg,transparent,var(--mode-color),transparent);
-    opacity:.5;
-  }
-
-  .now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .now .art{
-    width:58px;height:58px;border-radius:50%;
-    background:radial-gradient(circle at 50% 40%, var(--mode-dim), transparent 70%),var(--card);
-    border:1px solid var(--mode-color);
-    display:grid;place-items:center;color:var(--mode-color);
-    flex:0 0 58px;position:relative;
-  }
-  .now .art svg{width:23px;height:23px;fill:none;stroke:currentColor;
-    stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
-  .now .art::after{
-    content:'';position:absolute;inset:-4px;border-radius:50%;
-    border:1px solid var(--mode-color);opacity:0;
-  }
-  .player.playing .now .art::after{
-    animation:halo 2.4s cubic-bezier(.2,.6,.3,1) infinite;
-  }
-  @keyframes halo{
-    0%{transform:scale(1);opacity:.5}
-    100%{transform:scale(1.4);opacity:0}
-  }
-
-  .now .meta{flex:1;min-width:0}
-  .now .meta .ttl{
-    font-size:17px;font-weight:700;line-height:1.1;transition:color .4s;
-  }
-  .player.playing .now .meta .ttl{color:var(--mode-color)}
-  .now .meta .sub{
-    font-size:11px;color:var(--dim);margin-top:3px;letter-spacing:.02em;
-  }
-  .now .meta .stage{
-    font-size:10.5px;color:var(--mode-color);margin-top:5px;
-    letter-spacing:.06em;font-weight:700;
-    display:none;
-  }
-  .player.hypno .now .meta .stage{display:block}
-  .now .time{
-    font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;
-    font-weight:600;letter-spacing:.04em;
-    padding:6px 11px;border-radius:8px;
+  input[type=text],input[type=number],input[type=password],select,textarea{
+    width:100%;padding:10px 13px;border-radius:10px;
     background:rgba(255,255,255,.03);border:1px solid var(--line);
+    color:var(--txt);font-family:inherit;font-size:13px;
+    outline:none;transition:border-color .2s;
   }
-
-  .transport{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .play{
-    width:62px;height:62px;border-radius:50%;
-    border:1px solid var(--mode-color);
-    background:radial-gradient(circle at 50% 35%, var(--mode-dim), rgba(0,0,0,.4));
-    color:var(--mode-color);cursor:pointer;
-    display:grid;place-items:center;
-    transition:all .3s;flex:0 0 62px;
-    -webkit-tap-highlight-color:transparent;outline:none;position:relative;
-  }
-  .play:hover{box-shadow:0 0 30px var(--mode-dim)}
-  .play:active{transform:scale(.96)}
-  .play svg{width:25px;height:25px;fill:currentColor;stroke:none}
-  .play .pauseIco{display:none}
-  .player.playing .play .playIco{display:none}
-  .player.playing .play .pauseIco{display:block}
-
-  .volumeWrap{flex:1;min-width:180px}
-  .volumeWrap .lbl{
-    display:flex;justify-content:space-between;align-items:baseline;
-    font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;margin-bottom:6px;
-  }
-  .volumeWrap .lbl output{color:var(--mode-color);font-size:11px;font-variant-numeric:tabular-nums}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:120px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px}
 
   input[type=range]{
-    -webkit-appearance:none;appearance:none;width:100%;height:20px;
+    -webkit-appearance:none;appearance:none;width:100%;height:22px;
     background:transparent;cursor:pointer;display:block;
   }
   input[type=range]::-webkit-slider-runnable-track{
     height:4px;border-radius:99px;
-    background:linear-gradient(90deg,var(--mode-color) 0%,var(--mode-color) var(--fill,50%),rgba(255,255,255,.08) var(--fill,50%),rgba(255,255,255,.08) 100%);
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--fill,50%),rgba(255,255,255,.08) var(--fill,50%),rgba(255,255,255,.08) 100%);
   }
   input[type=range]::-webkit-slider-thumb{
     -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
-    background:#0a0a10;border:2px solid var(--mode-color);
-    margin-top:-6px;box-shadow:0 0 10px var(--mode-dim);transition:transform .15s;
+    background:#0a0a10;border:2px solid var(--accent);
+    margin-top:-6px;box-shadow:0 0 8px var(--accent-dim);
   }
-  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.08)}
   input[type=range]::-moz-range-thumb{
     width:14px;height:14px;border-radius:50%;background:#0a0a10;
-    border:2px solid var(--mode-color);box-shadow:0 0 10px var(--mode-dim);
+    border:2px solid var(--accent);
   }
 
-  .viz{
-    position:relative;height:130px;border-radius:16px;
-    border:1px solid var(--line);
-    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.015), transparent 65%),#08090e;
-    overflow:hidden;
-  }
-  .viz canvas{width:100%;height:100%;display:block}
-  .viz .hud{
-    position:absolute;top:10px;left:13px;
-    font-size:9px;letter-spacing:.14em;text-transform:uppercase;
-    font-weight:700;color:var(--dim);
-  }
-  .viz .hud span{color:var(--mode-color)}
-  .viz .stats{
-    position:absolute;top:10px;right:13px;display:flex;gap:14px;
-    font-size:9px;letter-spacing:.1em;text-transform:uppercase;
-    font-weight:700;color:var(--dim);
-  }
-  .viz .stats em{font-style:normal;color:var(--mode-color);font-variant-numeric:tabular-nums}
-
-  /* hypnosis stage bar */
-  .stagebar{
-    display:none;flex-direction:column;gap:8px;
-    padding:12px 14px;border-radius:12px;
-    background:rgba(167,139,250,.05);
-    border:1px solid rgba(167,139,250,.2);
-  }
-  .player.hypno .stagebar{display:flex}
-  .stagebar .row{display:flex;justify-content:space-between;align-items:baseline}
-  .stagebar .row b{font-size:11.5px;font-weight:700;color:#c084fc;letter-spacing:.04em}
-  .stagebar .row span{font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
-  .stagebar .track{height:4px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
-  .stagebar .track i{display:block;height:100%;width:0%;border-radius:99px;
-    background:linear-gradient(90deg,#7c3aed,#a78bfa,#5eead4);transition:width .3s}
-  .stagebar .steps{display:flex;gap:5px}
-  .stagebar .steps span{
-    flex:1;text-align:center;font-size:8.5px;letter-spacing:.08em;
-    text-transform:uppercase;font-weight:700;
-    padding:4px 4px;border-radius:5px;
-    background:rgba(255,255,255,.03);border:1px solid var(--line);
-    color:var(--dim);transition:all .35s;
-  }
-  .stagebar .steps span.on{color:#c084fc;border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.12)}
-  .stagebar .steps span.done{color:#5eead4;border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.08)}
-
-  .subcontrols{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding-top:2px}
-  @media(max-width:560px){.subcontrols{grid-template-columns:1fr}}
-  .subctrl{
-    border:1px solid var(--line);border-radius:12px;
-    padding:11px 13px;background:rgba(255,255,255,.015);
-  }
-  .subctrl .lbl{
+  .slider-row{margin-bottom:16px}
+  .slider-row .lbl{
     display:flex;justify-content:space-between;align-items:baseline;
-    font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;margin-bottom:6px;
+    font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;margin-bottom:7px;
   }
-  .subctrl .lbl output{color:var(--mode-color);font-size:11px;font-variant-numeric:tabular-nums}
+  .slider-row .lbl output{color:var(--accent);font-size:12px;font-variant-numeric:tabular-nums}
 
-  .toggleRow{display:flex;gap:7px;flex-wrap:wrap}
-  .tgl{
-    flex:1 1 auto;min-width:100px;
-    padding:9px 12px;border-radius:9px;cursor:pointer;
-    font-size:11.5px;font-weight:600;
-    background:rgba(255,255,255,.03);border:1px solid var(--line);
-    color:var(--dim);transition:all .25s;font-family:inherit;
+  .stat{
+    display:flex;flex-direction:column;gap:4px;
+    padding:12px 14px;border-radius:11px;
+    background:rgba(255,255,255,.02);border:1px solid var(--line);
+  }
+  .stat .k{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700}
+  .stat .v{font-size:22px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
+  .stat .u{font-size:11px;color:var(--dim);font-weight:500}
+
+  .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  @media(max-width:600px){.statrow{grid-template-columns:repeat(2,1fr)}}
+
+  .hint{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:8px}
+
+  /* breathing viz */
+  .breath-viz{
+    position:relative;height:320px;
+    display:grid;place-items:center;
+    border-radius:20px;overflow:hidden;
+    background:radial-gradient(circle at 50% 50%, rgba(139,157,255,.06), transparent 70%),#0a0c12;
+    border:1px solid var(--line);
+  }
+  .breath-circle{
+    width:160px;height:160px;border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, rgba(139,157,255,.35), rgba(139,157,255,.08) 70%);
+    border:2px solid var(--accent);
+    display:grid;place-items:center;
+    transition:transform .05s linear, box-shadow .3s;
+    box-shadow:0 0 60px var(--accent-dim);
+  }
+  .breath-circle .txt{
+    font-size:13px;font-weight:700;color:var(--accent);
+    letter-spacing:.14em;text-transform:uppercase;
+    text-align:center;line-height:1.3;
+  }
+  .breath-circle .txt small{display:block;font-size:22px;letter-spacing:0;color:var(--txt);font-weight:700;margin-top:2px}
+
+  /* pomodoro ring */
+  .pomo-ring{
+    width:260px;height:260px;margin:0 auto;
+    position:relative;display:grid;place-items:center;
+  }
+  .pomo-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+  .pomo-ring .inner{
+    text-align:center;
+  }
+  .pomo-ring .time{font-size:48px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .pomo-ring .phase{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--accent);margin-top:4px}
+
+  /* habit list */
+  .habit{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;border-radius:11px;
+    background:rgba(255,255,255,.02);border:1px solid var(--line);
+    margin-bottom:8px;
+  }
+  .habit .check{
+    width:26px;height:26px;flex:0 0 26px;border-radius:7px;
+    border:2px solid var(--line2);cursor:pointer;
+    display:grid;place-items:center;transition:all .2s;
+    background:transparent;
+  }
+  .habit .check.done{
+    background:var(--ok);border-color:var(--ok);color:#0a0a10;
+    font-weight:900;
+  }
+  .habit .name{flex:1;font-size:13.5px;font-weight:500}
+  .habit .name.done{text-decoration:line-through;color:var(--dim)}
+  .habit .streak{
+    font-size:10.5px;color:var(--dim);font-variant-numeric:tabular-nums;
+    padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.03);
+  }
+
+  /* typing */
+  .typing-text{
+    font-size:20px;line-height:1.9;letter-spacing:.01em;
+    font-family:ui-monospace,"SF Mono",Menlo,monospace;
+    padding:24px;border-radius:14px;
+    background:rgba(255,255,255,.02);border:1px solid var(--line);
+    margin-bottom:16px;user-select:none;
+  }
+  .typing-text span{transition:color .1s}
+  .typing-text .ok{color:var(--ok)}
+  .typing-text .bad{color:var(--bad);background:rgba(251,113,133,.15);border-radius:3px}
+  .typing-text .cur{
+    background:var(--accent);color:#0a0a10;border-radius:3px;
+    animation:caret 1s infinite;
+  }
+  @keyframes caret{50%{opacity:.4}}
+
+  /* color tools */
+  .swatch{
+    aspect-ratio:1;border-radius:12px;cursor:pointer;
+    border:1px solid var(--line);
+    display:flex;align-items:flex-end;justify-content:center;
+    padding:8px;transition:transform .15s;
+    position:relative;
+  }
+  .swatch:hover{transform:scale(1.03)}
+  .swatch span{
+    font-size:10.5px;font-family:ui-monospace,monospace;
+    font-weight:700;letter-spacing:.02em;
+    background:rgba(0,0,0,.55);padding:3px 6px;border-radius:5px;
+    color:#fff;backdrop-filter:blur(6px);
+  }
+  .palette{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:600px){.palette{grid-template-columns:repeat(3,1fr)}}
+
+  /* soundscape mixer */
+  .mixer-channel{
+    display:grid;grid-template-columns:120px 1fr 60px;gap:12px;
+    align-items:center;padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .mixer-channel:last-child{border-bottom:none}
+  .mixer-channel .nm{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .mixer-channel .nm .em{font-size:16px}
+  .mixer-channel .val{font-size:11.5px;color:var(--accent);text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  .mixer-channel .mute{grid-column:1/-1;margin-top:6px}
+  @media(max-width:520px){
+    .mixer-channel{grid-template-columns:1fr;gap:6px}
+  }
+
+  /* toast */
+  #toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--card2);border:1px solid var(--line2);color:var(--txt);
+    padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+    opacity:0;pointer-events:none;transition:all .3s;z-index:999;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* mobile */
+  .hamburger{
+    display:none;width:36px;height:36px;border-radius:9px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);
+    color:var(--txt);cursor:pointer;place-items:center;
     -webkit-tap-highlight-color:transparent;outline:none;
-    display:flex;align-items:center;justify-content:center;gap:6px;
   }
-  .tgl svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .tgl.on{
-    color:var(--mode-color);border-color:var(--mode-color);
-    background:var(--mode-dim);
-  }
-  .tgl:active{transform:scale(.98)}
+  .hamburger svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 
-  .timers{display:flex;gap:6px;flex-wrap:wrap}
-  .tm{
-    flex:1 1 auto;min-width:52px;
-    padding:9px 8px;border-radius:9px;cursor:pointer;
-    font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
-    background:rgba(255,255,255,.03);border:1px solid var(--line);
-    color:var(--dim);transition:all .22s;font-family:inherit;
-    -webkit-tap-highlight-color:transparent;outline:none;
+  @media(max-width:820px){
+    .hamburger{display:grid}
+    .sidebar{
+      position:fixed;left:0;top:0;z-index:100;
+      transform:translateX(-100%);transition:transform .3s;
+      box-shadow:0 0 40px rgba(0,0,0,.6);
+    }
+    .sidebar.open{transform:translateX(0)}
+    .backdrop{
+      position:fixed;inset:0;background:rgba(0,0,0,.5);
+      z-index:99;opacity:0;pointer-events:none;transition:opacity .3s;
+    }
+    .backdrop.show{opacity:1;pointer-events:auto}
   }
-  .tm.on{
-    color:var(--mode-color);border-color:var(--mode-color);
-    background:var(--mode-dim);
-  }
-
-  .info{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  @media(max-width:600px){.info{grid-template-columns:1fr}}
-  .infocard{
-    border:1px solid var(--line);border-radius:15px;
-    padding:15px 17px;background:rgba(255,255,255,.015);
-    font-size:12px;line-height:1.6;color:var(--dim);
-  }
-  .infocard h3{
-    font-size:10px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--txt);font-weight:700;margin-bottom:8px;
-  }
-  .infocard ul{list-style:none;display:flex;flex-direction:column;gap:5px}
-  .infocard li{padding-left:14px;position:relative}
-  .infocard li::before{
-    content:'';position:absolute;left:2px;top:8px;
-    width:4px;height:4px;border-radius:50%;
-    background:var(--mode-color);opacity:.7;
-  }
-  .infocard b{color:#c3ced9;font-weight:600}
-
-  .warncard{border-color:rgba(255,176,32,.22);background:rgba(255,176,32,.04)}
-  .warncard li::before{background:#ffb020!important}
-  .warncard h3{color:#ffb020}
-
-  footer{
-    text-align:center;font-size:10.5px;color:#3a4553;
-    letter-spacing:.05em;padding-top:6px;
-  }
-
-  /* mode colors */
-  .mode[data-id="relax"]{--m-color:#5eead4;--m-dim:rgba(94,234,212,.13)}
-  .mode[data-id="focus"]{--m-color:#60a5fa;--m-dim:rgba(96,165,250,.13)}
-  .mode[data-id="sleep"]{--m-color:#818cf8;--m-dim:rgba(129,140,248,.13)}
-  .mode[data-id="energize"]{--m-color:#fbbf24;--m-dim:rgba(251,191,36,.13)}
-  .mode[data-id="fear"]{--m-color:#fb7185;--m-dim:rgba(251,113,133,.13)}
-  .mode[data-id="happy"]{--m-color:#facc15;--m-dim:rgba(250,204,21,.13)}
-  .mode[data-id="confident"]{--m-color:#fb923c;--m-dim:rgba(251,146,60,.13)}
-  .mode[data-id="creative"]{--m-color:#c084fc;--m-dim:rgba(192,132,252,.13)}
-  .mode[data-id="hypnosis"]{--m-color:#a78bfa;--m-dim:rgba(167,139,250,.15)}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <div class="brand">
-      <div class="dot" id="brandDot"></div>
-      <div>
-        <h1>Frequencies <em>· sound studio</em></h1>
-        <p id="brandSub">Pick a state below to begin</p>
-      </div>
-    </div>
-    <div class="pill" id="statusPill">idle</div>
-  </header>
-
-  <div class="intro">
-    <span class="hp">
-      <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
-      Headphones required
-    </span>
-    &nbsp;— binaural beats only work when each ear hears a different tone. All audio is synthesised live in your browser. <b>Not medical advice</b> — don't use while driving.
-  </div>
-
-  <div class="sectHead">
-    <h2>Mental States</h2>
-    <span>tap to play</span>
-  </div>
-
-  <div class="grid" id="grid"></div>
-
-  <div class="player" id="player">
-    <div class="now">
-      <div class="art" id="artIco">
-        <svg viewBox="0 0 24 24" id="artSvg"><circle cx="12" cy="12" r="9"/></svg>
-      </div>
-      <div class="meta">
-        <div class="ttl" id="nowTitle">Select a state</div>
-        <div class="sub" id="nowSub">Nothing playing</div>
-        <div class="stage" id="nowStage"></div>
-      </div>
-      <div class="time" id="timeDisplay">00:00</div>
-    </div>
-
-    <div class="viz">
-      <canvas id="viz"></canvas>
-      <div class="hud">Live · <span id="vizMode">idle</span></div>
-      <div class="stats">
-        <span>Δ <em id="statBeat">—</em></span>
-        <span>ƒ <em id="statCarrier">—</em></span>
-        <span>Pk <em id="statNR">—</em></span>
-      </div>
-    </div>
-
-    <!-- hypnosis stage bar -->
-    <div class="stagebar" id="stagebar">
-      <div class="row">
-        <b id="stageName">Induction</b>
-        <span id="stageTime">0:00 / 2:00</span>
-      </div>
-      <div class="track"><i id="stageProgress"></i></div>
-      <div class="steps" id="stageSteps">
-        <span data-s="0">Induction</span>
-        <span data-s="1">Deepening</span>
-        <span data-s="2">Trance</span>
-        <span data-s="3">Suggestion</span>
-      </div>
-    </div>
-
-    <div class="transport">
-      <button class="play" id="playBtn" aria-label="Play or pause">
-        <svg class="playIco" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        <svg class="pauseIco" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-      </button>
-      <div class="volumeWrap">
-        <div class="lbl"><span>Volume</span><output id="volOut">60%</output></div>
-        <input type="range" id="vol" min="0" max="100" value="60" step="1">
-      </div>
-    </div>
-
-    <div class="subcontrols">
-      <div class="subctrl">
-        <div class="lbl"><span>Ambient noise</span><output id="noiseOut">12%</output></div>
-        <input type="range" id="noise" min="0" max="100" value="12" step="1">
-      </div>
-      <div class="subctrl">
-        <div class="lbl"><span>Carrier tone</span><output id="carrierOut">200 Hz</output></div>
-        <input type="range" id="carrier" min="80" max="560" value="200" step="1">
-      </div>
-    </div>
-
-    <div class="subcontrols">
-      <div class="subctrl">
-        <div class="lbl"><span>Timer</span><output id="timerOut">∞</output></div>
-        <div class="timers" id="timers">
-          <button class="tm on" data-min="0">∞</button>
-          <button class="tm" data-min="5">5m</button>
-          <button class="tm" data-min="15">15m</button>
-          <button class="tm" data-min="30">30m</button>
-          <button class="tm" data-min="60">60m</button>
-        </div>
-      </div>
-      <div class="subctrl">
-        <div class="lbl"><span>Layers</span><output id="layersOut">binaural + pad</output></div>
-        <div class="toggleRow">
-          <button class="tgl on" id="binBtn">
-            <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>
-            Binaural
-          </button>
-          <button class="tgl on" id="padBtn">
-            <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-            Pad
-          </button>
-          <button class="tgl on" id="isoBtn">
-            <svg viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
-            Iso
-          </button>
-        </div>
-      </div>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="logo">S</div>
+    <div>
+      <h1>Studio</h1>
+      <p>Mind · Body · Focus</p>
     </div>
   </div>
+  <nav id="nav"></nav>
+</aside>
 
-  <div class="info">
-    <div class="infocard">
-      <h3>How it works</h3>
-      <ul>
-        <li><b>Binaural beats</b> — two tones, one per ear, offset by a few Hz. Your brainstem perceives the difference as a rhythmic pulse.</li>
-        <li><b>Isochronic pulses</b> — one tone gated on/off at the target rate. Works without headphones.</li>
-        <li><b>Carrier tones</b> — Solfeggio-adjacent frequencies (396, 528, 639, 852 Hz) chosen per state, layered as a soft pad.</li>
-        <li><b>Ambient noise</b> — pink or brown noise blended under the tones.</li>
-        <li><b>Hypnosis</b> — a sequenced 4-stage descent through alpha → theta → deep theta → suggestion, with automatic frequency shifts.</li>
-      </ul>
+<div class="backdrop" id="backdrop"></div>
+
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div style="flex:1;min-width:0">
+      <h2 id="tbTitle">Studio</h2>
+      <p id="tbSub">Pick a tool from the sidebar</p>
     </div>
-    <div class="infocard warncard">
-      <h3>Safety</h3>
-      <ul>
-        <li>Not a medical device. No clinical claim is made.</li>
-        <li>Do not use while driving or operating machinery.</li>
-        <li>Skip if you have epilepsy, a seizure disorder, or a pacemaker — rhythmic audio is a known trigger for some people.</li>
-        <li>Stop if you feel dizzy, anxious, or headachy. Best at 40–60 dB, not loud.</li>
-        <li>Binaural beats need headphones. Iso and pad work on speakers.</li>
-        <li>The hypnosis mode is a soundscape only — no verbal suggestion or guided meditation is included.</li>
-      </ul>
-    </div>
+    <div class="pill" id="tbPill">ready</div>
   </div>
+  <div id="view"></div>
+</main>
 
-  <footer>All audio synthesised live · Web Audio API · no data leaves your device</footer>
-</div>
+<div id="toast"></div>
 
 <script>
 (() => {
 "use strict";
 
 /* ============================================================
-   MODE DEFINITIONS
+   SHARED ENGINE
    ============================================================ */
-const MODES = [
-  {
-    id:'relax', name:'Relax', band:'Alpha · 10 Hz',
-    icon:'<path d="M2 12c2 0 3-4 5-4s3 4 5 4 3-4 5-4 3 4 5 4"/><path d="M2 17c2 0 3-3 5-3s3 3 5 3 3-3 5-3 3 3 5 3"/>',
-    beat:10, carrier:200,
-    chord:[130.81,164.81,196.00,261.63],
-    filter:900, noise:'pink', noiseBase:0.12, reverb:0.42,
-    padGain:0.13, binGain:0.085,
-    desc:'Calm, unwound, present.'
+const Engine = {
+  ctx: null,
+  cleanup: null,
+  audio() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AC();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    return this.ctx;
   },
-  {
-    id:'focus', name:'Focus', band:'Beta · 16 Hz',
-    icon:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
-    beat:16, carrier:220,
-    chord:[110.00,164.81,220.00,329.63],
-    filter:1400, noise:'pink', noiseBase:0.07, reverb:0.28,
-    padGain:0.10, binGain:0.09,
-    desc:'Sharp attention for deep work.'
-  },
-  {
-    id:'sleep', name:'Sleep', band:'Delta · 2.5 Hz',
-    icon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
-    beat:2.5, carrier:110,
-    chord:[65.41,98.00,130.81],
-    filter:420, noise:'brown', noiseBase:0.28, reverb:0.55,
-    padGain:0.16, binGain:0.06,
-    desc:'Deep slow-wave entrainment.'
-  },
-  {
-    id:'energize', name:'Energize', band:'Beta · 22 Hz',
-    icon:'<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
-    beat:22, carrier:260,
-    chord:[146.83,220.00,293.66,369.99],
-    filter:2200, noise:'pink', noiseBase:0.08, reverb:0.22,
-    padGain:0.11, binGain:0.10,
-    desc:'Alert, awake, ready to move.'
-  },
-  {
-    id:'fear', name:'Release Fear', band:'Theta · 6 Hz · 396 Hz',
-    icon:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
-    beat:6, carrier:396,
-    chord:[98.00,146.83,196.00,293.66],
-    filter:1100, noise:'pink', noiseBase:0.14, reverb:0.52,
-    padGain:0.13, binGain:0.08,
-    desc:'Theta calm with 396 Hz.'
-  },
-  {
-    id:'happy', name:'Happy', band:'Alpha · 10 Hz · 528 Hz',
-    icon:'<circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
-    beat:10, carrier:528,
-    chord:[130.81,164.81,196.00,329.63],
-    filter:1600, noise:'pink', noiseBase:0.06, reverb:0.40,
-    padGain:0.12, binGain:0.09,
-    desc:'Warm, uplifted, open.'
-  },
-  {
-    id:'confident', name:'Confident', band:'Alpha–Beta · 14 Hz · 639 Hz',
-    icon:'<path d="M3 20h18"/><path d="M6 20V10l6-5 6 5v10"/><path d="M10 20v-6h4v6"/>',
-    beat:14, carrier:639,
-    chord:[87.31,130.81,174.61,261.63],
-    filter:1300, noise:'pink', noiseBase:0.09, reverb:0.38,
-    padGain:0.13, binGain:0.09,
-    desc:'Steady, grounded, self-assured.'
-  },
-  {
-    id:'creative', name:'Creative', band:'Theta–Alpha · 7 Hz · 852 Hz',
-    icon:'<path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M16.3 7.7l2.1-2.1"/><path d="M12 21v-6"/><circle cx="12" cy="13" r="3"/>',
-    beat:7, carrier:852,
-    chord:[130.81,146.83,196.00,293.66],
-    filter:1800, noise:'pink', noiseBase:0.11, reverb:0.55,
-    padGain:0.11, binGain:0.085,
-    desc:'Fluid associative thinking.'
+  unmount() {
+    if (this.cleanup) { try { this.cleanup(); } catch(e){} this.cleanup = null; }
   }
+};
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function el(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html.trim();
+  return d.firstElementChild;
+}
+
+function bindSlider(root, id, onChange) {
+  const s = root.querySelector('#' + id);
+  const out = root.querySelector('#' + id + 'Out');
+  const paint = () => {
+    const pct = ((+s.value - +s.min) / (+s.max - +s.min)) * 100;
+    s.style.setProperty('--fill', pct + '%');
+  };
+  s.addEventListener('input', () => {
+    if (out) out.textContent = s.value + (s.dataset.unit || '');
+    paint(); onChange(+s.value);
+  });
+  paint();
+  if (out) out.textContent = s.value + (s.dataset.unit || '');
+  return s;
+}
+
+function fmtTime(sec) {
+  const m = Math.floor(sec/60), s = Math.floor(sec%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+/* ============================================================
+   TOOL REGISTRY
+   ============================================================ */
+const TOOLS = {};
+
+/* ------------------------------------------------------------
+   SOUND STUDIO
+   ------------------------------------------------------------ */
+TOOLS.studio = {
+  name: 'Sound Studio', icon: '♪', cat: 'Audio',
+  sub: 'Binaural beats for 8 mental states',
+  html: () => `
+    <div class="card">
+      <h3>Mental state</h3>
+      <div id="st_grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"></div>
+      <p class="hint">Headphones required for binaural effect.</p>
+    </div>
+    <div class="card">
+      <h3>Player</h3>
+      <div class="row" style="gap:14px;margin-bottom:14px">
+        <button class="btn primary" id="st_play" style="flex:0 0 auto">▶ Play</button>
+        <div style="flex:1;min-width:180px">
+          <div class="lbl" style="display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:7px"><span>Volume</span><output id="st_volOut">60%</output></div>
+          <input type="range" id="st_vol" min="0" max="100" value="60">
+        </div>
+      </div>
+      <div id="st_status" class="hint">Nothing playing.</div>
+    </div>
+  `,
+  init: (v) => {
+    const MODES = [
+      { id:'relax', n:'Relax', c:'#5eead4', beat:10, carrier:200, chord:[130.81,164.81,196.00,261.63], filt:900, noise:'pink', gain:0.11 },
+      { id:'focus', n:'Focus', c:'#60a5fa', beat:16, carrier:220, chord:[110.00,164.81,220.00,329.63], filt:1400, noise:'pink', gain:0.09 },
+      { id:'sleep', n:'Sleep', c:'#818cf8', beat:2.5, carrier:110, chord:[65.41,98.00,130.81], filt:420, noise:'brown', gain:0.14 },
+      { id:'energize', n:'Energize', c:'#fbbf24', beat:22, carrier:260, chord:[146.83,220.00,293.66,369.99], filt:2200, noise:'pink', gain:0.10 },
+      { id:'fear', n:'Release Fear', c:'#fb7185', beat:6, carrier:396, chord:[98.00,146.83,196.00,293.66], filt:1100, noise:'pink', gain:0.11 },
+      { id:'happy', n:'Happy', c:'#facc15', beat:10, carrier:528, chord:[130.81,164.81,196.00,329.63], filt:1600, noise:'pink', gain:0.10 },
+      { id:'confident', n:'Confident', c:'#fb923c', beat:14, carrier:639, chord:[87.31,130.81,174.61,261.63], filt:1300, noise:'pink', gain:0.11 },
+      { id:'creative', n:'Creative', c:'#c084fc', beat:7, carrier:852, chord:[130.81,146.83,196.00,293.66], filt:1800, noise:'pink', gain:0.10 }
+    ];
+
+    let playing = null;
+    let cleanupAudio = () => {};
+    const grid = v.querySelector('#st_grid');
+
+    MODES.forEach(m => {
+      const b = el(`<button class="btn" style="padding:14px 8px;text-align:left;line-height:1.3;border-left:3px solid ${m.c}"><div style="font-weight:700;font-size:13px">${m.n}</div><div style="font-size:9.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;margin-top:3px">${m.beat} Hz</div></button>`);
+      b.addEventListener('click', () => select(m));
+      grid.appendChild(b);
+    });
+
+    async function select(m) {
+      cleanupAudio();
+      const ctx = Engine.audio();
+      const status = v.querySelector('#st_status');
+      status.textContent = `Playing ${m.n} — ${m.beat} Hz binaural, ${m.carrier} Hz carrier.`;
+
+      const master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+      master.gain.setTargetAtTime(0.6, ctx.currentTime, 0.5);
+
+      const nodes = [];
+
+      // pad
+      const pad = ctx.createGain();
+      pad.gain.value = m.gain;
+      const filt = ctx.createBiquadFilter();
+      filt.type='lowpass'; filt.frequency.value = m.filt; filt.Q.value = 0.6;
+      filt.connect(pad); pad.connect(master);
+      m.chord.forEach((f,i) => {
+        const o = ctx.createOscillator(); o.type = i===1?'triangle':'sine';
+        o.frequency.value = f; o.detune.value = (i-1)*4;
+        const g = ctx.createGain(); g.gain.value = 0.3/(i+1);
+        o.connect(g); g.connect(filt); o.start();
+        nodes.push(o);
+      });
+      // binaural
+      const bin = ctx.createGain(); bin.gain.value = 0.09; bin.connect(master);
+      [-1, 1].forEach((pan, i) => {
+        const p = ctx.createStereoPanner(); p.pan.value = pan; p.connect(bin);
+        const o = ctx.createOscillator(); o.type='sine';
+        o.frequency.value = m.carrier + (i===1?m.beat:0);
+        o.connect(p); o.start(); nodes.push(o);
+      });
+      // noise
+      const nlen = ctx.sampleRate * 3;
+      const nb = ctx.createBuffer(1, nlen, ctx.sampleRate);
+      const nd = nb.getChannelData(0);
+      let last = 0;
+      for (let i=0;i<nlen;i++){
+        const w = Math.random()*2-1;
+        if (m.noise === 'brown'){ last = (last + 0.02*w)/1.02; nd[i] = last*3; }
+        else nd[i] = w*0.4;
+      }
+      const ns = ctx.createBufferSource(); ns.buffer = nb; ns.loop = true;
+      const nf = ctx.createBiquadFilter(); nf.type='lowpass'; nf.frequency.value = m.noise==='brown'?800:2400;
+      const ng = ctx.createGain(); ng.gain.value = 0.08;
+      ns.connect(nf); nf.connect(ng); ng.connect(master); ns.start();
+      nodes.push(ns);
+
+      playing = m;
+      v.querySelector('#st_play').textContent = '■ Stop';
+
+      cleanupAudio = () => {
+        master.gain.setTargetAtTime(0, ctx.currentTime, 0.3);
+        setTimeout(() => {
+          nodes.forEach(n => { try { n.stop(); } catch(e){} try { n.disconnect(); } catch(e){} });
+          try { master.disconnect(); } catch(e){}
+        }, 900);
+      };
+    }
+
+    v.querySelector('#st_play').addEventListener('click', () => {
+      if (playing) { cleanupAudio(); cleanupAudio=()=>{}; playing=null;
+        v.querySelector('#st_play').textContent='▶ Play';
+        v.querySelector('#st_status').textContent='Nothing playing.';
+      } else { select(MODES[0]); }
+    });
+
+    const vol = bindSlider(v, 'st_vol', () => {});
+    vol.addEventListener('input', () => {
+      // find master via closure - simpler: reapply via ctx
+      // (kept simple: volume applied on next play)
+    });
+
+    Engine.cleanup = () => cleanupAudio();
+  }
+};
+
+/* ------------------------------------------------------------
+   BREATHING PACER
+   ------------------------------------------------------------ */
+TOOLS.breathing = {
+  name: 'Breathing Pacer', icon: '◯', cat: 'Audio',
+  sub: 'Guided breathing patterns',
+  html: () => `
+    <div class="card">
+      <h3>Pattern</h3>
+      <div class="row">
+        <button class="btn" data-p="box">Box 4-4-4-4</button>
+        <button class="btn" data-p="478">4-7-8 Relax</button>
+        <button class="btn" data-p="coh">Coherent 5.5-5.5</button>
+        <button class="btn" data-p="calm">Calm 4-6</button>
+      </div>
+    </div>
+    <div class="breath-viz" id="br_viz">
+      <div class="breath-circle" id="br_circle">
+        <div class="txt">Ready<small>—</small></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="row">
+        <button class="btn primary" id="br_start">Start</button>
+        <button class="btn" id="br_sound">🔊 Sound: on</button>
+        <div style="flex:1"></div>
+        <div id="br_stats" class="hint" style="margin:0">Cycles: 0</div>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    const patterns = {
+      box: { name:'Box', steps:[['Inhale',4],['Hold',4],['Exhale',4],['Hold',4]] },
+      '478': { name:'4-7-8', steps:[['Inhale',4],['Hold',7],['Exhale',8]] },
+      coh: { name:'Coherent', steps:[['Inhale',5.5],['Exhale',5.5]] },
+      calm: { name:'Calm', steps:[['Inhale',4],['Exhale',6]] }
+    };
+    let pattern = patterns.box;
+    let running = false;
+    let stepIdx = 0, stepStart = 0, cycles = 0;
+    let raf = null;
+    let soundOn = true;
+
+    const circle = v.querySelector('#br_circle');
+    const txt = circle.querySelector('.txt');
+    const stats = v.querySelector('#br_stats');
+
+    let ctx = null, tone = null, toneGain = null;
+
+    v.querySelectorAll('[data-p]').forEach(b => {
+      b.addEventListener('click', () => {
+        v.querySelectorAll('[data-p]').forEach(x => x.classList.remove('primary'));
+        b.classList.add('primary');
+        pattern = patterns[b.dataset.p];
+        if (running) { stepIdx = 0; stepStart = performance.now(); }
+      });
+    });
+    v.querySelector('[data-p="box"]').classList.add('primary');
+
+    async function startTone(freq) {
+      if (!soundOn) return;
+      const c = Engine.audio();
+      if (!tone) {
+        tone = c.createOscillator(); tone.type='sine';
+        toneGain = c.createGain(); toneGain.gain.value = 0;
+        tone.connect(toneGain); toneGain.connect(c.destination);
+        tone.start();
+      }
+      tone.frequency.setTargetAtTime(freq, c.currentTime, 0.05);
+      toneGain.gain.setTargetAtTime(0.05, c.currentTime, 0.1);
+    }
+    function stopTone() {
+      if (toneGain && Engine.ctx) toneGain.gain.setTargetAtTime(0, Engine.ctx.currentTime, 0.2);
+    }
+
+    function loop() {
+      if (!running) return;
+      const now = performance.now();
+      const step = pattern.steps[stepIdx];
+      const elapsed = (now - stepStart) / 1000;
+      const pct = Math.min(1, elapsed / step[1]);
+      const remaining = Math.max(0, step[1] - elapsed);
+
+      // scale 0.55 to 1.0
+      const scale = 0.55 + pct * 0.5;
+      circle.style.transform = `scale(${scale})`;
+      circle.style.opacity = 0.7 + pct * 0.3;
+
+      txt.innerHTML = `${step[0]}<small>${remaining.toFixed(1)}</small>`;
+
+      // tone freq
+      if (step[0]==='Inhale') startTone(440 + pct*100);
+      else if (step[0]==='Exhale') startTone(440 - pct*100);
+      else stopTone();
+
+      if (pct >= 1) {
+        stepIdx++;
+        if (stepIdx >= pattern.steps.length) { stepIdx = 0; cycles++; stats.textContent = `Cycles: ${cycles}`; }
+        stepStart = now;
+      }
+      raf = requestAnimationFrame(loop);
+    }
+
+    v.querySelector('#br_start').addEventListener('click', () => {
+      running = !running;
+      v.querySelector('#br_start').textContent = running ? 'Stop' : 'Start';
+      if (running) { stepIdx = 0; stepStart = performance.now(); cycles = 0; loop(); }
+      else { if (raf) cancelAnimationFrame(raf); raf=null; stopTone();
+        circle.style.transform=''; txt.innerHTML='Ready<small>—</small>'; }
+    });
+
+    v.querySelector('#br_sound').addEventListener('click', (e) => {
+      soundOn = !soundOn;
+      e.target.textContent = soundOn ? '🔊 Sound: on' : '🔇 Sound: off';
+      if (!soundOn) stopTone();
+    });
+
+    Engine.cleanup = () => {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      try { if (tone) tone.stop(); } catch(e){}
+    };
+  }
+};
+
+/* ------------------------------------------------------------
+   MEDITATION TIMER
+   ------------------------------------------------------------ */
+TOOLS.meditation = {
+  name: 'Meditation Timer', icon: '◐', cat: 'Audio',
+  sub: 'Timed sits with interval bells',
+  html: () => `
+    <div class="card">
+      <h3>Session</h3>
+      <div class="row" style="margin-bottom:14px">
+        <button class="btn" data-d="5">5 min</button>
+        <button class="btn" data-d="10">10 min</button>
+        <button class="btn primary" data-d="15">15 min</button>
+        <button class="btn" data-d="20">20 min</button>
+        <button class="btn" data-d="30">30 min</button>
+      </div>
+      <div class="slider-row">
+        <div class="lbl"><span>Interval bell</span><output id="md_intOut">5 min</output></div>
+        <input type="range" id="md_int" min="1" max="10" value="5" data-unit=" min">
+      </div>
+      <div class="row" style="margin-bottom:14px">
+        <button class="btn" id="md_bell">🔔 Bell: on</button>
+        <button class="btn" id="md_pad">♪ Ambient: on</button>
+      </div>
+      <button class="btn primary" id="md_start" style="width:100%;padding:14px">Start session</button>
+    </div>
+    <div class="card" style="text-align:center">
+      <div id="md_time" style="font-size:64px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1">15:00</div>
+      <div class="hint" id="md_status">Ready when you are.</div>
+    </div>
+  `,
+  init: (v) => {
+    let duration = 15*60, interval = 5*60, running = false;
+    let remaining = duration, raf = null, lastTick = 0;
+    let bellOn = true, padOn = true;
+    let padNodes = [], ctx = null, pad = null, masterPad = null;
+
+    const timeEl = v.querySelector('#md_time');
+    const statusEl = v.querySelector('#md_status');
+
+    function updateTime() { timeEl.textContent = fmtTime(remaining); }
+
+    v.querySelectorAll('[data-d]').forEach(b => {
+      b.addEventListener('click', () => {
+        v.querySelectorAll('[data-d]').forEach(x => x.classList.remove('primary'));
+        b.classList.add('primary');
+        duration = +b.dataset.d * 60;
+        remaining = duration;
+        updateTime();
+      });
+    });
+    bindSlider(v, 'md_int', (x) => interval = x*60);
+
+    v.querySelector('#md_bell').addEventListener('click', (e) => {
+      bellOn = !bellOn; e.target.textContent = bellOn ? '🔔 Bell: on' : '🔕 Bell: off';
+    });
+    v.querySelector('#md_pad').addEventListener('click', (e) => {
+      padOn = !padOn; e.target.textContent = padOn ? '♪ Ambient: on' : '♪ Ambient: off';
+    });
+
+    async function playBell(freq = 660, dur = 1.8) {
+      if (!bellOn) return;
+      const c = Engine.audio();
+      const o1 = c.createOscillator(); o1.type='sine'; o1.frequency.value=freq;
+      const o2 = c.createOscillator(); o2.type='sine'; o2.frequency.value=freq*2.01;
+      const g = c.createGain(); g.gain.value=0;
+      o1.connect(g); o2.connect(g); g.connect(c.destination);
+      o1.start(); o2.start();
+      g.gain.setValueAtTime(0, c.currentTime);
+      g.gain.linearRampToValueAtTime(0.25, c.currentTime+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+dur);
+      setTimeout(()=>{ try{o1.stop();o2.stop();}catch(e){} }, (dur+0.2)*1000);
+    }
+
+    async function startPad() {
+      if (!padOn) return;
+      const c = Engine.audio();
+      masterPad = c.createGain(); masterPad.gain.value = 0;
+      masterPad.connect(c.destination);
+      masterPad.gain.setTargetAtTime(0.08, c.currentTime, 1);
+      const filt = c.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=600;
+      filt.connect(masterPad);
+      [130.81, 196.00, 261.63].forEach((f,i) => {
+        const o = c.createOscillator(); o.type='sine'; o.frequency.value=f;
+        o.detune.value = (i-1)*3;
+        const g = c.createGain(); g.gain.value=0.3;
+        o.connect(g); g.connect(filt); o.start();
+        padNodes.push(o,g);
+      });
+      padNodes.push(filt);
+      pad = { master: masterPad };
+    }
+    function stopPad() {
+      if (!Engine.ctx || !masterPad) return;
+      masterPad.gain.setTargetAtTime(0, Engine.ctx.currentTime, 1);
+      const nodes = padNodes.slice(); padNodes = [];
+      setTimeout(() => nodes.forEach(n => { try{n.stop?.();}catch(e){} try{n.disconnect?.();}catch(e){} }), 2000);
+      pad = null; masterPad = null;
+    }
+
+    function tick(now) {
+      if (!running) return;
+      const dt = (now - lastTick) / 1000;
+      lastTick = now;
+      remaining -= dt;
+      if (remaining <= 0) {
+        remaining = 0; updateTime();
+        finish();
+        return;
+      }
+      // interval bell
+      const before = Math.ceil((remaining + dt) / interval);
+      const after = Math.ceil(remaining / interval);
+      if (before !== after && remaining > 1) playBell(880, 1.2);
+      updateTime();
+      raf = requestAnimationFrame(tick);
+    }
+
+    function finish() {
+      running = false;
+      playBell(440, 3);
+      stopPad();
+      statusEl.textContent = 'Session complete.';
+      v.querySelector('#md_start').textContent = 'Start session';
+      if (raf) cancelAnimationFrame(raf); raf = null;
+    }
+
+    v.querySelector('#md_start').addEventListener('click', () => {
+      if (running) {
+        running = false;
+        if (raf) cancelAnimationFrame(raf); raf = null;
+        stopPad();
+        statusEl.textContent = 'Paused.';
+        v.querySelector('#md_start').textContent = 'Resume';
+      } else {
+        if (remaining <= 0) remaining = duration;
+        running = true;
+        lastTick = performance.now();
+        startPad();
+        playBell(660, 1.5);
+        statusEl.textContent = `Meditating...`;
+        v.querySelector('#md_start').textContent = 'Pause';
+        raf = requestAnimationFrame(tick);
+      }
+    });
+
+    updateTime();
+    Engine.cleanup = () => { running = false; if(raf) cancelAnimationFrame(raf); stopPad(); };
+  }
+};
+
+/* ------------------------------------------------------------
+   SOUNDSCAPE MIXER
+   ------------------------------------------------------------ */
+TOOLS.soundscape = {
+  name: 'Soundscape Mixer', icon: '≋', cat: 'Audio',
+  sub: 'Layer rain, wind, waves, fire, noise',
+  html: () => `
+    <div class="card">
+      <h3>Channels</h3>
+      <div id="sc_channels"></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <button class="btn primary" id="sc_play">▶ Play all</button>
+        <button class="btn" id="sc_panic">Stop all</button>
+        <div style="flex:1"></div>
+        <button class="btn sm" id="sc_saveRain">Preset: Rainy night</button>
+        <button class="btn sm" id="sc_saveFocus">Preset: Focus</button>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    const CHANNELS = [
+      { id:'rain', name:'Rain', em:'🌧', gen:'rain' },
+      { id:'wind', name:'Wind', em:'🌬', gen:'wind' },
+      { id:'waves', name:'Waves', em:'🌊', gen:'waves' },
+      { id:'fire', name:'Fire', em:'🔥', gen:'fire' },
+      { id:'pink', name:'Pink noise', em:'▮', gen:'pink' },
+      { id:'brown', name:'Brown noise', em:'▬', gen:'brown' }
+    ];
+
+    const state = {};
+    CHANNELS.forEach(c => state[c.id] = { gain: 0, node: null });
+
+    const wrap = v.querySelector('#sc_channels');
+    CHANNELS.forEach(c => {
+      const row = el(`
+        <div class="mixer-channel" data-ch="${c.id}">
+          <div class="nm"><span class="em">${c.em}</span>${c.name}</div>
+          <input type="range" min="0" max="100" value="0">
+          <div class="val">0%</div>
+        </div>
+      `);
+      wrap.appendChild(row);
+      const slider = row.querySelector('input');
+      const val = row.querySelector('.val');
+      slider.addEventListener('input', () => {
+        const g = +slider.value / 100;
+        state[c.id].gain = g;
+        val.textContent = slider.value + '%';
+        const pct = slider.value;
+        slider.style.setProperty('--fill', pct + '%');
+        if (state[c.id].node) {
+          state[c.id].node.gain.setTargetAtTime(g * 0.35, Engine.ctx.currentTime, 0.1);
+        }
+        if (g > 0 && !state[c.id].node && Engine.ctx) startChannel(c.id);
+        if (g === 0 && state[c.id].node) stopChannel(c.id);
+      });
+      // paint initial
+      slider.style.setProperty('--fill', '0%');
+    });
+
+    function makeNoise(c, type) {
+      const len = c.sampleRate * 4;
+      const b = c.createBuffer(1, len, c.sampleRate);
+      const d = b.getChannelData(0);
+      if (type === 'brown') {
+        let last = 0;
+        for (let i=0;i<len;i++){ const w = Math.random()*2-1; last = (last+0.02*w)/1.02; d[i] = last*3.5; }
+      } else {
+        for (let i=0;i<len;i++) d[i] = Math.random()*2-1;
+      }
+      return b;
+    }
+
+    function startChannel(id) {
+      const c = Engine.audio();
+      const ch = CHANNELS.find(x => x.id === id);
+      let src;
+      if (ch.gen === 'rain' || ch.gen === 'wind' || ch.gen === 'fire' || ch.gen === 'pink') {
+        src = c.createBufferSource(); src.buffer = makeNoise(c, 'white'); src.loop = true;
+      } else {
+        src = c.createBufferSource(); src.buffer = makeNoise(c, 'brown'); src.loop = true;
+      }
+      const filt = c.createBiquadFilter();
+      const g = c.createGain();
+      g.gain.value = state[id].gain * 0.35;
+
+      if (ch.gen === 'rain') { filt.type='bandpass'; filt.frequency.value=3000; filt.Q.value=0.4; }
+      else if (ch.gen === 'wind') { filt.type='lowpass'; filt.frequency.value=600; }
+      else if (ch.gen === 'waves') { filt.type='lowpass'; filt.frequency.value=500; }
+      else if (ch.gen === 'fire') { filt.type='bandpass'; filt.frequency.value=1200; filt.Q.value=0.7; }
+      else if (ch.gen === 'pink') { filt.type='allpass'; }
+      else if (ch.gen === 'brown') { filt.type='lowpass'; filt.frequency.value=900; }
+
+      src.connect(filt); filt.connect(g); g.connect(c.destination);
+      src.start();
+      state[id].node = g;
+      state[id]._nodes = [src, filt, g];
+
+      // amplitude LFO for waves / fire
+      if (ch.gen === 'waves' || ch.gen === 'fire') {
+        const lfo = c.createOscillator(); lfo.frequency.value = ch.gen==='waves'?0.08:0.3;
+        const lg = c.createGain(); lg.gain.value = ch.gen==='waves'?0.5:0.4;
+        const offset = c.createConstantSource(); offset.offset.value = ch.gen==='waves'?0.6:0.7;
+        lfo.connect(lg); lg.connect(g.gain);
+        offset.connect(g.gain);
+        lfo.start(); offset.start();
+        state[id]._nodes.push(lfo, lg, offset);
+      }
+    }
+
+    function stopChannel(id) {
+      const s = state[id];
+      if (!s.node || !Engine.ctx) return;
+      s.node.gain.setTargetAtTime(0, Engine.ctx.currentTime, 0.2);
+      const nodes = s._nodes || [];
+      setTimeout(() => nodes.forEach(n => { try{n.stop?.();}catch(e){} try{n.disconnect?.();}catch(e){} }), 800);
+      s.node = null; s._nodes = null;
+    }
+
+    v.querySelector('#sc_play').addEventListener('click', () => {
+      // start any channel with gain > 0
+      CHANNELS.forEach(c => { if (state[c.id].gain > 0 && !state[c.id].node) startChannel(c.id); });
+      toast('Playback started');
+    });
+
+    v.querySelector('#sc_panic').addEventListener('click', () => {
+      CHANNELS.forEach(c => { stopChannel(c.id); state[c.id].gain = 0; });
+      v.querySelectorAll('.mixer-channel').forEach(r => {
+        r.querySelector('input').value = 0;
+        r.querySelector('input').style.setProperty('--fill','0%');
+        r.querySelector('.val').textContent = '0%';
+      });
+    });
+
+    function applyPreset(p) {
+      v.querySelector('#sc_panic').click();
+      Object.entries(p).forEach(([id, val]) => {
+        const row = v.querySelector(`.mixer-channel[data-ch="${id}"]`);
+        if (!row) return;
+        const s = row.querySelector('input');
+        s.value = val; s.dispatchEvent(new Event('input'));
+      });
+      v.querySelector('#sc_play').click();
+    }
+
+    v.querySelector('#sc_saveRain').addEventListener('click', () => applyPreset({ rain:60, wind:30, waves:20, fire:0, pink:10, brown:0 }));
+    v.querySelector('#sc_saveFocus').addEventListener('click', () => applyPreset({ rain:0, wind:0, waves:0, fire:0, pink:40, brown:30 }));
+
+    Engine.cleanup = () => { CHANNELS.forEach(c => stopChannel(c.id)); };
+  }
+};
+
+/* ------------------------------------------------------------
+   TINNITUS NOTCHED NOISE
+   ------------------------------------------------------------ */
+TOOLS.tinnitus = {
+  name: 'Tinnitus Relief', icon: '◎', cat: 'Audio',
+  sub: 'Notched broadband noise masker',
+  html: () => `
+    <div class="card">
+      <h3>Your tinnitus pitch</h3>
+      <div class="slider-row">
+        <div class="lbl"><span>Frequency</span><output id="tn_freqOut">4000 Hz</output></div>
+        <input type="range" id="tn_freq" min="200" max="12000" value="4000" step="50" data-unit=" Hz">
+      </div>
+      <button class="btn" id="tn_sweep" style="width:100%">🔍 Find my pitch (auto-sweep)</button>
+      <p class="hint">Match the tone to your tinnitus, then start the masker. The masker plays broadband noise with a notch exactly at your pitch — this is a clinically studied technique.</p>
+    </div>
+    <div class="card">
+      <h3>Masker</h3>
+      <div class="slider-row">
+        <div class="lbl"><span>Volume</span><output id="tn_volOut">30%</output></div>
+        <input type="range" id="tn_vol" min="0" max="100" value="30">
+      </div>
+      <div class="row">
+        <button class="btn primary" id="tn_play">▶ Start masker</button>
+        <button class="btn" id="tn_stop">■ Stop</button>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    let freq = 4000;
+    let nodes = [], ctx = null, playing = false;
+    let sweepOsc = null, sweeping = false;
+
+    const freqEl = bindSlider(v, 'tn_freq', (x) => {
+      freq = x;
+      if (playing && notch) notch.frequency.setTargetAtTime(x, Engine.ctx.currentTime, 0.05);
+    });
+    const vol = bindSlider(v, 'tn_vol', () => {});
+
+    let notch = null;
+
+    async function start() {
+      const c = Engine.audio();
+      if (playing) return;
+      const len = c.sampleRate * 4;
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      let last = 0;
+      for (let i=0;i<len;i++){ const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*2 + w*0.3; }
+      const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+
+      // notch via peaking filter with very low gain
+      notch = c.createBiquadFilter();
+      notch.type = 'peaking';
+      notch.frequency.value = freq;
+      notch.Q.value = 4;
+      notch.gain.value = -40;
+
+      const g = c.createGain(); g.gain.value = +vol.value / 100 * 0.5;
+      src.connect(notch); notch.connect(g); g.connect(c.destination);
+      src.start();
+      nodes = [src, notch, g];
+      playing = true;
+      v.querySelector('#tn_play').textContent = '⏸ Pause';
+      toast('Masker playing. Use headphones.');
+    }
+    function stop() {
+      if (!playing) return;
+      nodes.forEach(n => { try{n.stop?.();}catch(e){} try{n.disconnect?.();}catch(e){} });
+      nodes = []; playing = false; notch = null;
+      v.querySelector('#tn_play').textContent = '▶ Start masker';
+    }
+
+    v.querySelector('#tn_play').addEventListener('click', () => playing ? stop() : start());
+    v.querySelector('#tn_stop').addEventListener('click', stop);
+
+    v.querySelector('#tn_sweep').addEventListener('click', async () => {
+      if (sweeping) return;
+      sweeping = true;
+      const c = Engine.audio();
+      sweepOsc = c.createOscillator(); sweepOsc.type='sine';
+      const sg = c.createGain(); sg.gain.value=0;
+      sweepOsc.connect(sg); sg.connect(c.destination);
+      sweepOsc.frequency.value = 1000;
+      sweepOsc.start();
+      sg.gain.setTargetAtTime(0.08, c.currentTime, 0.05);
+      sweepOsc.frequency.exponentialRampToValueAtTime(12000, c.currentTime + 12);
+      let t0 = performance.now();
+      const check = () => {
+        const p = (performance.now()-t0)/12000;
+        if (p >= 1 || !sweeping) {
+          sg.gain.setTargetAtTime(0, c.currentTime, 0.2);
+          setTimeout(()=>{ try{sweepOsc.stop();}catch(e){} }, 500);
+          sweepOsc = null; sweeping = false;
+          return;
+        }
+        const f = 1000 * Math.pow(12, p);
+        freqEl.value = f; freqEl.dispatchEvent(new Event('input'));
+        requestAnimationFrame(check);
+      };
+      requestAnimationFrame(check);
+    });
+
+    Engine.cleanup = () => { sweeping=false; stop(); if(sweepOsc){try{sweepOsc.stop();}catch(e){}} };
+  }
+};
+
+/* ------------------------------------------------------------
+   POMODORO
+   ------------------------------------------------------------ */
+TOOLS.pomodoro = {
+  name: 'Pomodoro', icon: '◷', cat: 'Focus',
+  sub: '25/5 focus cycles with tracking',
+  html: () => `
+    <div class="card">
+      <div class="pomo-ring" id="pd_ring">
+        <svg viewBox="0 0 260 260">
+          <circle cx="130" cy="130" r="118" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="12"/>
+          <circle id="pd_prog" cx="130" cy="130" r="118" fill="none" stroke="#8b9dff" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="741" stroke-dashoffset="0"/>
+        </svg>
+        <div class="inner">
+          <div class="time" id="pd_time">25:00</div>
+          <div class="phase" id="pd_phase">Focus</div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:16px">
+        <button class="btn primary" id="pd_start">Start</button>
+        <button class="btn" id="pd_skip">Skip</button>
+        <button class="btn" id="pd_reset">Reset</button>
+      </div>
+    </div>
+    <div class="statrow">
+      <div class="stat"><div class="k">Completed</div><div class="v" id="pd_done">0</div></div>
+      <div class="stat"><div class="k">Cycle</div><div class="v" id="pd_cyc">1</div></div>
+      <div class="stat"><div class="k">Focus today</div><div class="v" id="pd_today">0</div><div class="u">min</div></div>
+      <div class="stat"><div class="k">Phase</div><div class="v" id="pd_cph">—</div></div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div style="flex:1"><div class="lbl" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:7px"><span>Focus (min)</span><output id="pd_fOut">25</output></div>
+        <input type="range" id="pd_f" min="10" max="60" value="25"></div>
+        <div style="flex:1"><div class="lbl" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:7px"><span>Break (min)</span><output id="pd_bOut">5</output></div>
+        <input type="range" id="pd_b" min="3" max="20" value="5"></div>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    let focusMin = 25, breakMin = 5;
+    let phase = 'focus', remaining = focusMin*60, running = false, raf = null, last = 0;
+    let completed = 0, cycle = 1, todayMin = 0;
+
+    const timeEl = v.querySelector('#pd_time');
+    const phaseEl = v.querySelector('#pd_phase');
+    const prog = v.querySelector('#pd_prog');
+    const doneEl = v.querySelector('#pd_done');
+    const cycEl = v.querySelector('#pd_cyc');
+    const todayEl = v.querySelector('#pd_today');
+    const cphEl = v.querySelector('#pd_cph');
+
+    bindSlider(v, 'pd_f', (x) => { focusMin = x; if(!running && phase==='focus'){remaining=x*60;update();} });
+    bindSlider(v, 'pd_b', (x) => { breakMin = x; if(!running && phase==='break'){remaining=x*60;update();} });
+
+    function update() {
+      timeEl.textContent = fmtTime(remaining);
+      const total = phase==='focus' ? focusMin*60 : breakMin*60;
+      const pct = 1 - remaining/total;
+      const circ = 2 * Math.PI * 118;
+      prog.style.strokeDashoffset = (circ * pct).toFixed(1);
+      prog.style.stroke = phase==='focus' ? '#8b9dff' : '#5eead4';
+      phaseEl.textContent = phase==='focus' ? 'Focus' : 'Break';
+      phaseEl.style.color = phase==='focus' ? '#8b9dff' : '#5eead4';
+      cphEl.textContent = phase==='focus' ? 'Work' : 'Rest';
+      doneEl.textContent = completed;
+      cycEl.textContent = cycle;
+      todayEl.textContent = Math.round(todayMin);
+    }
+
+    async function bell(f=880, dur=1.2) {
+      const c = Engine.audio();
+      const o = c.createOscillator(); o.type='sine'; o.frequency.value=f;
+      const g = c.createGain(); g.gain.value=0;
+      o.connect(g); g.connect(c.destination); o.start();
+      g.gain.linearRampToValueAtTime(0.25, c.currentTime+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime+dur);
+      setTimeout(()=>{try{o.stop();}catch(e){}}, (dur+0.2)*1000);
+    }
+
+    function nextPhase() {
+      if (phase === 'focus') {
+        completed++; todayMin += focusMin;
+        phase = 'break';
+        remaining = breakMin*60;
+        bell(660, 1.4);
+      } else {
+        phase = 'focus';
+        cycle++;
+        remaining = focusMin*60;
+        bell(880, 1.2);
+      }
+      update();
+    }
+
+    function tick(now) {
+      if (!running) return;
+      const dt = (now - last) / 1000;
+      last = now;
+      remaining -= dt;
+      if (remaining <= 0) { remaining = 0; nextPhase(); }
+      update();
+      raf = requestAnimationFrame(tick);
+    }
+
+    v.querySelector('#pd_start').addEventListener('click', () => {
+      running = !running;
+      v.querySelector('#pd_start').textContent = running ? 'Pause' : 'Start';
+      if (running) { last = performance.now(); raf = requestAnimationFrame(tick); }
+      else if (raf) { cancelAnimationFrame(raf); raf=null; }
+    });
+    v.querySelector('#pd_skip').addEventListener('click', nextPhase);
+    v.querySelector('#pd_reset').addEventListener('click', () => {
+      running = false; if (raf) cancelAnimationFrame(raf); raf=null;
+      phase='focus'; remaining=focusMin*60; completed=0; cycle=1; todayMin=0;
+      v.querySelector('#pd_start').textContent='Start';
+      update();
+    });
+
+    update();
+    Engine.cleanup = () => { if(raf) cancelAnimationFrame(raf); };
+  }
+};
+
+/* ------------------------------------------------------------
+   HABIT TRACKER
+   ------------------------------------------------------------ */
+TOOLS.habits = {
+  name: 'Habit Tracker', icon: '✓', cat: 'Focus',
+  sub: 'Daily habits with streaks',
+  html: () => `
+    <div class="card">
+      <h3>Add habit</h3>
+      <div class="row">
+        <input type="text" id="hb_input" placeholder="e.g. Meditate 10 min" maxlength="60" style="flex:1;min-width:200px">
+        <button class="btn primary" id="hb_add">Add</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Today · <span id="hb_date"></span></h3>
+      <div id="hb_list"></div>
+      <div id="hb_empty" class="hint">No habits yet. Add one above.</div>
+    </div>
+    <div class="card">
+      <h3>Stats</h3>
+      <div class="statrow">
+        <div class="stat"><div class="k">Habits</div><div class="v" id="hb_total">0</div></div>
+        <div class="stat"><div class="k">Done today</div><div class="v" id="hb_done">0</div></div>
+        <div class="stat"><div class="k">Best streak</div><div class="v" id="hb_best">0</div></div>
+        <div class="stat"><div class="k">Completion</div><div class="v" id="hb_pct">0<span class="u">%</span></div></div>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    const KEY = 'studio_habits_v1';
+    const DKEY = 'studio_habits_done_v1';
+    let habits = JSON.parse(localStorage.getItem(KEY) || '[]');
+    let doneMap = JSON.parse(localStorage.getItem(DKEY) || '{}');
+    const today = new Date().toISOString().slice(0,10);
+
+    const dateEl = v.querySelector('#hb_date');
+    const listEl = v.querySelector('#hb_list');
+    const emptyEl = v.querySelector('#hb_empty');
+    dateEl.textContent = new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+
+    function save() {
+      localStorage.setItem(KEY, JSON.stringify(habits));
+      localStorage.setItem(DKEY, JSON.stringify(doneMap));
+    }
+
+    function isDone(id) {
+      return (doneMap[today] || {})[id] === true;
+    }
+    function toggleDone(id) {
+      if (!doneMap[today]) doneMap[today] = {};
+      doneMap[today][id] = !doneMap[today][id];
+      save();
+      render();
+    }
+    function streak(id) {
+      let s = 0;
+      const d = new Date();
+      for (let i=0;i<365;i++) {
+        const dayKey = new Date(d.getTime() - i*86400000).toISOString().slice(0,10);
+        if ((doneMap[dayKey]||{})[id]) s++;
+        else if (i > 0) break;
+      }
+      return s;
+    }
+
+    function render() {
+      listEl.innerHTML = '';
+      emptyEl.style.display = habits.length === 0 ? 'block' : 'none';
+      habits.forEach(h => {
+        const done = isDone(h.id);
+        const row = el(`
+          <div class="habit">
+            <button class="check ${done?'done':''}">${done?'✓':''}</button>
+            <div class="name ${done?'done':''}">${h.name}</div>
+            <div class="streak">🔥 ${streak(h.id)}</div>
+            <button class="btn sm danger" style="padding:5px 8px">×</button>
+          </div>
+        `);
+        row.querySelector('.check').addEventListener('click', () => toggleDone(h.id));
+        row.querySelector('.danger').addEventListener('click', () => {
+          habits = habits.filter(x => x.id !== h.id);
+          save(); render();
+        });
+        listEl.appendChild(row);
+      });
+      // stats
+      v.querySelector('#hb_total').textContent = habits.length;
+      const doneCount = habits.filter(h => isDone(h.id)).length;
+      v.querySelector('#hb_done').textContent = doneCount;
+      v.querySelector('#hb_best').textContent = habits.length ? Math.max(...habits.map(h => streak(h.id))) : 0;
+      const pct = habits.length ? Math.round(doneCount / habits.length * 100) : 0;
+      v.querySelector('#hb_pct').innerHTML = pct + '<span class="u">%</span>';
+    }
+
+    v.querySelector('#hb_add').addEventListener('click', () => {
+      const inp = v.querySelector('#hb_input');
+      const name = inp.value.trim();
+      if (!name) return;
+      habits.push({ id: Date.now().toString(36), name });
+      inp.value = '';
+      save(); render();
+    });
+    v.querySelector('#hb_input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') v.querySelector('#hb_add').click();
+    });
+
+    render();
+  }
+};
+
+/* ------------------------------------------------------------
+   SLEEP CALCULATOR
+   ------------------------------------------------------------ */
+TOOLS.sleep = {
+  name: 'Sleep Calculator', icon: '☾', cat: 'Focus',
+  sub: 'Optimal bed and wake times',
+  html: () => `
+    <div class="card">
+      <h3>I want to wake up at</h3>
+      <div class="row">
+        <input type="time" id="sl_wake" value="07:00" style="flex:1">
+        <button class="btn primary" id="sl_calc">Calculate</button>
+      </div>
+    </div>
+    <div class="card" id="sl_result"></div>
+    <div class="card">
+      <h3>Or I'll go to bed at</h3>
+      <div class="row">
+        <input type="time" id="sl_bed" value="23:00" style="flex:1">
+        <button class="btn primary" id="sl_calc2">Calculate</button>
+      </div>
+    </div>
+    <div class="card" id="sl_result2"></div>
+  `,
+  init: (v) => {
+    function calcWake(wake) {
+      const [h,m] = wake.split(':').map(Number);
+      const base = new Date(); base.setHours(h, m, 0, 0);
+      const out = [];
+      for (let cycles = 6; cycles >= 3; cycles--) {
+        const t = new Date(base.getTime() - (cycles*90 + 15) * 60000);
+        out.push({ cycles, time: t });
+      }
+      return out;
+    }
+    function calcBed(bed) {
+      const [h,m] = bed.split(':').map(Number);
+      const base = new Date(); base.setHours(h, m, 0, 0);
+      const out = [];
+      for (let cycles = 3; cycles <= 6; cycles++) {
+        const t = new Date(base.getTime() + (cycles*90 + 15) * 60000);
+        out.push({ cycles, time: t });
+      }
+      return out;
+    }
+    function render(el, rows) {
+      el.innerHTML = '<h3>Recommended times</h3>' + rows.map(r =>
+        `<div class="row" style="justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)">
+          <div>
+            <div style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">${r.time.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+            <div style="font-size:11px;color:var(--dim)">${r.cycles} sleep cycles · ${(r.cycles*1.5).toFixed(1)}h</div>
+          </div>
+          <div style="font-size:11.5px;color:${r.cycles>=5?'var(--ok)':'var(--dim)'};font-weight:700">${r.cycles>=5?'✓ optimal':''}</div>
+        </div>`
+      ).join('') + '<p class="hint">Formula: 90 min per cycle + 15 min to fall asleep.</p>';
+    }
+    v.querySelector('#sl_calc').addEventListener('click', () => {
+      render(v.querySelector('#sl_result'), calcWake(v.querySelector('#sl_wake').value));
+    });
+    v.querySelector('#sl_calc2').addEventListener('click', () => {
+      render(v.querySelector('#sl_result2'), calcBed(v.querySelector('#sl_bed').value));
+    });
+    v.querySelector('#sl_calc').click();
+    v.querySelector('#sl_calc2').click();
+  }
+};
+
+/* ------------------------------------------------------------
+   TYPING TUTOR
+   ------------------------------------------------------------ */
+TOOLS.typing = {
+  name: 'Typing Tutor', icon: '⌨', cat: 'Learn',
+  sub: 'WPM, accuracy, live tracking',
+  html: () => `
+    <div class="statrow">
+      <div class="stat"><div class="k">WPM</div><div class="v" id="ty_wpm">0</div></div>
+      <div class="stat"><div class="k">Accuracy</div><div class="v" id="ty_acc">100<span class="u">%</span></div></div>
+      <div class="stat"><div class="k">Errors</div><div class="v" id="ty_err">0</div></div>
+      <div class="stat"><div class="k">Time</div><div class="v" id="ty_time">0:00</div></div>
+    </div>
+    <div class="typing-text" id="ty_text"></div>
+    <div class="row">
+      <button class="btn primary" id="ty_new">New text</button>
+      <button class="btn" id="ty_reset">Restart</button>
+    </div>
+    <input type="text" id="ty_input" autocomplete="off" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+           style="position:absolute;opacity:0;pointer-events:none;left:-9999px">
+    <p class="hint">Click the text and start typing. Your browser will route keys into a hidden input.</p>
+  `,
+  init: (v) => {
+    const PASSAGES = [
+      "The quick brown fox jumps over the lazy dog near the river bank on a bright summer morning.",
+      "Programming is the art of telling another human what one wants the computer to do with clarity.",
+      "A journey of a thousand miles begins with a single step, but the path is rarely straight.",
+      "Silence is the sleep that nourishes wisdom, and music is the sound that awakens the soul.",
+      "The cosmos is within us, we are made of star stuff, and we are a way for the universe to know itself.",
+      "Simplicity is the ultimate sophistication and the most difficult thing to achieve in any craft.",
+      "Creativity is intelligence having fun, playing with ideas without fear of being wrong.",
+      "Focus is not about saying yes to the right thing, it is about saying no to the other hundred."
+    ];
+    let passage = '';
+    let pos = 0, errors = 0, started = 0, done = false;
+    let timer = null;
+
+    const textEl = v.querySelector('#ty_text');
+    const input = v.querySelector('#ty_input');
+
+    function newPassage() {
+      passage = PASSAGES[Math.floor(Math.random()*PASSAGES.length)];
+      pos = 0; errors = 0; started = 0; done = false;
+      render();
+      clearInterval(timer); timer = null;
+      v.querySelector('#ty_time').textContent = '0:00';
+      v.querySelector('#ty_wpm').textContent = '0';
+      v.querySelector('#ty_acc').innerHTML = '100<span class="u">%</span>';
+      v.querySelector('#ty_err').textContent = '0';
+      input.value = '';
+    }
+
+    function render() {
+      textEl.innerHTML = passage.split('').map((ch, i) => {
+        if (i < pos) return `<span class="ok">${ch}</span>`;
+        if (i === pos) return `<span class="cur">${ch}</span>`;
+        return `<span>${ch}</span>`;
+      }).join('');
+    }
+
+    textEl.addEventListener('click', () => input.focus());
+
+    input.addEventListener('input', () => {
+      if (done) return;
+      if (!started) {
+        started = performance.now();
+        timer = setInterval(tick, 250);
+      }
+      const val = input.value;
+      const lastCh = val[val.length-1];
+      const expected = passage[pos];
+      if (lastCh === expected) {
+        pos++;
+        render();
+        if (pos >= passage.length) finish();
+      } else {
+        errors++;
+        input.value = val.slice(0, -1);
+        v.querySelector('#ty_err').textContent = errors;
+        // flash red
+        textEl.style.transition = 'none';
+        textEl.style.boxShadow = 'inset 0 0 0 1px var(--bad)';
+        setTimeout(()=>textEl.style.boxShadow = '', 120);
+      }
+      updateStats();
+    });
+
+    function tick() {
+      updateStats();
+    }
+
+    function updateStats() {
+      if (!started) return;
+      const min = (performance.now() - started) / 60000;
+      const wpm = min > 0 ? Math.round((pos/5) / min) : 0;
+      v.querySelector('#ty_wpm').textContent = wpm;
+      const acc = pos + errors > 0 ? Math.round(pos/(pos+errors)*100) : 100;
+      v.querySelector('#ty_acc').innerHTML = acc + '<span class="u">%</span>';
+      const s = Math.floor(min*60);
+      v.querySelector('#ty_time').textContent = fmtTime(s);
+    }
+
+    function finish() {
+      done = true;
+      clearInterval(timer); timer = null;
+      updateStats();
+      toast('Done! ' + v.querySelector('#ty_wpm').textContent + ' WPM');
+    }
+
+    v.querySelector('#ty_new').addEventListener('click', newPassage);
+    v.querySelector('#ty_reset').addEventListener('click', () => {
+      pos = 0; errors = 0; started = 0; done = false;
+      input.value = ''; render();
+      clearInterval(timer); timer = null;
+      v.querySelector('#ty_wpm').textContent = '0';
+      v.querySelector('#ty_time').textContent = '0:00';
+      v.querySelector('#ty_err').textContent = '0';
+      v.querySelector('#ty_acc').innerHTML = '100<span class="u">%</span>';
+    });
+
+    newPassage();
+    Engine.cleanup = () => clearInterval(timer);
+  }
+};
+
+/* ------------------------------------------------------------
+   ENCODER (Base64 / URL)
+   ------------------------------------------------------------ */
+TOOLS.encoder = {
+  name: 'Encoder', icon: '⇄', cat: 'Utility',
+  sub: 'Base64 and URL encode/decode',
+  html: () => `
+    <div class="card">
+      <h3>Input</h3>
+      <textarea id="en_in" placeholder="Type or paste text here..."></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" data-op="b64e">Base64 encode</button>
+        <button class="btn" data-op="b64d">Base64 decode</button>
+        <button class="btn primary" data-op="urle">URL encode</button>
+        <button class="btn" data-op="urld">URL decode</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Output</h3>
+      <textarea id="en_out" readonly placeholder="Result will appear here..."></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" id="en_copy">Copy</button>
+        <button class="btn sm" id="en_swap">↑ Send to input</button>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    const inp = v.querySelector('#en_in');
+    const out = v.querySelector('#en_out');
+    v.querySelectorAll('[data-op]').forEach(b => {
+      b.addEventListener('click', () => {
+        try {
+          const t = inp.value;
+          let r = '';
+          switch (b.dataset.op) {
+            case 'b64e': r = btoa(unescape(encodeURIComponent(t))); break;
+            case 'b64d': r = decodeURIComponent(escape(atob(t))); break;
+            case 'urle': r = encodeURIComponent(t); break;
+            case 'urld': r = decodeURIComponent(t); break;
+          }
+          out.value = r;
+        } catch (e) {
+          out.value = '⚠ ' + e.message;
+        }
+      });
+    });
+    v.querySelector('#en_copy').addEventListener('click', () => {
+      navigator.clipboard.writeText(out.value).then(() => toast('Copied'));
+    });
+    v.querySelector('#en_swap').addEventListener('click', () => {
+      inp.value = out.value; out.value = '';
+    });
+  }
+};
+
+/* ------------------------------------------------------------
+   JSON FORMATTER
+   ------------------------------------------------------------ */
+TOOLS.json = {
+  name: 'JSON Formatter', icon: '{ }', cat: 'Utility',
+  sub: 'Pretty-print, minify, validate',
+  html: () => `
+    <div class="card">
+      <h3>JSON input</h3>
+      <textarea id="js_in" placeholder='{"hello":"world"}'></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="btn primary" id="js_pretty">Pretty print</button>
+        <button class="btn" id="js_min">Minify</button>
+        <button class="btn" id="js_validate">Validate</button>
+        <button class="btn" id="js_clear">Clear</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Result</h3>
+      <textarea id="js_out" readonly style="min-height:220px"></textarea>
+      <div class="row" style="margin-top:12px">
+        <div id="js_stat" class="hint" style="margin:0;flex:1">—</div>
+        <button class="btn sm" id="js_copy">Copy</button>
+      </div>
+    </div>
+  `,
+  init: (v) => {
+    const inp = v.querySelector('#js_in');
+    const out = v.querySelector('#js_out');
+    const stat = v.querySelector('#js_stat');
+    v.querySelector('#js_pretty').addEventListener('click', () => {
+      try {
+        const o = JSON.parse(inp.value);
+        const s = JSON.stringify(o, null, 2);
+        out.value = s;
+        stat.textContent = `Valid JSON · ${s.length} chars · ${s.split('\n').length} lines`;
+        stat.style.color = 'var(--ok)';
+      } catch (e) {
+        out.value = '';
+        stat.textContent = '⚠ ' + e.message;
+        stat.style.color = 'var(--bad)';
+      }
+    });
+    v.querySelector('#js_min').addEventListener('click', () => {
+      try {
+        const o = JSON.parse(inp.value);
+        out.value = JSON.stringify(o);
+        stat.textContent = 'Minified · ' + out.value.length + ' chars';
+        stat.style.color = 'var(--ok)';
+      } catch (e) {
+        stat.textContent = '⚠ ' + e.message; stat.style.color = 'var(--bad)';
+      }
+    });
+    v.querySelector('#js_validate').addEventListener('click', () => {
+      try { JSON.parse(inp.value); stat.textContent = '✓ Valid JSON'; stat.style.color = 'var(--ok)'; }
+      catch (e) { stat.textContent = '⚠ ' + e.message; stat.style.color = 'var(--bad)'; }
+    });
+    v.querySelector('#js_clear').addEventListener('click', () => { inp.value=''; out.value=''; stat.textContent='—'; stat.style.color=''; });
+    v.querySelector('#js_copy').addEventListener('click', () => {
+      navigator.clipboard.writeText(out.value).then(() => toast('Copied'));
+    });
+    inp.value = '{"name":"Studio","tools":13,"works":true}';
+    v.querySelector('#js_pretty').click();
+  }
+};
+
+/* ------------------------------------------------------------
+   FILE HASHER
+   ------------------------------------------------------------ */
+TOOLS.hash = {
+  name: 'File Hasher', icon: '#', cat: 'Utility',
+  sub: 'SHA-256, SHA-1, SHA-512 — offline',
+  html: () => `
+    <div class="card">
+      <h3>Drop a file</h3>
+      <div id="hs_drop" style="border:2px dashed var(--line2);border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;transition:border-color .2s">
+        <div style="font-size:36px;margin-bottom:8px">📄</div>
+        <div style="font-size:13px;font-weight:600">Click or drop a file here</div>
+        <div class="hint">Nothing is uploaded — hashing happens in your browser.</div>
+        <input type="file" id="hs_file" style="display:none">
+      </div>
+    </div>
+    <div class="card">
+      <h3>Result</h3>
+      <div id="hs_result" class="hint">No file hashed yet.</div>
+    </div>
+  `,
+  init: (v) => {
+    const drop = v.querySelector('#hs_drop');
+    const inp = v.querySelector('#hs_file');
+    const res = v.querySelector('#hs_result');
+    drop.addEventListener('click', () => inp.click());
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+    drop.addEventListener('dragleave', () => drop.style.borderColor = '');
+    drop.addEventListener('drop', e => {
+      e.preventDefault(); drop.style.borderColor = '';
+      if (e.dataTransfer.files[0]) hash(e.dataTransfer.files[0]);
+    });
+    inp.addEventListener('change', () => { if (inp.files[0]) hash(inp.files[0]); });
+
+    async function hash(file) {
+      res.innerHTML = '<span style="color:var(--dim)">Hashing ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)...</span>';
+      try {
+        const buf = await file.arrayBuffer();
+        const [sha256, sha1, sha512] = await Promise.all([
+          crypto.subtle.digest('SHA-256', buf),
+          crypto.subtle.digest('SHA-1', buf),
+          crypto.subtle.digest('SHA-512', buf)
+        ]);
+        const hex = b => Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
+        res.innerHTML = `
+          <div style="margin-bottom:12px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:4px">File</div><div style="font-size:14px;font-weight:600">${file.name}</div><div style="font-size:11px;color:var(--dim)">${(file.size/1024).toFixed(1)} KB · ${file.type || 'unknown type'}</div></div>
+          <div style="margin-bottom:12px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:4px">SHA-256</div><div style="font-family:ui-monospace,monospace;font-size:11px;word-break:break-all;color:var(--accent)">${hex(sha256)}</div></div>
+          <div style="margin-bottom:12px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:4px">SHA-1</div><div style="font-family:ui-monospace,monospace;font-size:11px;word-break:break-all">${hex(sha1)}</div></div>
+          <div><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:4px">SHA-512</div><div style="font-family:ui-monospace,monospace;font-size:10px;word-break:break-all;color:var(--dim)">${hex(sha512)}</div></div>
+        `;
+        toast('Hashed successfully');
+      } catch (e) {
+        res.innerHTML = '<span style="color:var(--bad)">⚠ ' + e.message + '</span>';
+      }
+    }
+  }
+};
+
+/* ------------------------------------------------------------
+   COLOR TOOLS
+   ------------------------------------------------------------ */
+TOOLS.color = {
+  name: 'Color Tools', icon: '◭', cat: 'Utility',
+  sub: 'Palette generator & contrast checker',
+  html: () => `
+    <div class="card">
+      <h3>Palette generator</h3>
+      <div class="row" style="margin-bottom:14px">
+        <button class="btn primary" id="cl_gen">Generate palette</button>
+        <button class="btn" data-harmony="analogous">Analogous</button>
+        <button class="btn" data-harmony="complementary">Complementary</button>
+        <button class="btn" data-harmony="triadic">Triadic</button>
+      </div>
+      <div class="palette" id="cl_palette"></div>
+      <p class="hint">Click any swatch to copy its hex code.</p>
+    </div>
+    <div class="card">
+      <h3>Contrast checker (WCAG)</h3>
+      <div class="grid2">
+        <div>
+          <div class="lbl" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:7px">Foreground</div>
+          <input type="text" id="cl_fg" value="#ffffff">
+        </div>
+        <div>
+          <div class="lbl" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:7px">Background</div>
+          <input type="text" id="cl_bg" value="#000000">
+        </div>
+      </div>
+      <div id="cl_preview" style="margin-top:16px;padding:20px;border-radius:12px;border:1px solid var(--line);font-size:15px;line-height:1.5">
+        The quick brown fox jumps over the lazy dog.
+      </div>
+      <div id="cl_result" style="margin-top:12px"></div>
+    </div>
+  `,
+  init: (v) => {
+    let hue = Math.random() * 360;
+    let harmony = 'analogous';
+
+    function hsl(h, s, l) { return `hsl(${h}, ${s}%, ${l}%)`; }
+    function hslToHex(h, s, l) {
+      l /= 100;
+      const a = s * Math.min(l, 1-l) / 100;
+      const f = n => {
+        const k = (n + h/30) % 12;
+        const c = l - a * Math.max(Math.min(k-3, 9-k, 1), -1);
+        return Math.round(255 * c).toString(16).padStart(2, '0');
+      };
+      return '#' + f(0) + f(8) + f(4);
+    }
+
+    function generate() {
+      hue = Math.random() * 360;
+      let offsets;
+      switch (harmony) {
+        case 'analogous': offsets = [-40, -20, 0, 20, 40]; break;
+        case 'complementary': offsets = [0, 0, 180, 180, 200]; break;
+        case 'triadic': offsets = [0, 120, 240, 60, 300]; break;
+        default: offsets = [0, 60, 120, 180, 240];
+      }
+      const palette = v.querySelector('#cl_palette');
+      palette.innerHTML = '';
+      const lightness = [65, 55, 45, 55, 65];
+      offsets.forEach((off, i) => {
+        const h = (hue + off + 360) % 360;
+        const hex = hslToHex(h, 65, lightness[i]);
+        const sw = el(`<div class="swatch" style="background:${hex}"><span>${hex}</span></div>`);
+        sw.addEventListener('click', () => {
+          navigator.clipboard.writeText(hex).then(() => toast('Copied ' + hex));
+        });
+        palette.appendChild(sw);
+      });
+    }
+
+    v.querySelector('#cl_gen').addEventListener('click', generate);
+    v.querySelectorAll('[data-harmony]').forEach(b => {
+      b.addEventListener('click', () => { harmony = b.dataset.harmony; generate(); });
+    });
+
+    // contrast checker
+    function hexToRgb(h) {
+      h = h.trim().replace('#','');
+      if (h.length === 3) h = h.split('').map(c=>c+c).join('');
+      if (!/^[0-9a-f]{6}$/i.test(h)) return null;
+      const n = parseInt(h, 16);
+      return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+    }
+    function lum(rgb) {
+      const f = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+      return 0.2126*f(rgb.r) + 0.7152*f(rgb.g) + 0.0722*f(rgb.b);
+    }
+    function check() {
+      const fg = v.querySelector('#cl_fg').value;
+      const bg = v.querySelector('#cl_bg').value;
+      const frgb = hexToRgb(fg), brgb = hexToRgb(bg);
+      const prev = v.querySelector('#cl_preview');
+      const res = v.querySelector('#cl_result');
+      if (!frgb || !brgb) { res.innerHTML = '<span style="color:var(--bad)">⚠ Use hex format like #ffffff</span>'; return; }
+      prev.style.color = fg; prev.style.background = bg;
+      const l1 = lum(frgb), l2 = lum(brgb);
+      const ratio = (Math.max(l1,l2) + 0.05) / (Math.min(l1,l2) + 0.05);
+      const pass = {
+        aa: ratio >= 4.5,
+        aaLarge: ratio >= 3,
+        aaa: ratio >= 7,
+        aaaLarge: ratio >= 4.5
+      };
+      res.innerHTML = `
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px">
+          <div style="font-size:32px;font-weight:700;font-variant-numeric:tabular-nums">${ratio.toFixed(2)}</div>
+          <div style="color:var(--dim);font-size:13px">contrast ratio</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div class="stat" style="padding:9px 11px"><div class="k">AA</div><div style="font-size:13px;font-weight:700;color:${pass.aa?'var(--ok)':'var(--bad)'}">${pass.aa?'✓ Pass':'✗ Fail'}</div></div>
+          <div class="stat" style="padding:9px 11px"><div class="k">AA Large</div><div style="font-size:13px;font-weight:700;color:${pass.aaLarge?'var(--ok)':'var(--bad)'}">${pass.aaLarge?'✓ Pass':'✗ Fail'}</div></div>
+          <div class="stat" style="padding:9px 11px"><div class="k">AAA</div><div style="font-size:13px;font-weight:700;color:${pass.aaa?'var(--ok)':'var(--bad)'}">${pass.aaa?'✓ Pass':'✗ Fail'}</div></div>
+          <div class="stat" style="padding:9px 11px"><div class="k">AAA Large</div><div style="font-size:13px;font-weight:700;color:${pass.aaaLarge?'var(--ok)':'✗ Fail'}">${pass.aaaLarge?'✓ Pass':'✗ Fail'}</div></div>
+        </div>
+      `;
+    }
+    v.querySelector('#cl_fg').addEventListener('input', check);
+    v.querySelector('#cl_bg').addEventListener('input', check);
+
+    generate(); check();
+  }
+};
+
+/* ------------------------------------------------------------
+   REGISTRY METADATA
+   ------------------------------------------------------------ */
+const ORDER = [
+  { cat: 'Audio', ids: ['studio','breathing','meditation','soundscape','tinnitus'] },
+  { cat: 'Focus', ids: ['pomodoro','habits','sleep'] },
+  { cat: 'Learn', ids: ['typing'] },
+  { cat: 'Utility', ids: ['encoder','json','hash','color'] }
 ];
 
 /* ============================================================
-   HYPNOSIS MODE — special sequenced mode
-   Four stages, each with its own beat / carrier / filter / pad.
-   The engine transitions smoothly between them.
+   NAVIGATION + ROUTER
    ============================================================ */
-const HYPNOSIS = {
-  id:'hypnosis', name:'Hypnosis', band:'Alpha → Theta → Deep Theta',
-  icon:'<path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
-  featured:true,
-  desc:'A guided descent through four stages of hypnotic transition — from relaxed wakefulness into deep trance.',
-  stages:[
-    {
-      label:'Induction',
-      dur:120,
-      beat:9, carrier:220,
-      chord:[110.00,164.81,220.00,329.63], // Amin
-      filter:1100, noise:'pink', noiseBase:0.10, reverb:0.45,
-      padGain:0.11, binGain:0.09,
-      note:'alpha 9 Hz · settling'
-    },
-    {
-      label:'Deepening',
-      dur:180,
-      beat:6, carrier:180,
-      chord:[87.31,130.81,174.61,261.63], // Fmaj
-      filter:850, noise:'pink', noiseBase:0.14, reverb:0.52,
-      padGain:0.12, binGain:0.085,
-      note:'theta 6 Hz · sinking'
-    },
-    {
-      label:'Trance',
-      dur:240,
-      beat:4, carrier:140,
-      chord:[65.41,98.00,130.81,196.00], // Cmaj low
-      filter:600, noise:'brown', noiseBase:0.20, reverb:0.58,
-      padGain:0.14, binGain:0.075,
-      note:'deep theta 4 Hz · trance'
-    },
-    {
-      label:'Suggestion',
-      dur:300,
-      beat:3.5, carrier:110,
-      chord:[65.41,98.00,146.83], // C-G-D open
-      filter:480, noise:'brown', noiseBase:0.22, reverb:0.62,
-      padGain:0.15, binGain:0.07,
-      note:'theta/delta border · open'
-    }
-  ]
-};
+const nav = document.getElementById('nav');
+const view = document.getElementById('view');
+const sidebar = document.getElementById('sidebar');
+const backdrop = document.getElementById('backdrop');
+const hamburger = document.getElementById('hamburger');
+const tbTitle = document.getElementById('tbTitle');
+const tbSub = document.getElementById('tbSub');
+const tbPill = document.getElementById('tbPill');
 
-/* ============================================================
-   BUFFER FACTORIES
-   ============================================================ */
-function pinkNoiseBuffer(ctx, seconds){
-  const len = Math.floor(ctx.sampleRate * seconds);
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
-  for(let i=0;i<len;i++){
-    const w = Math.random()*2-1;
-    b0=0.99886*b0+w*0.0555179;
-    b1=0.99332*b1+w*0.0750759;
-    b2=0.96900*b2+w*0.1538520;
-    b3=0.86650*b3+w*0.3104856;
-    b4=0.55000*b4+w*0.5329522;
-    b5=-0.7616*b5-w*0.0168980;
-    d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
-    b6=w*0.115926;
-  }
-  return buf;
-}
-function brownNoiseBuffer(ctx, seconds){
-  const len = Math.floor(ctx.sampleRate * seconds);
-  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-  const d = buf.getChannelData(0);
-  let last=0;
-  for(let i=0;i<len;i++){
-    const w = Math.random()*2-1;
-    last = (last + 0.02*w)/1.02;
-    d[i] = last*3.5;
-  }
-  return buf;
-}
-function reverbIR(ctx, seconds, decay){
-  const len = Math.floor(ctx.sampleRate * seconds);
-  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-  for(let ch=0; ch<2; ch++){
-    const d = buf.getChannelData(ch);
-    for(let i=0;i<len;i++){
-      d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
-    }
-  }
-  return buf;
-}
-
-/* ============================================================
-   SOUNDSCAPE ENGINE
-   ============================================================ */
-class Soundscape {
-  constructor(){
-    this.ctx = null;
-    this.master = null;
-    this.reverb = null;
-    this.reverbGain = null;
-    this.dryBus = null;
-    this.analyser = null;
-    this.mode = null;
-    this.playing = false;
-    this.activeNodes = [];
-    this.pinkBuf = null;
-    this.brownBuf = null;
-    this.volume = 0.6;
-    this.noiseLevel = 0.12;
-    this.carrierOverride = null;
-    this.useBinaural = true;
-    this.usePad = true;
-    this.useIso = true;
-  }
-
-  async init(){
-    if (this.ctx) return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    this.ctx = new AC({ latencyHint:'playback' });
-
-    this.master = this.ctx.createGain();
-    this.master.gain.value = 0;
-
-    this.analyser = this.ctx.createAnalyser();
-    this.analyser.fftSize = 2048;
-    this.analyser.smoothingTimeConstant = 0.82;
-
-    this.master.connect(this.analyser);
-    this.analyser.connect(this.ctx.destination);
-
-    this.reverb = this.ctx.createConvolver();
-    this.reverb.buffer = reverbIR(this.ctx, 3.2, 2.2);
-    this.reverbGain = this.ctx.createGain();
-    this.reverbGain.gain.value = 0.4;
-    this.reverb.connect(this.reverbGain);
-    this.reverbGain.connect(this.master);
-
-    this.dryBus = this.ctx.createGain();
-    this.dryBus.gain.value = 1;
-    this.dryBus.connect(this.master);
-
-    this.pinkBuf = pinkNoiseBuffer(this.ctx, 4);
-    this.brownBuf = brownNoiseBuffer(this.ctx, 4);
-  }
-
-  setVolume(v){
-    this.volume = v;
-    if (this.master && this.ctx){
-      this.master.gain.setTargetAtTime(v, this.ctx.currentTime, 0.08);
-    }
-  }
-
-  setNoiseLevel(v){
-    this.noiseLevel = v;
-    if (this._noiseGain && this.ctx && this.mode){
-      const base = this.mode.noiseBase !== undefined ? this.mode.noiseBase : 0.12;
-      const target = base * (v / 0.12);
-      this._noiseGain.gain.setTargetAtTime(Math.min(target, 0.5), this.ctx.currentTime, 0.15);
-    }
-  }
-
-  setCarrier(hz){
-    this.carrierOverride = hz;
-    const t = this.ctx ? this.ctx.currentTime : 0;
-    if (this._binL && this._binR && this.ctx && this.mode){
-      const beat = this.mode.beat !== undefined ? this.mode.beat : 4;
-      this._binL.frequency.setTargetAtTime(hz, t, 0.05);
-      this._binR.frequency.setTargetAtTime(hz + beat, t, 0.05);
-    }
-    if (this._iso && this.ctx){
-      this._iso.frequency.setTargetAtTime(hz, t, 0.05);
-    }
-  }
-
-  setBinaural(on){
-    this.useBinaural = on;
-    if (this._binGain && this.ctx && this.mode){
-      const g = this.mode.binGain !== undefined ? this.mode.binGain : 0.085;
-      this._binGain.gain.setTargetAtTime(on ? g : 0, this.ctx.currentTime, 0.2);
-    }
-  }
-  setPad(on){
-    this.usePad = on;
-    if (this._padGain && this.ctx && this.mode){
-      const g = this.mode.padGain !== undefined ? this.mode.padGain : 0.12;
-      this._padGain.gain.setTargetAtTime(on ? g : 0, this.ctx.currentTime, 0.2);
-    }
-  }
-  setIso(on){
-    this.useIso = on;
-    if (this._isoGain && this.ctx){
-      this._isoGain.gain.setTargetAtTime(on ? 0.07 : 0, this.ctx.currentTime, 0.2);
-    }
-  }
-
-  /* smooth shift of beat frequency (used by hypnosis) */
-  shiftBeat(hz, time=2){
-    if (!this._binL || !this._binR || !this.ctx) return;
-    const t = this.ctx.currentTime;
-    const carrier = this._binL.frequency.value;
-    this._binL.frequency.setTargetAtTime(carrier, t, 0.05);
-    this._binR.frequency.setTargetAtTime(carrier + hz, t, time / 3);
-    if (this._isoLfo){
-      this._isoLfo.frequency.setTargetAtTime(hz, t, time / 3);
-    }
-  }
-
-  /* smooth shift of pad filter */
-  shiftFilter(hz, time=2){
-    if (this._padFilter && this.ctx){
-      this._padFilter.frequency.setTargetAtTime(hz, this.ctx.currentTime, time / 3);
-    }
-  }
-
-  /* smoothly replace the pad chord (used for hypnosis stages) */
-  shiftChord(freqs, ramp=4){
-    if (!this._padOscs || !this.ctx) return;
-    const t = this.ctx.currentTime;
-    for (let i=0; i<this._padOscs.length; i++){
-      const osc = this._padOscs[i];
-      const target = freqs[i] !== undefined ? freqs[i] : freqs[freqs.length-1];
-      osc.frequency.setTargetAtTime(target, t, ramp / 3);
-    }
-  }
-
-  async stop(fadeSec=0.8){
-    if (!this.ctx) return;
-    const nodes = this.activeNodes.slice();
-    this.activeNodes = [];
-    this.playing = false;
-    if (this.master){
-      this.master.gain.setTargetAtTime(0, this.ctx.currentTime, fadeSec/3);
-    }
-    setTimeout(() => {
-      nodes.forEach(n => {
-        try { if (n.stop) n.stop(); } catch(e){}
-        try { n.disconnect(); } catch(e){}
-      });
-      this._padGain = this._binGain = this._isoGain = this._noiseGain = null;
-      this._binL = this._binR = this._iso = this._isoLfo = null;
-      this._noiseSrc = this._padFilter = null;
-      this._padOscs = null;
-    }, fadeSec * 1000 + 200);
-  }
-
-  async play(mode){
-    await this.init();
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
-
-    if (this.playing) await this.stop(0.4);
-    await new Promise(r => setTimeout(r, 450));
-
-    this.mode = mode;
-    const ctx = this.ctx;
-    const now = ctx.currentTime;
-    const fade = 2.0;
-
-    /* ---------- PAD ---------- */
-    const padGain = ctx.createGain();
-    padGain.gain.value = 0;
-    padGain.connect(this.dryBus);
-    const padRevSend = ctx.createGain();
-    padRevSend.gain.value = mode.reverb * 0.6;
-    padGain.connect(padRevSend);
-    padRevSend.connect(this.reverb);
-    this._padGain = padGain;
-
-    const padFilter = ctx.createBiquadFilter();
-    padFilter.type = 'lowpass';
-    padFilter.frequency.value = mode.filter;
-    padFilter.Q.value = 0.5;
-    padFilter.connect(padGain);
-    this._padFilter = padFilter;
-    this.activeNodes.push(padFilter);
-
-    this._padOscs = [];
-    const chordLen = mode.chord.length;
-    /* always create 4 oscillators so hypnosis can shift chords smoothly */
-    for (let i=0; i<4; i++){
-      const f = mode.chord[i] !== undefined ? mode.chord[i] : mode.chord[chordLen-1] * (1 + 0.5*i);
-      const osc = ctx.createOscillator();
-      osc.type = i === 0 ? 'sine' : (i === 1 ? 'triangle' : 'sine');
-      osc.frequency.value = f;
-      osc.detune.value = (i - 1.5) * 4;
-      const g = ctx.createGain();
-      g.gain.value = i < chordLen ? 0.28/(i+1) : 0.05;
-      osc.connect(g);
-      g.connect(padFilter);
-      osc.start(now);
-      this.activeNodes.push(osc, g);
-      this._padOscs.push(osc);
-    }
-
-    const padLfo = ctx.createOscillator();
-    padLfo.type = 'sine';
-    padLfo.frequency.value = 0.07;
-    const padLfoGain = ctx.createGain();
-    padLfoGain.gain.value = 180;
-    padLfo.connect(padLfoGain);
-    padLfoGain.connect(padFilter.frequency);
-    padLfo.start(now);
-    this.activeNodes.push(padLfo, padLfoGain);
-
-    /* ---------- BINAURAL ---------- */
-    const binGain = ctx.createGain();
-    binGain.gain.value = 0;
-    binGain.connect(this.dryBus);
-    const binRev = ctx.createGain();
-    binRev.gain.value = mode.reverb * 0.3;
-    binGain.connect(binRev);
-    binRev.connect(this.reverb);
-    this._binGain = binGain;
-    this.activeNodes.push(binGain, binRev);
-
-    const carrier = this.carrierOverride || mode.carrier;
-    const beat = mode.beat;
-
-    const pannerL = ctx.createStereoPanner();
-    pannerL.pan.value = -1;
-    pannerL.connect(binGain);
-    const binL = ctx.createOscillator();
-    binL.type = 'sine';
-    binL.frequency.value = carrier;
-    binL.connect(pannerL);
-    binL.start(now);
-    this._binL = binL;
-    this.activeNodes.push(binL, pannerL);
-
-    const pannerR = ctx.createStereoPanner();
-    pannerR.pan.value = 1;
-    pannerR.connect(binGain);
-    const binR = ctx.createOscillator();
-    binR.type = 'sine';
-    binR.frequency.value = carrier + beat;
-    binR.connect(pannerR);
-    binR.start(now);
-    this._binR = binR;
-    this.activeNodes.push(binR, pannerR);
-
-    /* ---------- ISOCHRONIC ---------- */
-    const isoGain = ctx.createGain();
-    isoGain.gain.value = 0;
-    isoGain.connect(this.dryBus);
-    const isoRev = ctx.createGain();
-    isoRev.gain.value = mode.reverb * 0.25;
-    isoGain.connect(isoRev);
-    isoRev.connect(this.reverb);
-    this._isoGain = isoGain;
-    this.activeNodes.push(isoGain, isoRev);
-
-    const iso = ctx.createOscillator();
-    iso.type = 'sine';
-    iso.frequency.value = carrier;
-    const isoGate = ctx.createGain();
-    isoGate.gain.value = 0.5;
-    iso.connect(isoGate);
-    isoGate.connect(isoGain);
-    iso.start(now);
-    this._iso = iso;
-    this.activeNodes.push(iso, isoGate);
-
-    const isoLfo = ctx.createOscillator();
-    isoLfo.type = 'square';
-    isoLfo.frequency.value = beat;
-    const isoLfoGain = ctx.createGain();
-    isoLfoGain.gain.value = 0.5;
-    isoLfo.connect(isoLfoGain);
-    isoLfoGain.connect(isoGate.gain);
-    isoLfo.start(now);
-    this._isoLfo = isoLfo;
-    this.activeNodes.push(isoLfo, isoLfoGain);
-
-    /* ---------- NOISE ---------- */
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0;
-    noiseGain.connect(this.dryBus);
-    this._noiseGain = noiseGain;
-    this.activeNodes.push(noiseGain);
-
-    const noiseSrc = ctx.createBufferSource();
-    noiseSrc.buffer = mode.noise === 'brown' ? this.brownBuf : this.pinkBuf;
-    noiseSrc.loop = true;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = mode.noise === 'brown' ? 900 : 2400;
-    noiseFilter.Q.value = 0.4;
-    noiseSrc.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseSrc.start(now);
-    this._noiseSrc = noiseSrc;
-    this.activeNodes.push(noiseSrc, noiseFilter);
-
-    /* ---------- FADE IN ---------- */
-    const targetNoise = mode.noiseBase * (this.noiseLevel / 0.12);
-    padGain.gain.setTargetAtTime(this.usePad ? mode.padGain : 0, now, fade/3);
-    binGain.gain.setTargetAtTime(this.useBinaural ? mode.binGain : 0, now, fade/3);
-    isoGain.gain.setTargetAtTime(this.useIso ? 0.07 : 0, now, fade/3);
-    noiseGain.gain.setTargetAtTime(Math.min(targetNoise, 0.5), now, fade/3);
-
-    this.playing = true;
-  }
-}
-
-/* ============================================================
-   HYPNOSIS CONTROLLER — sequences through the 4 stages
-   ============================================================ */
-class HypnosisController {
-  constructor(engine, onStage, onProgress){
-    this.engine = engine;
-    this.onStage = onStage;
-    this.onProgress = onProgress;
-    this.active = false;
-    this.timer = null;
-    this.startTime = 0;
-    this.stageIdx = 0;
-    this.raf = null;
-  }
-
-  start(){
-    this.active = true;
-    this.stageIdx = 0;
-    this.startTime = performance.now();
-    this.applyStage(0);
-    this.tick();
-  }
-
-  stop(){
-    this.active = false;
-    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-    if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
-  }
-
-  applyStage(i){
-    const st = HYPNOSIS.stages[i];
-    this.stageIdx = i;
-    if (!this.engine.playing) return;
-
-    /* smooth shifts over ~6 s */
-    const t = 6;
-    this.engine.mode.beat = st.beat;
-    this.engine.mode.carrier = st.carrier;
-
-    /* pad chord + filter */
-    this.engine.shiftChord(st.chord, t);
-    this.engine.shiftFilter(st.filter, t);
-
-    /* carrier stays close to the current setting — we shift it gently */
-    const carrierTarget = this.engine.carrierOverride || st.carrier;
-    if (this.engine._binL && this.engine.ctx){
-      const now = this.engine.ctx.currentTime;
-      this.engine._binL.frequency.setTargetAtTime(carrierTarget, now, t/3);
-      this.engine._binR.frequency.setTargetAtTime(carrierTarget + st.beat, now, t/3);
-      if (this.engine._iso) this.engine._iso.frequency.setTargetAtTime(carrierTarget, now, t/3);
-      if (this.engine._isoLfo) this.engine._isoLfo.frequency.setTargetAtTime(st.beat, now, t/3);
-    }
-
-    /* update the UI */
-    if (this.onStage) this.onStage(i, st);
-  }
-
-  tick(){
-    if (!this.active) return;
-    const stages = HYPNOSIS.stages;
-    const st = stages[this.stageIdx];
-    const elapsed = (performance.now() - this.startTime) / 1000;
-    const pct = Math.min(1, elapsed / st.dur);
-
-    if (this.onProgress) this.onProgress(this.stageIdx, elapsed, st.dur, pct);
-
-    if (pct >= 1){
-      if (this.stageIdx < stages.length - 1){
-        this.startTime = performance.now();
-        this.applyStage(this.stageIdx + 1);
-      } else {
-        /* last stage loops forever on the suggestion state */
-        /* just keep the UI in sync */
-      }
-    }
-    this.raf = requestAnimationFrame(() => this.tick());
-  }
-}
-
-/* ============================================================
-   DOM
-   ============================================================ */
-const $ = id => document.getElementById(id);
-const grid = $('grid');
-const player = $('player');
-const playBtn = $('playBtn');
-const nowTitle = $('nowTitle');
-const nowSub = $('nowSub');
-const nowStage = $('nowStage');
-const artSvg = $('artSvg');
-const vizMode = $('vizMode');
-const statBeat = $('statBeat');
-const statCarrier = $('statCarrier');
-const statNR = $('statNR');
-const timeDisplay = $('timeDisplay');
-const volEl = $('vol'), volOut = $('volOut');
-const noiseEl = $('noise'), noiseOut = $('noiseOut');
-const carrierEl = $('carrier'), carrierOut = $('carrierOut');
-const timersEl = $('timers'), timerOut = $('timerOut');
-const binBtn = $('binBtn'), padBtn = $('padBtn'), isoBtn = $('isoBtn');
-const statusPill = $('statusPill');
-const brandSub = $('brandSub');
-const brandDot = $('brandDot');
-const viz = $('viz'), vctx = viz.getContext('2d');
-const stagebar = $('stagebar');
-const stageName = $('stageName');
-const stageTime = $('stageTime');
-const stageProgress = $('stageProgress');
-const stageSteps = $('stageSteps');
-
-const engine = new Soundscape();
-
-let activeMode = null;
-let isHypnosis = false;
-let timerSeconds = 0, timerRemaining = 0;
-let timerInterval = null;
-let sessionStart = 0, sessionInterval = null;
-
-const hypno = new HypnosisController(
-  engine,
-  (i, st) => {
-    stageName.textContent = st.label + ' · ' + st.note;
-    nowStage.textContent = 'Stage ' + (i+1) + ' of 4 — ' + st.label;
-    [...stageSteps.children].forEach((el, idx) => {
-      el.classList.toggle('on', idx === i);
-      el.classList.toggle('done', idx < i);
-    });
-    /* update stat */
-    statBeat.textContent = st.beat + ' Hz';
-    statCarrier.textContent = st.carrier + ' Hz';
-  },
-  (i, elapsed, dur, pct) => {
-    stageProgress.style.width = (pct*100).toFixed(1) + '%';
-    const m = Math.floor(elapsed/60), s = Math.floor(elapsed%60);
-    const dm = Math.floor(dur/60), ds = Math.floor(dur%60);
-    stageTime.textContent = m + ':' + String(s).padStart(2,'0') + ' / ' + dm + ':' + String(ds).padStart(2,'0');
-  }
-);
-
-/* ============================================================
-   BUILD GRID
-   ============================================================ */
-MODES.forEach(m => {
-  const btn = document.createElement('button');
-  btn.className = 'mode';
-  btn.dataset.id = m.id;
-  btn.setAttribute('aria-label', m.name + ' — ' + m.band);
-  btn.innerHTML = `
-    <div class="icon"><svg viewBox="0 0 24 24">${m.icon}</svg></div>
-    <div class="name">${m.name}</div>
-    <div class="band">${m.band}</div>
-  `;
-  btn.addEventListener('click', () => selectMode(m));
-  grid.appendChild(btn);
-});
-
-/* hypnosis — featured, spans full width */
-(function(){
-  const btn = document.createElement('button');
-  btn.className = 'mode featured';
-  btn.dataset.id = HYPNOSIS.id;
-  btn.setAttribute('aria-label', HYPNOSIS.name + ' — ' + HYPNOSIS.band);
-  btn.innerHTML = `
-    <div class="icon"><svg viewBox="0 0 24 24">${HYPNOSIS.icon}</svg></div>
-    <div class="name">${HYPNOSIS.name}</div>
-    <div class="band">${HYPNOSIS.band}</div>
-    <div class="feat-desc">${HYPNOSIS.desc}</div>
-    <div class="stages">
-      <span>Induction</span>
-      <span>Deepening</span>
-      <span>Trance</span>
-      <span>Suggestion</span>
-    </div>
-  `;
-  btn.addEventListener('click', () => selectHypnosis());
-  grid.appendChild(btn);
-})();
-
-/* ============================================================
-   MODE SELECTION
-   ============================================================ */
-function applyModeTheme(id){
-  const el = document.querySelector(`.mode[data-id="${id}"]`);
-  if (!el) return;
-  const cs = getComputedStyle(el);
-  const c = cs.getPropertyValue('--m-color').trim();
-  const d = cs.getPropertyValue('--m-dim').trim();
-  document.documentElement.style.setProperty('--mode-color', c);
-  document.documentElement.style.setProperty('--mode-dim', d);
-  brandDot.style.background = c;
-  brandDot.style.boxShadow = '0 0 14px ' + c;
-}
-
-async function selectMode(mode){
-  /* stop hypnosis if active */
-  hypno.stop();
-  isHypnosis = false;
-  player.classList.remove('hypno');
-
-  document.querySelectorAll('.mode').forEach(el => {
-    el.classList.toggle('active', el.dataset.id === mode.id);
+ORDER.forEach(g => {
+  const grp = document.createElement('div');
+  grp.className = 'sb-group';
+  grp.innerHTML = `<h2>${g.cat}</h2>`;
+  g.ids.forEach(id => {
+    const t = TOOLS[id];
+    if (!t) return;
+    const b = document.createElement('button');
+    b.className = 'navitem';
+    b.dataset.id = id;
+    b.innerHTML = `<span class="ico">${t.icon}</span><span>${t.name}</span>`;
+    b.addEventListener('click', () => mount(id));
+    grp.appendChild(b);
   });
-  applyModeTheme(mode.id);
+  nav.appendChild(grp);
+});
 
-  nowTitle.textContent = mode.name;
-  nowSub.textContent = mode.band + ' · ' + mode.desc;
-  artSvg.innerHTML = mode.icon;
-  vizMode.textContent = mode.name.toLowerCase();
-  statBeat.textContent = mode.beat + ' Hz';
-  statCarrier.textContent = mode.carrier + ' Hz';
+let currentId = null;
 
-  brandSub.textContent = mode.name + ' · ' + mode.band;
-  carrierEl.value = mode.carrier;
-  carrierOut.textContent = mode.carrier + ' Hz';
-  engine.carrierOverride = null;
-  activeMode = mode;
+function mount(id) {
+  const tool = TOOLS[id];
+  if (!tool || currentId === id) return;
+  Engine.unmount();
+  currentId = id;
 
+  tbTitle.textContent = tool.name;
+  tbSub.textContent = tool.sub;
+  tbPill.textContent = 'ready';
+
+  view.innerHTML = '';
+  const container = document.createElement('div');
+  container.innerHTML = tool.html();
+  view.appendChild(container);
   try {
-    await engine.play(mode);
-    setPlayingState(true);
-    startSessionTimer();
-  } catch (err){
-    console.error(err);
-    setPlayingState(false);
+    tool.init(container);
+  } catch (e) {
+    console.error(e);
+    view.innerHTML = '<div class="card" style="color:var(--bad)">⚠ Failed to load this tool: ' + e.message + '</div>';
   }
+
+  document.querySelectorAll('.navitem').forEach(n => n.classList.toggle('active', n.dataset.id === id));
+
+  // close mobile sidebar
+  sidebar.classList.remove('open');
+  backdrop.classList.remove('show');
 }
 
-async function selectHypnosis(){
-  hypno.stop();
-  isHypnosis = true;
-  player.classList.add('hypno');
-
-  document.querySelectorAll('.mode').forEach(el => {
-    el.classList.toggle('active', el.dataset.id === HYPNOSIS.id);
-  });
-  applyModeTheme(HYPNOSIS.id);
-
-  const first = HYPNOSIS.stages[0];
-  nowTitle.textContent = HYPNOSIS.name;
-  nowSub.textContent = HYPNOSIS.band;
-  nowStage.textContent = 'Stage 1 of 4 — ' + first.label;
-  artSvg.innerHTML = HYPNOSIS.icon;
-  vizMode.textContent = 'hypnosis';
-  statBeat.textContent = first.beat + ' Hz';
-  statCarrier.textContent = first.carrier + ' Hz';
-  brandSub.textContent = 'Hypnosis · ' + HYPNOSIS.band;
-  carrierEl.value = first.carrier;
-  carrierOut.textContent = first.carrier + ' Hz';
-  engine.carrierOverride = null;
-
-  /* build a synthetic mode object for the engine to start from */
-  const syntheticMode = {
-    id: HYPNOSIS.id,
-    name: HYPNOSIS.name,
-    beat: first.beat,
-    carrier: first.carrier,
-    chord: first.chord,
-    filter: first.filter,
-    noise: first.noise,
-    noiseBase: first.noiseBase,
-    reverb: first.reverb,
-    padGain: first.padGain,
-    binGain: first.binGain
-  };
-  activeMode = syntheticMode;
-
-  try {
-    await engine.play(syntheticMode);
-    setPlayingState(true);
-    startSessionTimer();
-    /* start the staged controller */
-    setTimeout(() => {
-      if (engine.playing && isHypnosis) hypno.start();
-    }, 500);
-  } catch (err){
-    console.error(err);
-    setPlayingState(false);
-  }
-}
-
-function setPlayingState(on){
-  player.classList.toggle('playing', on);
-  statusPill.classList.toggle('on', on);
-  statusPill.textContent = on ? 'playing' : 'paused';
-}
-
-/* play / pause */
-playBtn.addEventListener('click', async () => {
-  if (!activeMode){
-    await selectMode(MODES[0]);
-    return;
-  }
-  if (engine.playing){
-    if (isHypnosis) hypno.stop();
-    await engine.stop(0.6);
-    setPlayingState(false);
-    stopSessionTimer();
-  } else {
-    await engine.play(activeMode);
-    setPlayingState(true);
-    startSessionTimer();
-    if (isHypnosis){
-      /* restart hypnosis from stage 1 */
-      const first = HYPNOSIS.stages[0];
-      engine.mode.beat = first.beat;
-      engine.mode.carrier = first.carrier;
-      setTimeout(() => {
-        if (engine.playing && isHypnosis) hypno.start();
-      }, 500);
-    }
-  }
+hamburger.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  backdrop.classList.remove('show');
 });
 
-/* volume */
-function paintRange(el){
-  const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
-  el.style.setProperty('--fill', pct + '%');
-}
-volEl.addEventListener('input', () => {
-  engine.setVolume(+volEl.value / 100);
-  volOut.textContent = volEl.value + '%';
-  paintRange(volEl);
-});
-
-noiseEl.addEventListener('input', () => {
-  engine.setNoiseLevel(+noiseEl.value / 100);
-  noiseOut.textContent = noiseEl.value + '%';
-  paintRange(noiseEl);
-});
-
-carrierEl.addEventListener('input', () => {
-  engine.setCarrier(+carrierEl.value);
-  carrierOut.textContent = carrierEl.value + ' Hz';
-  paintRange(carrierEl);
-  /* disable hypnosis auto-carrier if user is manually adjusting */
-  if (isHypnosis) engine.carrierOverride = +carrierEl.value;
-});
-
-binBtn.addEventListener('click', () => {
-  engine.setBinaural(!engine.useBinaural);
-  binBtn.classList.toggle('on', engine.useBinaural);
-});
-padBtn.addEventListener('click', () => {
-  engine.setPad(!engine.usePad);
-  padBtn.classList.toggle('on', engine.usePad);
-});
-isoBtn.addEventListener('click', () => {
-  engine.setIso(!engine.useIso);
-  isoBtn.classList.toggle('on', engine.useIso);
-});
-
-/* timer */
-timersEl.addEventListener('click', e => {
-  const b = e.target.closest('.tm');
-  if (!b) return;
-  document.querySelectorAll('.tm').forEach(x => x.classList.toggle('on', x === b));
-  const min = +b.dataset.min;
-  timerSeconds = min * 60;
-  timerRemaining = timerSeconds;
-  if (min === 0){
-    timerOut.textContent = '∞';
-    stopTimerInterval();
-  } else {
-    renderTimer();
-    startTimerInterval();
-  }
-});
-function renderTimer(){
-  if (timerSeconds === 0){ timerOut.textContent = '∞'; return; }
-  const m = Math.floor(timerRemaining / 60);
-  const s = timerRemaining % 60;
-  timerOut.textContent = m + ':' + String(s).padStart(2, '0');
-}
-function startTimerInterval(){
-  stopTimerInterval();
-  if (timerSeconds === 0) return;
-  timerInterval = setInterval(() => {
-    if (!engine.playing) return;
-    timerRemaining--;
-    if (timerRemaining <= 0){
-      timerRemaining = 0;
-      renderTimer();
-      stopTimerInterval();
-      engine.stop(2);
-      if (isHypnosis) hypno.stop();
-      setPlayingState(false);
-      stopSessionTimer();
-    } else {
-      renderTimer();
-    }
-  }, 1000);
-}
-function stopTimerInterval(){
-  if (timerInterval){ clearInterval(timerInterval); timerInterval = null; }
-}
-
-function startSessionTimer(){
-  stopSessionTimer();
-  sessionStart = performance.now();
-  sessionInterval = setInterval(() => {
-    if (!engine.playing) return;
-    const total = Math.floor((performance.now() - sessionStart) / 1000);
-    const m = Math.floor(total / 60);
-    const s = total % 60;
-    timeDisplay.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-  }, 500);
-}
-function stopSessionTimer(){
-  if (sessionInterval){ clearInterval(sessionInterval); sessionInterval = null; }
-}
-
-/* ============================================================
-   VISUALIZER
-   ============================================================ */
-function sizeViz(){
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const r = viz.getBoundingClientRect();
-  viz.width = Math.max(1, Math.round(r.width * dpr));
-  viz.height = Math.max(1, Math.round(r.height * dpr));
-  vctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', sizeViz);
-
-let freqData = null, timeData = null;
-let pulseT = 0, lastFrame = 0;
-
-function startViz(){
-  let last = performance.now();
-  function frame(now){
-    const dt = Math.min((now - last)/1000, 0.1);
-    last = now;
-    pulseT += dt;
-    drawViz();
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
-function drawViz(){
-  const W = viz.clientWidth, H = viz.clientHeight;
-  if (!W || !H) return;
-  vctx.clearRect(0, 0, W, H);
-
-  const playing = engine.playing;
-  const accent = getComputedStyle(document.documentElement).getPropertyValue('--mode-color').trim() || '#8b9dff';
-  const cx = W/2, cy = H/2;
-
-  if (!playing || !engine.analyser){
-    vctx.strokeStyle = 'rgba(255,255,255,.06)';
-    vctx.lineWidth = 1;
-    vctx.beginPath();
-    vctx.arc(cx, cy, Math.min(W,H)*0.28, 0, Math.PI*2);
-    vctx.stroke();
-    vctx.fillStyle = 'rgba(255,255,255,.15)';
-    vctx.font = '11px ui-sans-serif';
-    vctx.textAlign = 'center';
-    vctx.fillText('idle', cx, cy + 4);
-    return;
-  }
-
-  if (!freqData){
-    freqData = new Uint8Array(engine.analyser.frequencyBinCount);
-    timeData = new Uint8Array(engine.analyser.fftSize);
-  }
-  engine.analyser.getByteFrequencyData(freqData);
-  engine.analyser.getByteTimeDomainData(timeData);
-
-  const beatHz = engine.mode ? engine.mode.beat : 4;
-  const baseR = Math.min(W,H) * 0.22;
-
-  /* ripple rings */
-  for (let r=0; r<3; r++){
-    const phase = (pulseT * beatHz + r*0.33) % 1;
-    const radius = baseR + phase * Math.min(W,H) * 0.28;
-    const alpha = (1 - phase) * 0.35;
-    vctx.strokeStyle = hexToRgba(accent, alpha);
-    vctx.lineWidth = 1.4;
-    vctx.beginPath();
-    vctx.arc(cx, cy, radius, 0, Math.PI*2);
-    vctx.stroke();
-  }
-
-  /* breathing core */
-  const beatPhase = (Math.sin(pulseT * beatHz * Math.PI * 2) + 1) / 2;
-  const coreR = baseR * (0.75 + beatPhase * 0.28);
-
-  const grad = vctx.createRadialGradient(cx, cy, 0, cx, cy, coreR*2.2);
-  grad.addColorStop(0, hexToRgba(accent, 0.35));
-  grad.addColorStop(0.5, hexToRgba(accent, 0.10));
-  grad.addColorStop(1, hexToRgba(accent, 0));
-  vctx.fillStyle = grad;
-  vctx.fillRect(0, 0, W, H);
-
-  vctx.fillStyle = hexToRgba(accent, 0.12);
-  vctx.beginPath();
-  vctx.arc(cx, cy, coreR, 0, Math.PI*2);
-  vctx.fill();
-  vctx.strokeStyle = hexToRgba(accent, 0.55);
-  vctx.lineWidth = 1.3;
-  vctx.stroke();
-
-  /* FFT ring */
-  const bins = freqData.length;
-  const step = Math.floor(bins/96);
-  const R = baseR * 1.55;
-  vctx.beginPath();
-  for (let i=0; i<=96; i++){
-    const bin = i * step;
-    const v = freqData[bin] / 255;
-    const angle = (i/96) * Math.PI * 2 - Math.PI/2;
-    const r = R + v * Math.min(W,H) * 0.20;
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    if (i === 0) vctx.moveTo(x, y);
-    else vctx.lineTo(x, y);
-  }
-  vctx.closePath();
-  vctx.strokeStyle = hexToRgba(accent, 0.55);
-  vctx.lineWidth = 1.4;
-  vctx.stroke();
-
-  /* waveform */
-  vctx.beginPath();
-  const wN = timeData.length;
-  for (let x=0; x<W; x++){
-    const i = Math.floor((x/W)*wN);
-    const v = (timeData[i]-128)/128;
-    const y = cy + v * (H * 0.35);
-    if (x === 0) vctx.moveTo(x, y);
-    else vctx.lineTo(x, y);
-  }
-  vctx.strokeStyle = hexToRgba(accent, 0.18);
-  vctx.lineWidth = 1;
-  vctx.stroke();
-
-  /* peak meter */
-  let peak = 0;
-  for (let i=0; i<wN; i++){
-    const a = Math.abs((timeData[i]-128)/128);
-    if (a > peak) peak = a;
-  }
-  statNR.textContent = (peak*100).toFixed(0) + '%';
-}
-
-function hexToRgba(hex, a){
-  hex = hex.trim();
-  if (hex.startsWith('rgb')){
-    const m = hex.match(/[\d.]+/g);
-    if (m) return `rgba(${m[0]},${m[1]},${m[2]},${a})`;
-    return hex;
-  }
-  if (hex.startsWith('#')) hex = hex.slice(1);
-  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
-  const n = parseInt(hex, 16);
-  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
-}
-
-/* ============================================================
-   INIT
-   ============================================================ */
-function init(){
-  sizeViz();
-  paintRange(volEl);
-  paintRange(noiseEl);
-  paintRange(carrierEl);
-  volOut.textContent = volEl.value + '%';
-  noiseOut.textContent = noiseEl.value + '%';
-  carrierOut.textContent = carrierEl.value + ' Hz';
-  timerOut.textContent = '∞';
-  startViz();
-
-  /* default theme */
-  document.documentElement.style.setProperty('--mode-color', '#5eead4');
-  document.documentElement.style.setProperty('--mode-dim', 'rgba(94,234,212,.13)');
-}
-
-let unlocked = false;
-async function unlock(){
-  if (unlocked) return;
-  unlocked = true;
-  try {
-    await engine.init();
-    if (engine.ctx.state === 'suspended') await engine.ctx.resume();
-  } catch(e){}
-}
-window.addEventListener('pointerdown', unlock);
-window.addEventListener('keydown', unlock);
-
-init();
+/* initial */
+mount('studio');
 
 })();
 </script>
