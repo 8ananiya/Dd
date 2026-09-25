@@ -8,33 +8,20 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#0a0a0f;
-    --panel:#11131a;
-    --card:#151822;
-    --line:rgba(255,255,255,.08);
-    --txt:#e8edf5;
-    --dim:#6b7a8f;
-    --accent:#00e5c0;
-    --accent-dim:rgba(0,229,192,.15);
-    --anti:#ff4d6d;
-    --warn:#ffb020;
-    --blue:#5b9dff;
-    --purple:#a78bfa;
+    --bg:#0a0a0f;--panel:#11131a;--card:#151822;--line:rgba(255,255,255,.08);
+    --txt:#e8edf5;--dim:#6b7a8f;--accent:#00e5c0;--accent-dim:rgba(0,229,192,.15);
+    --anti:#ff4d6d;--warn:#ffb020;--blue:#5b9dff;--purple:#a78bfa;
   }
   html,body{height:100%}
   body{
     background:radial-gradient(1200px 800px at 50% -15%,rgba(0,229,192,.06),transparent 55%),
-      radial-gradient(800px 600px at 85% 100%,rgba(91,157,255,.04),transparent 55%),
-      var(--bg);
-    color:var(--txt);
-    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;justify-content:center;
+      radial-gradient(800px 600px at 85% 100%,rgba(91,157,255,.04),transparent 55%),var(--bg);
+    color:var(--txt);font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;display:flex;justify-content:center;
     padding:20px 16px 40px;min-height:100%;
   }
   .wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
 
-  /* header */
   .top{display:flex;align-items:center;justify-content:space-between}
   .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:15px}
   .logo em{font-style:normal;color:var(--dim);font-weight:500}
@@ -46,7 +33,52 @@
     background:rgba(255,255,255,.02);color:var(--dim);transition:.3s;white-space:nowrap}
   .pill.on{color:var(--accent);border-color:rgba(0,229,192,.35);background:rgba(0,229,192,.06)}
 
-  /* power */
+  /* mic picker */
+  .micpick{
+    display:flex;align-items:center;gap:10px;
+    border:1px solid var(--line);border-radius:14px;
+    padding:10px 12px;background:var(--card);
+  }
+  .micpick .ico{
+    width:34px;height:34px;flex:0 0 34px;border-radius:10px;
+    background:rgba(0,229,192,.08);border:1px solid rgba(0,229,192,.2);
+    display:grid;place-items:center;color:var(--accent);
+  }
+  .micpick .ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .micpick .body{flex:1;min-width:0}
+  .micpick .lbl{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;margin-bottom:4px;display:flex;gap:6px;align-items:center}
+  .micpick .lbl .badge{
+    font-size:9px;padding:1px 6px;border-radius:99px;
+    background:rgba(0,229,192,.12);color:var(--accent);
+    letter-spacing:.08em;font-weight:700;text-transform:uppercase;
+    border:1px solid rgba(0,229,192,.25);display:none;
+  }
+  .micpick .lbl .badge.show{display:inline-block}
+  .micpick select{
+    width:100%;background:transparent;border:none;color:var(--txt);
+    font-family:inherit;font-size:13px;font-weight:500;outline:none;cursor:pointer;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a8f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;background-position:right 4px center;
+    padding-right:22px;text-overflow:ellipsis;
+  }
+  .micpick select option{background:#151822;color:var(--txt);padding:6px}
+  .micpick .refresh{
+    flex:0 0 34px;width:34px;height:34px;border-radius:10px;cursor:pointer;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);
+    display:grid;place-items:center;transition:.2s;-webkit-tap-highlight-color:transparent;outline:none;
+  }
+  .micpick .refresh:hover{color:var(--accent);border-color:rgba(0,229,192,.35)}
+  .micpick .refresh svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* level bar inside micpick */
+  .miclevel{height:3px;background:rgba(255,255,255,.06);border-radius:99px;
+    margin-top:6px;overflow:hidden}
+  .miclevel i{display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#007a68,var(--accent));
+    border-radius:99px;transition:width .06s linear}
+
   .stage{display:flex;flex-direction:column;align-items:center;gap:14px;
     padding:24px 20px 20px;border:1px solid var(--line);border-radius:22px;
     background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
@@ -67,7 +99,6 @@
   .hint{font-size:13px;color:var(--dim);text-align:center;line-height:1.5;max-width:420px;min-height:20px}
   .hint b{color:var(--txt);font-weight:600}
 
-  /* viz row */
   .vizrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:560px){.vizrow{grid-template-columns:1fr}}
   .vizbox{position:relative;border:1px solid var(--line);border-radius:16px;
@@ -81,11 +112,9 @@
   .legend span{display:flex;align-items:center;gap:5px;color:var(--dim)}
   .legend i{width:12px;height:2px;border-radius:2px;display:block}
 
-  /* meters */
   .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   @media(max-width:560px){.meters{grid-template-columns:1fr 1fr}}
-  .meter{border:1px solid var(--line);border-radius:12px;padding:10px 12px;
-    background:rgba(255,255,255,.015)}
+  .meter{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.015)}
   .meter-head{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;
     text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:7px}
   .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
@@ -96,7 +125,6 @@
   .bar.nr i{background:linear-gradient(90deg,#2d4a7a,var(--blue))}
   .meter-head output{font-size:10px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
 
-  /* controls */
   .panel{border:1px solid var(--line);border-radius:18px;padding:16px 16px 4px;background:var(--panel)}
   .panel h2{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
     font-weight:700;margin-bottom:14px}
@@ -104,12 +132,10 @@
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .ctrl-head b{font-size:12.5px;font-weight:600;color:#cbd6e0}
   .ctrl-head output{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;
-    background:transparent;cursor:pointer;display:block}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;display:block}
   input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
-    background:#0e141b;border:2px solid var(--accent);margin-top:-6px;
-    box-shadow:0 0 8px rgba(0,229,192,.4);transition:transform .15s}
+    background:#0e141b;border:2px solid var(--accent);margin-top:-6px;box-shadow:0 0 8px rgba(0,229,192,.4);transition:transform .15s}
   input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   input[type=range]::-moz-range-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
   input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0e141b;
@@ -123,7 +149,6 @@
   .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.07)}
   .tgl:active{transform:scale(.98)}
 
-  /* info */
   .note{border:1px solid var(--line);border-radius:16px;padding:14px 16px;
     background:rgba(255,255,255,.015);font-size:12px;line-height:1.6;color:var(--dim)}
   .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:6px;font-size:11px;
@@ -145,15 +170,34 @@
     <div class="pill" id="statusPill">standby</div>
   </header>
 
+  <!-- Microphone picker -->
+  <div class="micpick">
+    <div class="ico">
+      <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+    </div>
+    <div class="body">
+      <div class="lbl">
+        Input device
+        <span class="badge" id="headsetBadge">headset</span>
+      </div>
+      <select id="micSelect" aria-label="Select microphone">
+        <option value="">— default microphone —</option>
+      </select>
+      <div class="miclevel"><i id="micLevelBar"></i></div>
+    </div>
+    <button class="refresh" id="refreshBtn" title="Re-scan devices" aria-label="Re-scan devices">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+  </div>
+
   <section class="stage">
     <button class="power" id="powerBtn" aria-label="Toggle ANC">
       <span class="ring"></span><span class="ring r2"></span>
       <svg viewBox="0 0 24 24"><path d="M12 2.5v9"/><path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/></svg>
     </button>
-    <p class="hint" id="hint">Wear <b>headphones</b> and tap. The system uses <b>FxLMS</b> — the same algorithm as commercial ANC chips — to adaptively cancel low-frequency noise.</p>
+    <p class="hint" id="hint">Pick your <b>headset mic</b> above, wear headphones, then tap. The system uses <b>FxLMS</b> to adaptively cancel low-frequency noise.</p>
   </section>
 
-  <!-- Visualizations -->
   <div class="vizrow">
     <div class="vizbox">
       <canvas id="scope"></canvas>
@@ -184,7 +228,6 @@
     </div>
   </div>
 
-  <!-- Meters -->
   <section class="meters">
     <div class="meter">
       <div class="meter-head"><span>Ref</span><output id="inDb">−∞</output></div>
@@ -204,7 +247,6 @@
     </div>
   </section>
 
-  <!-- Controls -->
   <section class="panel">
     <h2>FxLMS Controller</h2>
 
@@ -231,13 +273,12 @@
   </section>
 
   <section class="note">
-    <strong>Based on michalber/ANC-Headphones-repository-</strong>
+    <strong>Using a headset microphone</strong>
     <ul>
-      <li>Original: JUCE C++ with ARM CMSIS DSP, targeting Raspberry Pi + I2S mics/DAC. This is a direct port of that FxLMS implementation to the Web Audio API.</li>
-      <li><b>FxLMS</b> (Filtered-x Least Mean Squares) with <b>NLMS</b> normalization — the same algorithm family used in commercial ANC chips.</li>
-      <li>Config defaults from the repo: <code>μ = 0.0005</code>, <code>taps = 256</code> (original used 4192 for Pi; reduced for browser CPU).</li>
-      <li><b>DC blocker</b> removes microphone DC offset, as the original repo requires via LADSPA plugins.</li>
-      <li class="warn">Browser latency (10–30 ms) limits cancellation to ~25 Hz. Commercial ANC chips run at &lt;1 ms. This is the real algorithm, but not the real hardware.</li>
+      <li>Select your <b>headset mic</b> from the input device dropdown above. The badge turns green when the system detects a headset.</li>
+      <li>Bluetooth headsets may show as "Hands-Free AG Audio" — that's the mic channel, but it's low quality and has high latency. <b>USB or 3.5mm headsets are preferred.</b></li>
+      <li>If you plug in a headset after opening the page, tap <b>re-scan</b> (↻) to refresh the device list.</li>
+      <li class="warn">Browser latency (10–30 ms) limits cancellation to ~25 Hz. This is the real FxLMS algorithm, just without the dedicated DSP silicon.</li>
     </ul>
   </section>
 
@@ -269,33 +310,20 @@ class ANCProcessor extends AudioWorkletProcessor {
     super();
     this.N = 2048;
     this.MAXTAPS = 512;
-
-    /* FxLMS adaptive filter weights */
     this.w = new Float32Array(this.MAXTAPS);
-
-    /* ring buffer for reference signal history */
     this.refHist = new Float32Array(this.N);
     this.refIdx = 0;
-
-    /* DC blocker state (from repo's dcBlocker) */
     this.xm1 = 0;
     this.ym1 = 0;
-
-    /* NLMS energy estimate */
     this.energy = 1e-6;
-
-    /* running measurements */
     this.refPow = 0;
     this.errPow = 0;
     this.outPow = 0;
     this.frameCount = 0;
-
-    /* filter coefficient snapshot for visualization */
     this.coeffSnapshot = new Float32Array(this.MAXTAPS);
     this.snapCounter = 0;
   }
 
-  /* DC blocker: out[i] = in[i] - xm1 + 0.995 * ym1 (from repo) */
   dcBlock(x) {
     const y = x - this.xm1 + 0.995 * this.ym1;
     this.xm1 = x;
@@ -316,7 +344,6 @@ class ANCProcessor extends AudioWorkletProcessor {
     }
 
     const in0 = input[0];
-
     const mu     = params.mu[0];
     const taps   = Math.min(this.MAXTAPS, Math.max(32, Math.round(params.taps[0])));
     const volume = params.volume[0];
@@ -331,14 +358,10 @@ class ANCProcessor extends AudioWorkletProcessor {
     let energy = this.energy;
 
     for (let i = 0; i < n; i++) {
-      /* 1. read reference, optionally DC-block */
       let x = in0[i];
       if (dcOn) x = this.dcBlock(x);
-
-      /* 2. write reference into history */
       refHist[refIdx] = x;
 
-      /* 3. compute anti-noise: y = -sum(w[k] * refHist[idx-k]) */
       let y = 0;
       for (let k = 0; k < taps; k++) {
         let idx = refIdx - k;
@@ -348,16 +371,12 @@ class ANCProcessor extends AudioWorkletProcessor {
       if (negOn) y = -y;
       y *= volume;
 
-      /* 4. hard safety clamp */
       if (y > 0.95) y = 0.95;
       else if (y < -0.95) y = -0.95;
       if (!isFinite(y)) { y = 0; w.fill(0); }
 
       out0[i] = y;
 
-      /* 5. NLMS weight update:
-         w[k] += mu * e * x[n-k] / (energy + eps)
-         where e = x (the residual at the mic)  */
       const e = x;
       energy = energy * 0.999 + x * x * 0.001;
       const step = normOn ? mu / (energy + 1e-6) : mu;
@@ -374,12 +393,10 @@ class ANCProcessor extends AudioWorkletProcessor {
       refIdx++;
       if (refIdx >= N) refIdx = 0;
 
-      /* measurements */
       this.refPow = this.refPow * 0.999 + x * x * 0.001;
       this.errPow = this.errPow * 0.999 + e * e * 0.001;
       this.outPow = this.outPow * 0.999 + y * y * 0.001;
 
-      /* periodic snapshot for visualization */
       this.snapCounter++;
       if (this.snapCounter >= 4096) {
         this.snapCounter = 0;
@@ -402,7 +419,6 @@ class ANCProcessor extends AudioWorkletProcessor {
 
     this.refIdx = refIdx;
     this.energy = energy;
-
     for (let c = 1; c < output.length; c++) output[c].set(out0);
     return true;
   }
@@ -418,6 +434,11 @@ const powerBtn = $('powerBtn');
 const statusPill = $('statusPill');
 const pulse = $('pulse');
 const hint = $('hint');
+
+const micSelect = $('micSelect');
+const refreshBtn = $('refreshBtn');
+const headsetBadge = $('headsetBadge');
+const micLevelBar = $('micLevelBar');
 
 const scope = $('scope'), sctx = scope.getContext('2d');
 const spectrum = $('spectrum'), fctx = spectrum.getContext('2d');
@@ -454,7 +475,116 @@ let powerIdx = 0;
 let nrValue = 0;
 
 let normOn = true, dcOn = true, negOn = true;
+let selectedDeviceId = null;
+let devicesLoaded = false;
 const BASE_VOLUME = 0.85;
+
+/* ============================================================
+   Device enumeration
+   ============================================================ */
+function isHeadsetLabel(label) {
+  const s = (label || '').toLowerCase();
+  return /headset|headphone|head-mounted|bluetooth|airpods|buds|wh-|wf-|qc|beats|jabra|plantronics|poly|sennheiser|bose|sony|handsfree|hands-free|hfp|ag audio/.test(s);
+}
+
+async function enumerateMics(requestLabelAccess = false) {
+  /* labels are only populated after a getUserMedia call has been granted.
+     If we don't have permission yet, request it once so the dropdown shows real names. */
+  if (requestLabelAccess) {
+    try {
+      const tmp = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      tmp.getTracks().forEach(t => t.stop());
+    } catch (err) {
+      /* ignore — user may deny; we'll still show generic entries */
+    }
+  }
+
+  let devices = [];
+  try {
+    devices = await navigator.mediaDevices.enumerateDevices();
+  } catch (err) {
+    console.warn('enumerateDevices failed', err);
+  }
+
+  const mics = devices.filter(d => d.kind === 'audioinput');
+
+  const prev = micSelect.value;
+  micSelect.innerHTML = '<option value="">— default microphone —</option>';
+
+  let headsetFound = false;
+
+  mics.forEach((d, i) => {
+    const opt = document.createElement('option');
+    opt.value = d.deviceId;
+    const label = d.label || ('Microphone ' + (i + 1));
+    opt.textContent = label;
+    if (isHeadsetLabel(d.label)) {
+      opt.textContent = '🎧  ' + label;
+      headsetFound = true;
+    }
+    micSelect.appendChild(opt);
+  });
+
+  /* restore previous selection if it still exists */
+  if (prev && mics.some(d => d.deviceId === prev)) {
+    micSelect.value = prev;
+  } else if (prev === '' || prev === undefined) {
+    /* nothing to do, default */
+  } else {
+    micSelect.value = '';
+  }
+
+  /* auto-pick first headset if user hasn't chosen yet */
+  if (!selectedDeviceId && headsetFound) {
+    const hs = mics.find(d => isHeadsetLabel(d.label));
+    if (hs) {
+      micSelect.value = hs.deviceId;
+      selectedDeviceId = hs.deviceId;
+      headsetBadge.classList.add('show');
+    }
+  } else {
+    headsetBadge.classList.toggle('show', isHeadsetLabel(
+      micSelect.options[micSelect.selectedIndex]?.textContent || ''
+    ));
+  }
+
+  devicesLoaded = true;
+  updateHeadsetBadge();
+}
+
+function updateHeadsetBadge() {
+  const opt = micSelect.options[micSelect.selectedIndex];
+  const label = opt ? opt.textContent : '';
+  const isHS = isHeadsetLabel(label);
+  headsetBadge.classList.toggle('show', isHS);
+}
+
+micSelect.addEventListener('change', () => {
+  selectedDeviceId = micSelect.value || null;
+  updateHeadsetBadge();
+  if (running) {
+    /* switch input live — restart capture with new device */
+    restartCapture();
+  }
+});
+
+refreshBtn.addEventListener('click', async () => {
+  refreshBtn.style.transform = 'rotate(360deg)';
+  refreshBtn.style.transition = 'transform .5s ease';
+  setTimeout(() => {
+    refreshBtn.style.transform = '';
+    refreshBtn.style.transition = '';
+  }, 520);
+  await enumerateMics(true);
+  hint.textContent = 'Device list refreshed.';
+});
+
+/* watch for device plug/unplug */
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+  navigator.mediaDevices.addEventListener('devicechange', () => {
+    enumerateMics(false);
+  });
+}
 
 /* ============================================================
    Canvas sizing
@@ -501,16 +631,25 @@ function pushParams() {
 }
 
 sliders.forEach(s => s.addEventListener('input', () => { updateLabels(); pushParams(); }));
+normBtn.addEventListener('click', () => { normOn = !normOn; normBtn.classList.toggle('on', normOn); pushParams(); });
+dcBtn.addEventListener('click', () => { dcOn = !dcOn; dcBtn.classList.toggle('on', dcOn); pushParams(); });
+negBtn.addEventListener('click', () => { negOn = !negOn; negBtn.classList.toggle('on', negOn); pushParams(); });
 
-normBtn.addEventListener('click', () => {
-  normOn = !normOn; normBtn.classList.toggle('on', normOn); pushParams();
-});
-dcBtn.addEventListener('click', () => {
-  dcOn = !dcOn; dcBtn.classList.toggle('on', dcOn); pushParams();
-});
-negBtn.addEventListener('click', () => {
-  negOn = !negOn; negBtn.classList.toggle('on', negOn); pushParams();
-});
+/* ============================================================
+   Build the getUserMedia audio constraints for the selected device
+   ============================================================ */
+function buildAudioConstraints() {
+  const audio = {
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+    channelCount: 1
+  };
+  if (selectedDeviceId) {
+    audio.deviceId = { exact: selectedDeviceId };
+  }
+  return { audio, video: false };
+}
 
 /* ============================================================
    Start / stop
@@ -520,16 +659,42 @@ async function start() {
   setStatus('mic…', false);
   hint.textContent = 'Requesting microphone…';
 
+  /* Make sure the dropdown has real labels */
+  if (!devicesLoaded) {
+    await enumerateMics(true);
+  }
+
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
-      video: false
-    });
+    stream = await navigator.mediaDevices.getUserMedia(buildAudioConstraints());
   } catch (err) {
     console.error(err);
-    setStatus('blocked', false);
-    hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
-    return;
+    /* If we requested a specific device and it failed, try default */
+    if (selectedDeviceId) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
+          video: false
+        });
+        micSelect.value = '';
+        selectedDeviceId = null;
+        updateHeadsetBadge();
+      } catch (err2) {
+        setStatus('blocked', false);
+        hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
+        return;
+      }
+    } else {
+      setStatus('blocked', false);
+      hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
+      return;
+    }
+  }
+
+  /* Report which device we actually got */
+  const track = stream.getAudioTracks()[0];
+  if (track && track.label) {
+    const isHS = isHeadsetLabel(track.label);
+    headsetBadge.classList.toggle('show', isHS);
   }
 
   try {
@@ -618,10 +783,34 @@ async function start() {
   fftStatus.textContent = 'live';
   filterStatus.textContent = 'adapting';
   powerStatus.textContent = 'tracking';
-  hint.innerHTML = 'Live. Raise <b>Step size</b> slowly if the rumble isn\'t dropping. If it howls, lower it.';
+
+  const deviceName = micSelect.options[micSelect.selectedIndex]?.textContent || 'default mic';
+  hint.innerHTML = 'Live using <b>' + deviceName.replace('🎧  ', '') + '</b>. Raise <b>Step size</b> slowly if rumble isn\'t dropping.';
 
   sizeAll();
   rafId = requestAnimationFrame(loop);
+}
+
+async function restartCapture() {
+  /* switch mic mid-run: stop tracks, rebuild source node, keep context alive */
+  if (!running || !ctx) return;
+  try {
+    if (stream) stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
+    stream = await navigator.mediaDevices.getUserMedia(buildAudioConstraints());
+
+    /* disconnect old source */
+    if (srcNode) { try { srcNode.disconnect(); } catch (e) {} }
+
+    srcNode = ctx.createMediaStreamSource(stream);
+    srcNode.connect(analyserIn);
+
+    const track = stream.getAudioTracks()[0];
+    if (track && track.label) {
+      headsetBadge.classList.toggle('show', isHeadsetLabel(track.label));
+    }
+  } catch (err) {
+    console.error('restartCapture failed', err);
+  }
 }
 
 function stop() {
@@ -656,6 +845,7 @@ function stop() {
   [inBar, outBar, errBar, nrBar].forEach(b => b.style.width = '0%');
   inDb.textContent = outDb.textContent = errDb.textContent = '−∞';
   nrDb.textContent = '0';
+  micLevelBar.style.width = '0%';
   coeffData.fill(0);
   powerHist.fill(0);
 }
@@ -669,7 +859,7 @@ function stopTracks() {
    ============================================================ */
 powerBtn.addEventListener('click', () => running ? stop() : start());
 window.addEventListener('keydown', e => {
-  if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
     e.preventDefault();
     running ? stop() : start();
   }
@@ -687,16 +877,23 @@ function loop() {
   analyserIn.getFloatFrequencyData(freqIn);
   analyserOut.getFloatFrequencyData(freqOut);
 
-  let peakIn = 0, peakOut = 0;
+  let peakIn = 0, peakOut = 0, sumSq = 0;
   for (let i = 0; i < bufIn.length; i++) {
-    const a = Math.abs(bufIn[i]); if (a > peakIn) peakIn = a;
+    const v = bufIn[i], a = v < 0 ? -v : v;
+    if (a > peakIn) peakIn = a;
+    sumSq += v * v;
   }
   for (let i = 0; i < bufOut.length; i++) {
-    const a = Math.abs(bufOut[i]); if (a > peakOut) peakOut = a;
+    const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i];
+    if (a > peakOut) peakOut = a;
   }
 
   setMeter(inBar, inDb, peakIn);
   setMeter(outBar, outDb, peakOut);
+
+  /* mic level bar in the picker (shows the headset mic is alive) */
+  const micLevel = Math.min(1, Math.sqrt(sumSq / bufIn.length) * 6);
+  micLevelBar.style.width = (micLevel * 100).toFixed(0) + '%';
 
   drawScope();
   drawSpectrum();
@@ -719,24 +916,18 @@ function setNR(nr) {
   nrDb.textContent = (nrValue >= 0 ? '+' : '') + nrValue.toFixed(1) + 'dB';
 }
 
-/* ============================================================
-   Scope (time domain)
-   ============================================================ */
 function drawScope() {
   const W = scope.clientWidth, H = scope.clientHeight;
   if (!W || !H) return;
   sctx.clearRect(0, 0, W, H);
-
   sctx.strokeStyle = 'rgba(255,255,255,0.04)';
   sctx.lineWidth = 1;
   sctx.beginPath();
   for (let x = 0; x <= W; x += W / 8) { sctx.moveTo(Math.round(x)+0.5,0); sctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { sctx.moveTo(0,Math.round(y)+0.5); sctx.lineTo(W,Math.round(y)+0.5); }
   sctx.stroke();
-
   sctx.strokeStyle = 'rgba(255,255,255,0.1)';
   sctx.beginPath(); sctx.moveTo(0,H/2); sctx.lineTo(W,H/2); sctx.stroke();
-
   drawWave(bufIn, 'rgba(0,229,192,0.5)', 1.2, W, H);
   drawWave(bufOut, '#ff4d6d', 1.5, W, H);
 }
@@ -766,38 +957,25 @@ function drawWave(data, color, lw, W, H) {
   sctx.stroke();
 }
 
-/* ============================================================
-   Spectrum (FFT)
-   ============================================================ */
 function drawSpectrum() {
   const W = spectrum.clientWidth, H = spectrum.clientHeight;
   if (!W || !H) return;
   fctx.clearRect(0, 0, W, H);
-
   fctx.strokeStyle = 'rgba(255,255,255,0.04)';
   fctx.lineWidth = 1;
   fctx.beginPath();
   for (let x = 0; x <= W; x += W / 6) { fctx.moveTo(Math.round(x)+0.5,0); fctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { fctx.moveTo(0,Math.round(y)+0.5); fctx.lineTo(W,Math.round(y)+0.5); }
   fctx.stroke();
-
-  /* frequency labels */
   fctx.fillStyle = 'rgba(255,255,255,0.18)';
   fctx.font = '8px ui-sans-serif';
   fctx.textAlign = 'center';
   const sr = ctx ? ctx.sampleRate : 48000;
-  const labels = [0, 100, 500, 1000, 2000, 5000];
-  labels.forEach(f => {
+  [0, 100, 500, 1000, 2000, 5000].forEach(f => {
     const x = (f / (sr/2)) * W;
-    if (x > 15 && x < W - 5) {
-      fctx.fillText(f >= 1000 ? (f/1000)+'k' : f, x, H - 3);
-    }
+    if (x > 15 && x < W - 5) fctx.fillText(f >= 1000 ? (f/1000)+'k' : f, x, H - 3);
   });
-
-  const nBins = freqIn.length;
-  const nyq = sr / 2;
-  const maxF = 4000;
-
+  const nBins = freqIn.length, nyq = sr / 2, maxF = 4000;
   drawFFT(freqIn, nBins, nyq, maxF, 'rgba(0,229,192,0.45)', W, H);
   drawFFT(freqOut, nBins, nyq, maxF, '#ff4d6d', W, H);
 }
@@ -820,72 +998,51 @@ function drawFFT(freq, nBins, nyq, maxF, color, W, H) {
   fctx.stroke();
 }
 
-/* ============================================================
-   Adaptive filter visualization
-   ============================================================ */
 function drawFilter() {
   const W = filterViz.clientWidth, H = filterViz.clientHeight;
   if (!W || !H) return;
   flctx.clearRect(0, 0, W, H);
-
   flctx.strokeStyle = 'rgba(255,255,255,0.04)';
   flctx.lineWidth = 1;
   flctx.beginPath();
   for (let x = 0; x <= W; x += W / 6) { flctx.moveTo(Math.round(x)+0.5,0); flctx.lineTo(Math.round(x)+0.5,H); }
   flctx.stroke();
-
   flctx.strokeStyle = 'rgba(255,255,255,0.1)';
   flctx.beginPath(); flctx.moveTo(0,H/2); flctx.lineTo(W,H/2); flctx.stroke();
-
-  /* find max abs for normalization */
   let mx = 0.001;
   for (let i = 0; i < coeffData.length; i++) {
     const a = Math.abs(coeffData[i]);
     if (a > mx) mx = a;
   }
-
   const n = coeffData.length;
   const barW = W / n;
   const amp = H * 0.42;
-
   for (let i = 0; i < n; i++) {
     const v = coeffData[i] / mx;
     const h = v * amp;
     const x = i * barW;
     flctx.fillStyle = v >= 0 ? 'rgba(0,229,192,0.6)' : 'rgba(255,77,109,0.6)';
-    if (h >= 0) {
-      flctx.fillRect(x, H/2 - h, Math.max(barW - 0.5, 0.5), h);
-    } else {
-      flctx.fillRect(x, H/2, Math.max(barW - 0.5, 0.5), -h);
-    }
+    if (h >= 0) flctx.fillRect(x, H/2 - h, Math.max(barW - 0.5, 0.5), h);
+    else flctx.fillRect(x, H/2, Math.max(barW - 0.5, 0.5), -h);
   }
 }
 
-/* ============================================================
-   Error power history
-   ============================================================ */
 function drawPower() {
   const W = powerViz.clientWidth, H = powerViz.clientHeight;
   if (!W || !H) return;
   pctx.clearRect(0, 0, W, H);
-
   pctx.strokeStyle = 'rgba(255,255,255,0.04)';
   pctx.lineWidth = 1;
   pctx.beginPath();
   for (let y = 0; y <= H; y += H / 4) { pctx.moveTo(0,Math.round(y)+0.5); pctx.lineTo(W,Math.round(y)+0.5); }
   pctx.stroke();
-
   let mx = 0.001;
-  for (let i = 0; i < powerHist.length; i++) {
-    if (powerHist[i] > mx) mx = powerHist[i];
-  }
-
+  for (let i = 0; i < powerHist.length; i++) if (powerHist[i] > mx) mx = powerHist[i];
   const n = powerHist.length;
   pctx.beginPath();
   pctx.strokeStyle = '#ffb020';
   pctx.lineWidth = 1.5;
   pctx.lineJoin = 'round';
-
   for (let x = 0; x < W; x++) {
     const i = Math.floor((x / W) * n);
     const v = powerHist[i] / mx;
@@ -899,9 +1056,18 @@ function drawPower() {
 /* ============================================================
    Init
    ============================================================ */
-sizeAll();
-updateLabels();
-setControls(false);
+async function init() {
+  sizeAll();
+  updateLabels();
+  setControls(false);
+
+  /* Try to enumerate without permission first — labels may be blank.
+     That's fine; we'll request permission when the user hits power. */
+  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+    await enumerateMics(false);
+  }
+}
+init();
 })();
 </script>
 </body>
