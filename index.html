@@ -4,20 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#07070b">
-<meta name="description" content="Sound frequency studio — relax, focus, sleep, energize, release fear, feel happy, confident, creative.">
 <title>Frequencies — Sound Studio</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#07070b;
-    --panel:#0f1017;
-    --card:#14161f;
-    --line:rgba(255,255,255,.07);
-    --txt:#e9eef5;
-    --dim:#78879a;
-    --accent:#8b9dff;
-    --mode-color:#8b9dff;
-    --mode-dim:rgba(139,157,255,.12);
+    --bg:#07070b;--panel:#0f1017;--card:#14161f;--line:rgba(255,255,255,.07);
+    --txt:#e9eef5;--dim:#78879a;--accent:#8b9dff;
+    --mode-color:#8b9dff;--mode-dim:rgba(139,157,255,.12);
   }
   html,body{height:100%}
   body{
@@ -32,9 +25,8 @@
     display:flex;justify-content:center;
     padding:20px 16px 60px;min-height:100%;
   }
-  .wrap{width:100%;max-width:880px;display:flex;flex-direction:column;gap:20px}
+  .wrap{width:100%;max-width:920px;display:flex;flex-direction:column;gap:20px}
 
-  /* header */
   header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
   .brand{display:flex;align-items:center;gap:11px}
   .brand .dot{
@@ -56,10 +48,9 @@
     background:var(--mode-dim);box-shadow:0 0 18px var(--mode-dim);
   }
 
-  /* intro */
   .intro{
-    border:1px solid var(--line);border-radius:18px;padding:18px 20px;
-    background:var(--panel);font-size:13px;line-height:1.6;color:var(--dim);
+    border:1px solid var(--line);border-radius:18px;padding:16px 18px;
+    background:var(--panel);font-size:12.5px;line-height:1.6;color:var(--dim);
   }
   .intro b{color:var(--txt);font-weight:600}
   .intro .hp{
@@ -68,27 +59,39 @@
   }
   .intro .hp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
+  /* section heading */
+  .sectHead{
+    display:flex;align-items:baseline;justify-content:space-between;
+    padding:0 2px;margin-top:4px;
+  }
+  .sectHead h2{
+    font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;
+  }
+  .sectHead span{font-size:10.5px;color:#4a5a6e;letter-spacing:.02em}
+
   /* mode grid */
   .grid{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:10px;
   }
-  @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:780px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:560px){.grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:400px){.grid{gap:8px}}
 
   .mode{
     position:relative;overflow:hidden;
-    padding:16px 14px 15px;
-    border-radius:16px;
+    padding:15px 13px 14px;
+    border-radius:15px;
     border:1px solid var(--line);
     background:linear-gradient(165deg,rgba(255,255,255,.028),rgba(255,255,255,0));
     cursor:pointer;
     transition:border-color .35s,box-shadow .4s,transform .15s,background .35s;
     -webkit-tap-highlight-color:transparent;outline:none;
     text-align:left;font-family:inherit;color:inherit;
-    display:flex;flex-direction:column;gap:9px;
-    min-height:132px;
+    display:flex;flex-direction:column;gap:8px;
+    min-height:126px;
   }
   .mode::before{
     content:'';position:absolute;inset:0;
@@ -105,41 +108,64 @@
   .mode.active::before{opacity:1}
 
   .mode .icon{
-    width:32px;height:32px;border-radius:10px;
+    width:30px;height:30px;border-radius:9px;
     background:var(--m-dim);
-    border:1px solid color-mix(in srgb, var(--m-color) 35%, transparent);
+    border:1px solid var(--m-color);
     display:grid;place-items:center;color:var(--m-color);
     transition:all .35s;position:relative;z-index:1;
+    opacity:.75;
   }
   .mode.active .icon{
-    background:var(--m-color);color:#0a0a10;
+    background:var(--m-color);color:#0a0a10;opacity:1;
     box-shadow:0 0 20px var(--m-dim);
   }
-  .mode .icon svg{width:16px;height:16px;fill:none;stroke:currentColor;
+  .mode .icon svg{width:15px;height:15px;fill:none;stroke:currentColor;
     stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
   .mode .name{
-    font-size:13.5px;font-weight:700;color:var(--txt);
+    font-size:13px;font-weight:700;color:var(--txt);
     letter-spacing:.01em;position:relative;z-index:1;line-height:1.15;
   }
   .mode .band{
-    font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    font-size:9px;letter-spacing:.11em;text-transform:uppercase;
     font-weight:700;color:var(--m-color);position:relative;z-index:1;
-    transition:opacity .3s;
   }
-  .mode .desc{
-    font-size:10.5px;color:var(--dim);line-height:1.35;
-    position:relative;z-index:1;margin-top:auto;
-    display:none;
+
+  /* featured hypnosis card spans full width on wide screens */
+  .mode.featured{
+    grid-column:span 2;
+    background:
+      linear-gradient(135deg, rgba(167,139,250,.10), rgba(94,234,212,.05) 60%, rgba(255,255,255,0) 100%),
+      linear-gradient(165deg,rgba(255,255,255,.03),rgba(255,255,255,0));
+    min-height:150px;
   }
-  .mode.active .desc{display:block}
+  .mode.featured .name{font-size:16px}
+  .mode.featured .band{font-size:9.5px}
+  .mode.featured .feat-desc{
+    font-size:10.5px;color:var(--dim);line-height:1.4;
+    position:relative;z-index:1;margin-top:2px;
+  }
+  .mode.featured .stages{
+    display:flex;gap:4px;margin-top:6px;position:relative;z-index:1;
+    flex-wrap:wrap;
+  }
+  .mode.featured .stages span{
+    font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+    padding:2px 6px;border-radius:5px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--line);
+    color:var(--dim);
+  }
+  @media(max-width:560px){
+    .mode.featured{grid-column:span 2}
+  }
 
   /* player */
   .player{
     border:1px solid var(--line);border-radius:22px;
     background:linear-gradient(180deg,var(--panel),#0b0c12);
-    padding:22px 20px;
-    display:flex;flex-direction:column;gap:18px;
+    padding:20px 20px;
+    display:flex;flex-direction:column;gap:16px;
     position:relative;overflow:hidden;
   }
   .player::before{
@@ -148,20 +174,15 @@
     opacity:.5;
   }
 
-  .now{
-    display:flex;align-items:center;gap:14px;
-    flex-wrap:wrap;
-  }
+  .now{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .now .art{
-    width:60px;height:60px;border-radius:50%;
-    background:radial-gradient(circle at 50% 40%, var(--mode-dim), transparent 70%),
-      var(--card);
-    border:1px solid color-mix(in srgb, var(--mode-color) 30%, transparent);
+    width:58px;height:58px;border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, var(--mode-dim), transparent 70%),var(--card);
+    border:1px solid var(--mode-color);
     display:grid;place-items:center;color:var(--mode-color);
-    flex:0 0 60px;
-    position:relative;
+    flex:0 0 58px;position:relative;
   }
-  .now .art svg{width:24px;height:24px;fill:none;stroke:currentColor;
+  .now .art svg{width:23px;height:23px;fill:none;stroke:currentColor;
     stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
   .now .art::after{
     content:'';position:absolute;inset:-4px;border-radius:50%;
@@ -177,14 +198,18 @@
 
   .now .meta{flex:1;min-width:0}
   .now .meta .ttl{
-    font-size:18px;font-weight:700;line-height:1.1;
-    transition:color .4s;
+    font-size:17px;font-weight:700;line-height:1.1;transition:color .4s;
   }
   .player.playing .now .meta .ttl{color:var(--mode-color)}
   .now .meta .sub{
-    font-size:11.5px;color:var(--dim);margin-top:3px;
-    letter-spacing:.02em;
+    font-size:11px;color:var(--dim);margin-top:3px;letter-spacing:.02em;
   }
+  .now .meta .stage{
+    font-size:10.5px;color:var(--mode-color);margin-top:5px;
+    letter-spacing:.06em;font-weight:700;
+    display:none;
+  }
+  .player.hypno .now .meta .stage{display:block}
   .now .time{
     font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;
     font-weight:600;letter-spacing:.04em;
@@ -192,23 +217,19 @@
     background:rgba(255,255,255,.03);border:1px solid var(--line);
   }
 
-  /* transport row */
-  .transport{
-    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  }
+  .transport{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .play{
-    width:64px;height:64px;border-radius:50%;
-    border:1px solid color-mix(in srgb, var(--mode-color) 45%, transparent);
+    width:62px;height:62px;border-radius:50%;
+    border:1px solid var(--mode-color);
     background:radial-gradient(circle at 50% 35%, var(--mode-dim), rgba(0,0,0,.4));
     color:var(--mode-color);cursor:pointer;
     display:grid;place-items:center;
-    transition:all .3s;flex:0 0 64px;
-    -webkit-tap-highlight-color:transparent;outline:none;
-    position:relative;
+    transition:all .3s;flex:0 0 62px;
+    -webkit-tap-highlight-color:transparent;outline:none;position:relative;
   }
   .play:hover{box-shadow:0 0 30px var(--mode-dim)}
   .play:active{transform:scale(.96)}
-  .play svg{width:26px;height:26px;fill:currentColor;stroke:none}
+  .play svg{width:25px;height:25px;fill:currentColor;stroke:none}
   .play .pauseIco{display:none}
   .player.playing .play .playIco{display:none}
   .player.playing .play .pauseIco{display:block}
@@ -217,7 +238,7 @@
   .volumeWrap .lbl{
     display:flex;justify-content:space-between;align-items:baseline;
     font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;margin-bottom:7px;
+    color:var(--dim);font-weight:700;margin-bottom:6px;
   }
   .volumeWrap .lbl output{color:var(--mode-color);font-size:11px;font-variant-numeric:tabular-nums}
 
@@ -232,8 +253,7 @@
   input[type=range]::-webkit-slider-thumb{
     -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
     background:#0a0a10;border:2px solid var(--mode-color);
-    margin-top:-6px;box-shadow:0 0 10px var(--mode-dim);
-    transition:transform .15s;
+    margin-top:-6px;box-shadow:0 0 10px var(--mode-dim);transition:transform .15s;
   }
   input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.08)}
@@ -241,9 +261,7 @@
     width:14px;height:14px;border-radius:50%;background:#0a0a10;
     border:2px solid var(--mode-color);box-shadow:0 0 10px var(--mode-dim);
   }
-  input[type=range]:disabled{opacity:.3;pointer-events:none}
 
-  /* visualizer */
   .viz{
     position:relative;height:130px;border-radius:16px;
     border:1px solid var(--line);
@@ -264,11 +282,32 @@
   }
   .viz .stats em{font-style:normal;color:var(--mode-color);font-variant-numeric:tabular-nums}
 
-  /* secondary controls */
-  .subcontrols{
-    display:grid;grid-template-columns:1fr 1fr;gap:12px;
-    padding-top:4px;
+  /* hypnosis stage bar */
+  .stagebar{
+    display:none;flex-direction:column;gap:8px;
+    padding:12px 14px;border-radius:12px;
+    background:rgba(167,139,250,.05);
+    border:1px solid rgba(167,139,250,.2);
   }
+  .player.hypno .stagebar{display:flex}
+  .stagebar .row{display:flex;justify-content:space-between;align-items:baseline}
+  .stagebar .row b{font-size:11.5px;font-weight:700;color:#c084fc;letter-spacing:.04em}
+  .stagebar .row span{font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .stagebar .track{height:4px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+  .stagebar .track i{display:block;height:100%;width:0%;border-radius:99px;
+    background:linear-gradient(90deg,#7c3aed,#a78bfa,#5eead4);transition:width .3s}
+  .stagebar .steps{display:flex;gap:5px}
+  .stagebar .steps span{
+    flex:1;text-align:center;font-size:8.5px;letter-spacing:.08em;
+    text-transform:uppercase;font-weight:700;
+    padding:4px 4px;border-radius:5px;
+    background:rgba(255,255,255,.03);border:1px solid var(--line);
+    color:var(--dim);transition:all .35s;
+  }
+  .stagebar .steps span.on{color:#c084fc;border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.12)}
+  .stagebar .steps span.done{color:#5eead4;border-color:rgba(94,234,212,.3);background:rgba(94,234,212,.08)}
+
+  .subcontrols{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding-top:2px}
   @media(max-width:560px){.subcontrols{grid-template-columns:1fr}}
   .subctrl{
     border:1px solid var(--line);border-radius:12px;
@@ -277,31 +316,30 @@
   .subctrl .lbl{
     display:flex;justify-content:space-between;align-items:baseline;
     font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;margin-bottom:7px;
+    color:var(--dim);font-weight:700;margin-bottom:6px;
   }
   .subctrl .lbl output{color:var(--mode-color);font-size:11px;font-variant-numeric:tabular-nums}
 
-  .toggleRow{display:flex;gap:8px;flex-wrap:wrap}
+  .toggleRow{display:flex;gap:7px;flex-wrap:wrap}
   .tgl{
-    flex:1 1 auto;min-width:110px;
-    padding:10px 13px;border-radius:10px;cursor:pointer;
+    flex:1 1 auto;min-width:100px;
+    padding:9px 12px;border-radius:9px;cursor:pointer;
     font-size:11.5px;font-weight:600;
     background:rgba(255,255,255,.03);border:1px solid var(--line);
     color:var(--dim);transition:all .25s;font-family:inherit;
     -webkit-tap-highlight-color:transparent;outline:none;
-    display:flex;align-items:center;justify-content:center;gap:7px;
+    display:flex;align-items:center;justify-content:center;gap:6px;
   }
-  .tgl svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .tgl svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .tgl.on{
-    color:var(--mode-color);border-color:color-mix(in srgb, var(--mode-color) 45%, transparent);
+    color:var(--mode-color);border-color:var(--mode-color);
     background:var(--mode-dim);
   }
   .tgl:active{transform:scale(.98)}
 
-  /* timer picker */
   .timers{display:flex;gap:6px;flex-wrap:wrap}
   .tm{
-    flex:1 1 auto;min-width:56px;
+    flex:1 1 auto;min-width:52px;
     padding:9px 8px;border-radius:9px;cursor:pointer;
     font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums;
     background:rgba(255,255,255,.03);border:1px solid var(--line);
@@ -309,14 +347,11 @@
     -webkit-tap-highlight-color:transparent;outline:none;
   }
   .tm.on{
-    color:var(--mode-color);border-color:color-mix(in srgb, var(--mode-color) 45%, transparent);
+    color:var(--mode-color);border-color:var(--mode-color);
     background:var(--mode-dim);
   }
 
-  /* info */
-  .info{
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  }
+  .info{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:600px){.info{grid-template-columns:1fr}}
   .infocard{
     border:1px solid var(--line);border-radius:15px;
@@ -336,10 +371,7 @@
   }
   .infocard b{color:#c3ced9;font-weight:600}
 
-  .warncard{
-    border:1px solid rgba(255,176,32,.22);
-    background:rgba(255,176,32,.04);
-  }
+  .warncard{border-color:rgba(255,176,32,.22);background:rgba(255,176,32,.04)}
   .warncard li::before{background:#ffb020!important}
   .warncard h3{color:#ffb020}
 
@@ -347,9 +379,8 @@
     text-align:center;font-size:10.5px;color:#3a4553;
     letter-spacing:.05em;padding-top:6px;
   }
-  footer a{color:#4a5a6e;text-decoration:none;border-bottom:1px dotted #3a4553}
 
-  /* mode color assignment */
+  /* mode colors */
   .mode[data-id="relax"]{--m-color:#5eead4;--m-dim:rgba(94,234,212,.13)}
   .mode[data-id="focus"]{--m-color:#60a5fa;--m-dim:rgba(96,165,250,.13)}
   .mode[data-id="sleep"]{--m-color:#818cf8;--m-dim:rgba(129,140,248,.13)}
@@ -358,6 +389,7 @@
   .mode[data-id="happy"]{--m-color:#facc15;--m-dim:rgba(250,204,21,.13)}
   .mode[data-id="confident"]{--m-color:#fb923c;--m-dim:rgba(251,146,60,.13)}
   .mode[data-id="creative"]{--m-color:#c084fc;--m-dim:rgba(192,132,252,.13)}
+  .mode[data-id="hypnosis"]{--m-color:#a78bfa;--m-dim:rgba(167,139,250,.15)}
 </style>
 </head>
 <body>
@@ -379,14 +411,16 @@
       <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
       Headphones required
     </span>
-    &nbsp;— the binaural beats only work when each ear receives a different tone.
-    All audio is synthesised live in your browser. <b>Not medical advice</b> — don't use while driving.
+    &nbsp;— binaural beats only work when each ear hears a different tone. All audio is synthesised live in your browser. <b>Not medical advice</b> — don't use while driving.
   </div>
 
-  <!-- MODE GRID -->
+  <div class="sectHead">
+    <h2>Mental States</h2>
+    <span>tap to play</span>
+  </div>
+
   <div class="grid" id="grid"></div>
 
-  <!-- PLAYER -->
   <div class="player" id="player">
     <div class="now">
       <div class="art" id="artIco">
@@ -395,6 +429,7 @@
       <div class="meta">
         <div class="ttl" id="nowTitle">Select a state</div>
         <div class="sub" id="nowSub">Nothing playing</div>
+        <div class="stage" id="nowStage"></div>
       </div>
       <div class="time" id="timeDisplay">00:00</div>
     </div>
@@ -405,7 +440,22 @@
       <div class="stats">
         <span>Δ <em id="statBeat">—</em></span>
         <span>ƒ <em id="statCarrier">—</em></span>
-        <span>NR <em id="statNR">—</em></span>
+        <span>Pk <em id="statNR">—</em></span>
+      </div>
+    </div>
+
+    <!-- hypnosis stage bar -->
+    <div class="stagebar" id="stagebar">
+      <div class="row">
+        <b id="stageName">Induction</b>
+        <span id="stageTime">0:00 / 2:00</span>
+      </div>
+      <div class="track"><i id="stageProgress"></i></div>
+      <div class="steps" id="stageSteps">
+        <span data-s="0">Induction</span>
+        <span data-s="1">Deepening</span>
+        <span data-s="2">Trance</span>
+        <span data-s="3">Suggestion</span>
       </div>
     </div>
 
@@ -462,15 +512,15 @@
     </div>
   </div>
 
-  <!-- INFO -->
   <div class="info">
     <div class="infocard">
       <h3>How it works</h3>
       <ul>
-        <li><b>Binaural beats</b> — two pure tones, one per ear, offset by a few Hz. Your brainstem perceives the difference as a rhythmic pulse at that offset frequency.</li>
-        <li><b>Isochronic pulses</b> — a single tone switched on/off at the target rate. Stronger, more direct entrainment; works without headphones.</li>
-        <li><b>Carrier tones</b> — Solfeggio-adjacent frequencies (396, 528, 639, 852 Hz) chosen for each state, layered as a soft pad.</li>
-        <li><b>Ambient noise</b> — pink or brown noise masked gently under the tones for a smoother bed.</li>
+        <li><b>Binaural beats</b> — two tones, one per ear, offset by a few Hz. Your brainstem perceives the difference as a rhythmic pulse.</li>
+        <li><b>Isochronic pulses</b> — one tone gated on/off at the target rate. Works without headphones.</li>
+        <li><b>Carrier tones</b> — Solfeggio-adjacent frequencies (396, 528, 639, 852 Hz) chosen per state, layered as a soft pad.</li>
+        <li><b>Ambient noise</b> — pink or brown noise blended under the tones.</li>
+        <li><b>Hypnosis</b> — a sequenced 4-stage descent through alpha → theta → deep theta → suggestion, with automatic frequency shifts.</li>
       </ul>
     </div>
     <div class="infocard warncard">
@@ -478,14 +528,15 @@
       <ul>
         <li>Not a medical device. No clinical claim is made.</li>
         <li>Do not use while driving or operating machinery.</li>
-        <li>Skip if you have epilepsy, a seizure disorder, or a pacemaker — rhythmic audio stimulation is a known trigger for some people.</li>
-        <li>Stop if you feel dizzy, anxious, or headachy. Lower the volume. Binaural beats are best around 40–60 dB, not loud.</li>
-        <li>Binaural beats need headphones; isochronic and pad layers work on speakers.</li>
+        <li>Skip if you have epilepsy, a seizure disorder, or a pacemaker — rhythmic audio is a known trigger for some people.</li>
+        <li>Stop if you feel dizzy, anxious, or headachy. Best at 40–60 dB, not loud.</li>
+        <li>Binaural beats need headphones. Iso and pad work on speakers.</li>
+        <li>The hypnosis mode is a soundscape only — no verbal suggestion or guided meditation is included.</li>
       </ul>
     </div>
   </div>
 
-  <footer>All audio synthesised live · Web Audio API · <a href="#" onclick="return false">no data leaves your device</a></footer>
+  <footer>All audio synthesised live · Web Audio API · no data leaves your device</footer>
 </div>
 
 <script>
@@ -494,182 +545,172 @@
 
 /* ============================================================
    MODE DEFINITIONS
-   Each mode: carrier tone, binaural beat freq, chord (pad),
-   filter brightness, noise type/level, and metadata.
    ============================================================ */
 const MODES = [
   {
-    id: 'relax',
-    name: 'Relax',
-    band: 'Alpha · 10 Hz',
-    desc: 'Calm, unwound, present. Gentle alpha entrainment for stress relief.',
-    icon: '<path d="M2 12c2 0 3-4 5-4s3 4 5 4 3-4 5-4 3 4 5 4"/><path d="M2 17c2 0 3-3 5-3s3 3 5 3 3-3 5-3 3 3 5 3"/>',
-    beat: 10,
-    carrier: 200,
-    chord: [130.81, 164.81, 196.00, 261.63], // C3 E3 G3 C4
-    filter: 900,
-    noise: 'pink',
-    noiseBase: 0.12,
-    reverb: 0.42,
-    padGain: 0.13,
-    binGain: 0.085
+    id:'relax', name:'Relax', band:'Alpha · 10 Hz',
+    icon:'<path d="M2 12c2 0 3-4 5-4s3 4 5 4 3-4 5-4 3 4 5 4"/><path d="M2 17c2 0 3-3 5-3s3 3 5 3 3-3 5-3 3 3 5 3"/>',
+    beat:10, carrier:200,
+    chord:[130.81,164.81,196.00,261.63],
+    filter:900, noise:'pink', noiseBase:0.12, reverb:0.42,
+    padGain:0.13, binGain:0.085,
+    desc:'Calm, unwound, present.'
   },
   {
-    id: 'focus',
-    name: 'Focus',
-    band: 'Beta · 16 Hz',
-    desc: 'Sharp attention for deep work. Low beta with a clean pad.',
-    icon: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
-    beat: 16,
-    carrier: 220,
-    chord: [110.00, 164.81, 220.00, 329.63], // A2 E3 A3 E4
-    filter: 1400,
-    noise: 'pink',
-    noiseBase: 0.07,
-    reverb: 0.28,
-    padGain: 0.10,
-    binGain: 0.09
+    id:'focus', name:'Focus', band:'Beta · 16 Hz',
+    icon:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+    beat:16, carrier:220,
+    chord:[110.00,164.81,220.00,329.63],
+    filter:1400, noise:'pink', noiseBase:0.07, reverb:0.28,
+    padGain:0.10, binGain:0.09,
+    desc:'Sharp attention for deep work.'
   },
   {
-    id: 'sleep',
-    name: 'Sleep',
-    band: 'Delta · 2.5 Hz',
-    desc: 'Deep slow-wave entrainment. Heavy brown-noise bed.',
-    icon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
-    beat: 2.5,
-    carrier: 110,
-    chord: [65.41, 98.00, 130.81], // C2 G2 C3
-    filter: 420,
-    noise: 'brown',
-    noiseBase: 0.28,
-    reverb: 0.55,
-    padGain: 0.16,
-    binGain: 0.06
+    id:'sleep', name:'Sleep', band:'Delta · 2.5 Hz',
+    icon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    beat:2.5, carrier:110,
+    chord:[65.41,98.00,130.81],
+    filter:420, noise:'brown', noiseBase:0.28, reverb:0.55,
+    padGain:0.16, binGain:0.06,
+    desc:'Deep slow-wave entrainment.'
   },
   {
-    id: 'energize',
-    name: 'Energize',
-    band: 'Beta · 22 Hz',
-    desc: 'Alert, awake, ready to move. Brighter high-beta band.',
-    icon: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
-    beat: 22,
-    carrier: 260,
-    chord: [146.83, 220.00, 293.66, 369.99], // D3 A3 D4 F#4
-    filter: 2200,
-    noise: 'pink',
-    noiseBase: 0.08,
-    reverb: 0.22,
-    padGain: 0.11,
-    binGain: 0.10
+    id:'energize', name:'Energize', band:'Beta · 22 Hz',
+    icon:'<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+    beat:22, carrier:260,
+    chord:[146.83,220.00,293.66,369.99],
+    filter:2200, noise:'pink', noiseBase:0.08, reverb:0.22,
+    padGain:0.11, binGain:0.10,
+    desc:'Alert, awake, ready to move.'
   },
   {
-    id: 'fear',
-    name: 'Release Fear',
-    band: 'Theta · 6 Hz · 396 Hz',
-    desc: 'Theta calm with the 396 Hz solfeggio carrier — traditionally used to release fear and guilt.',
-    icon: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
-    beat: 6,
-    carrier: 396,
-    chord: [98.00, 146.83, 196.00, 293.66], // G2 D3 G3 D4
-    filter: 1100,
-    noise: 'pink',
-    noiseBase: 0.14,
-    reverb: 0.52,
-    padGain: 0.13,
-    binGain: 0.08
+    id:'fear', name:'Release Fear', band:'Theta · 6 Hz · 396 Hz',
+    icon:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    beat:6, carrier:396,
+    chord:[98.00,146.83,196.00,293.66],
+    filter:1100, noise:'pink', noiseBase:0.14, reverb:0.52,
+    padGain:0.13, binGain:0.08,
+    desc:'Theta calm with 396 Hz.'
   },
   {
-    id: 'happy',
-    name: 'Happy',
-    band: 'Alpha · 10 Hz · 528 Hz',
-    desc: 'Warm, uplifted, open. 528 Hz carrier with a bright major pad.',
-    icon: '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
-    beat: 10,
-    carrier: 528,
-    chord: [130.81, 164.81, 196.00, 329.63], // C3 E3 G3 E4 (bright)
-    filter: 1600,
-    noise: 'pink',
-    noiseBase: 0.06,
-    reverb: 0.40,
-    padGain: 0.12,
-    binGain: 0.09
+    id:'happy', name:'Happy', band:'Alpha · 10 Hz · 528 Hz',
+    icon:'<circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>',
+    beat:10, carrier:528,
+    chord:[130.81,164.81,196.00,329.63],
+    filter:1600, noise:'pink', noiseBase:0.06, reverb:0.40,
+    padGain:0.12, binGain:0.09,
+    desc:'Warm, uplifted, open.'
   },
   {
-    id: 'confident',
-    name: 'Confident',
-    band: 'Alpha–Beta · 14 Hz · 639 Hz',
-    desc: 'Steady, grounded, self-assured. SMR-band entrainment with a full pad.',
-    icon: '<path d="M3 20h18"/><path d="M6 20V10l6-5 6 5v10"/><path d="M10 20v-6h4v6"/>',
-    beat: 14,
-    carrier: 639,
-    chord: [87.31, 130.81, 174.61, 261.63], // F2 C3 F3 C4
-    filter: 1300,
-    noise: 'pink',
-    noiseBase: 0.09,
-    reverb: 0.38,
-    padGain: 0.13,
-    binGain: 0.09
+    id:'confident', name:'Confident', band:'Alpha–Beta · 14 Hz · 639 Hz',
+    icon:'<path d="M3 20h18"/><path d="M6 20V10l6-5 6 5v10"/><path d="M10 20v-6h4v6"/>',
+    beat:14, carrier:639,
+    chord:[87.31,130.81,174.61,261.63],
+    filter:1300, noise:'pink', noiseBase:0.09, reverb:0.38,
+    padGain:0.13, binGain:0.09,
+    desc:'Steady, grounded, self-assured.'
   },
   {
-    id: 'creative',
-    name: 'Creative',
-    band: 'Theta–Alpha · 7 Hz · 852 Hz',
-    desc: 'Fluid associative thinking. Airy suspended chord with theta-alpha mix.',
-    icon: '<path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M16.3 7.7l2.1-2.1"/><path d="M12 21v-6"/><circle cx="12" cy="13" r="3"/>',
-    beat: 7,
-    carrier: 852,
-    chord: [130.81, 146.83, 196.00, 293.66], // C3 D3 G3 D4 (Csus2)
-    filter: 1800,
-    noise: 'pink',
-    noiseBase: 0.11,
-    reverb: 0.55,
-    padGain: 0.11,
-    binGain: 0.085
+    id:'creative', name:'Creative', band:'Theta–Alpha · 7 Hz · 852 Hz',
+    icon:'<path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18 12h3M16.3 7.7l2.1-2.1"/><path d="M12 21v-6"/><circle cx="12" cy="13" r="3"/>',
+    beat:7, carrier:852,
+    chord:[130.81,146.83,196.00,293.66],
+    filter:1800, noise:'pink', noiseBase:0.11, reverb:0.55,
+    padGain:0.11, binGain:0.085,
+    desc:'Fluid associative thinking.'
   }
 ];
 
 /* ============================================================
-   AUDIO BUFFER FACTORIES
+   HYPNOSIS MODE — special sequenced mode
+   Four stages, each with its own beat / carrier / filter / pad.
+   The engine transitions smoothly between them.
    ============================================================ */
-function createPinkNoiseBuffer(ctx, seconds) {
+const HYPNOSIS = {
+  id:'hypnosis', name:'Hypnosis', band:'Alpha → Theta → Deep Theta',
+  icon:'<path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+  featured:true,
+  desc:'A guided descent through four stages of hypnotic transition — from relaxed wakefulness into deep trance.',
+  stages:[
+    {
+      label:'Induction',
+      dur:120,
+      beat:9, carrier:220,
+      chord:[110.00,164.81,220.00,329.63], // Amin
+      filter:1100, noise:'pink', noiseBase:0.10, reverb:0.45,
+      padGain:0.11, binGain:0.09,
+      note:'alpha 9 Hz · settling'
+    },
+    {
+      label:'Deepening',
+      dur:180,
+      beat:6, carrier:180,
+      chord:[87.31,130.81,174.61,261.63], // Fmaj
+      filter:850, noise:'pink', noiseBase:0.14, reverb:0.52,
+      padGain:0.12, binGain:0.085,
+      note:'theta 6 Hz · sinking'
+    },
+    {
+      label:'Trance',
+      dur:240,
+      beat:4, carrier:140,
+      chord:[65.41,98.00,130.81,196.00], // Cmaj low
+      filter:600, noise:'brown', noiseBase:0.20, reverb:0.58,
+      padGain:0.14, binGain:0.075,
+      note:'deep theta 4 Hz · trance'
+    },
+    {
+      label:'Suggestion',
+      dur:300,
+      beat:3.5, carrier:110,
+      chord:[65.41,98.00,146.83], // C-G-D open
+      filter:480, noise:'brown', noiseBase:0.22, reverb:0.62,
+      padGain:0.15, binGain:0.07,
+      note:'theta/delta border · open'
+    }
+  ]
+};
+
+/* ============================================================
+   BUFFER FACTORIES
+   ============================================================ */
+function pinkNoiseBuffer(ctx, seconds){
   const len = Math.floor(ctx.sampleRate * seconds);
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
   const d = buf.getChannelData(0);
   let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
-  for (let i = 0; i < len; i++) {
-    const white = Math.random() * 2 - 1;
-    b0 = 0.99886*b0 + white*0.0555179;
-    b1 = 0.99332*b1 + white*0.0750759;
-    b2 = 0.96900*b2 + white*0.1538520;
-    b3 = 0.86650*b3 + white*0.3104856;
-    b4 = 0.55000*b4 + white*0.5329522;
-    b5 = -0.7616*b5 - white*0.0168980;
-    d[i] = (b0+b1+b2+b3+b4+b5+b6 + white*0.5362) * 0.11;
-    b6 = white * 0.115926;
+  for(let i=0;i<len;i++){
+    const w = Math.random()*2-1;
+    b0=0.99886*b0+w*0.0555179;
+    b1=0.99332*b1+w*0.0750759;
+    b2=0.96900*b2+w*0.1538520;
+    b3=0.86650*b3+w*0.3104856;
+    b4=0.55000*b4+w*0.5329522;
+    b5=-0.7616*b5-w*0.0168980;
+    d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;
+    b6=w*0.115926;
   }
   return buf;
 }
-
-function createBrownNoiseBuffer(ctx, seconds) {
+function brownNoiseBuffer(ctx, seconds){
   const len = Math.floor(ctx.sampleRate * seconds);
   const buf = ctx.createBuffer(1, len, ctx.sampleRate);
   const d = buf.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < len; i++) {
-    const white = Math.random() * 2 - 1;
-    last = (last + 0.02 * white) / 1.02;
-    d[i] = last * 3.5;
+  let last=0;
+  for(let i=0;i<len;i++){
+    const w = Math.random()*2-1;
+    last = (last + 0.02*w)/1.02;
+    d[i] = last*3.5;
   }
   return buf;
 }
-
-function createReverbIR(ctx, seconds, decay) {
+function reverbIR(ctx, seconds, decay){
   const len = Math.floor(ctx.sampleRate * seconds);
   const buf = ctx.createBuffer(2, len, ctx.sampleRate);
-  for (let ch = 0; ch < 2; ch++) {
+  for(let ch=0; ch<2; ch++){
     const d = buf.getChannelData(ch);
-    for (let i = 0; i < len; i++) {
-      d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+    for(let i=0;i<len;i++){
+      d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
     }
   }
   return buf;
@@ -679,7 +720,7 @@ function createReverbIR(ctx, seconds, decay) {
    SOUNDSCAPE ENGINE
    ============================================================ */
 class Soundscape {
-  constructor() {
+  constructor(){
     this.ctx = null;
     this.master = null;
     this.reverb = null;
@@ -691,21 +732,19 @@ class Soundscape {
     this.activeNodes = [];
     this.pinkBuf = null;
     this.brownBuf = null;
-
     this.volume = 0.6;
-    this.noiseLevel = 0.12;   // user-multiplied
+    this.noiseLevel = 0.12;
     this.carrierOverride = null;
     this.useBinaural = true;
     this.usePad = true;
     this.useIso = true;
   }
 
-  async init() {
+  async init(){
     if (this.ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
-    this.ctx = new AC({ latencyHint: 'playback' });
+    this.ctx = new AC({ latencyHint:'playback' });
 
-    /* master → analyser → destination */
     this.master = this.ctx.createGain();
     this.master.gain.value = 0;
 
@@ -716,105 +755,126 @@ class Soundscape {
     this.master.connect(this.analyser);
     this.analyser.connect(this.ctx.destination);
 
-    /* reverb bus */
     this.reverb = this.ctx.createConvolver();
-    this.reverb.buffer = createReverbIR(this.ctx, 3.2, 2.2);
+    this.reverb.buffer = reverbIR(this.ctx, 3.2, 2.2);
     this.reverbGain = this.ctx.createGain();
     this.reverbGain.gain.value = 0.4;
     this.reverb.connect(this.reverbGain);
     this.reverbGain.connect(this.master);
 
-    /* dry bus — everything gets routed here so we can fade as a group */
     this.dryBus = this.ctx.createGain();
     this.dryBus.gain.value = 1;
     this.dryBus.connect(this.master);
 
-    /* noise buffers */
-    this.pinkBuf = createPinkNoiseBuffer(this.ctx, 4);
-    this.brownBuf = createBrownNoiseBuffer(this.ctx, 4);
+    this.pinkBuf = pinkNoiseBuffer(this.ctx, 4);
+    this.brownBuf = brownNoiseBuffer(this.ctx, 4);
   }
 
-  setVolume(v) {
+  setVolume(v){
     this.volume = v;
-    if (this.master && this.ctx) {
+    if (this.master && this.ctx){
       this.master.gain.setTargetAtTime(v, this.ctx.currentTime, 0.08);
     }
   }
 
-  setNoiseLevel(v) {
+  setNoiseLevel(v){
     this.noiseLevel = v;
-    if (this._noiseGain && this.ctx && this.mode) {
-      const target = this.mode.noiseBase * (v / 0.12);
+    if (this._noiseGain && this.ctx && this.mode){
+      const base = this.mode.noiseBase !== undefined ? this.mode.noiseBase : 0.12;
+      const target = base * (v / 0.12);
       this._noiseGain.gain.setTargetAtTime(Math.min(target, 0.5), this.ctx.currentTime, 0.15);
     }
   }
 
-  setCarrier(hz) {
+  setCarrier(hz){
     this.carrierOverride = hz;
-    if (this._binL && this._binR && this.ctx && this.mode) {
-      const beat = this.mode.beat;
-      const t = this.ctx.currentTime;
+    const t = this.ctx ? this.ctx.currentTime : 0;
+    if (this._binL && this._binR && this.ctx && this.mode){
+      const beat = this.mode.beat !== undefined ? this.mode.beat : 4;
       this._binL.frequency.setTargetAtTime(hz, t, 0.05);
       this._binR.frequency.setTargetAtTime(hz + beat, t, 0.05);
     }
-    if (this._iso && this.ctx && this.mode) {
-      this._iso.frequency.setTargetAtTime(hz, this.ctx.currentTime, 0.05);
+    if (this._iso && this.ctx){
+      this._iso.frequency.setTargetAtTime(hz, t, 0.05);
     }
   }
 
-  setBinaural(on) {
+  setBinaural(on){
     this.useBinaural = on;
-    if (this._binGain && this.ctx) {
-      this._binGain.gain.setTargetAtTime(on ? this.mode.binGain : 0, this.ctx.currentTime, 0.2);
+    if (this._binGain && this.ctx && this.mode){
+      const g = this.mode.binGain !== undefined ? this.mode.binGain : 0.085;
+      this._binGain.gain.setTargetAtTime(on ? g : 0, this.ctx.currentTime, 0.2);
     }
   }
-
-  setPad(on) {
+  setPad(on){
     this.usePad = on;
-    if (this._padGain && this.ctx) {
-      this._padGain.gain.setTargetAtTime(on ? this.mode.padGain : 0, this.ctx.currentTime, 0.2);
+    if (this._padGain && this.ctx && this.mode){
+      const g = this.mode.padGain !== undefined ? this.mode.padGain : 0.12;
+      this._padGain.gain.setTargetAtTime(on ? g : 0, this.ctx.currentTime, 0.2);
     }
   }
-
-  setIso(on) {
+  setIso(on){
     this.useIso = on;
-    if (this._isoGain && this.ctx) {
+    if (this._isoGain && this.ctx){
       this._isoGain.gain.setTargetAtTime(on ? 0.07 : 0, this.ctx.currentTime, 0.2);
     }
   }
 
-  /* fade the whole bus down, then tear down nodes */
-  async stop(fadeSec = 0.8) {
+  /* smooth shift of beat frequency (used by hypnosis) */
+  shiftBeat(hz, time=2){
+    if (!this._binL || !this._binR || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    const carrier = this._binL.frequency.value;
+    this._binL.frequency.setTargetAtTime(carrier, t, 0.05);
+    this._binR.frequency.setTargetAtTime(carrier + hz, t, time / 3);
+    if (this._isoLfo){
+      this._isoLfo.frequency.setTargetAtTime(hz, t, time / 3);
+    }
+  }
+
+  /* smooth shift of pad filter */
+  shiftFilter(hz, time=2){
+    if (this._padFilter && this.ctx){
+      this._padFilter.frequency.setTargetAtTime(hz, this.ctx.currentTime, time / 3);
+    }
+  }
+
+  /* smoothly replace the pad chord (used for hypnosis stages) */
+  shiftChord(freqs, ramp=4){
+    if (!this._padOscs || !this.ctx) return;
+    const t = this.ctx.currentTime;
+    for (let i=0; i<this._padOscs.length; i++){
+      const osc = this._padOscs[i];
+      const target = freqs[i] !== undefined ? freqs[i] : freqs[freqs.length-1];
+      osc.frequency.setTargetAtTime(target, t, ramp / 3);
+    }
+  }
+
+  async stop(fadeSec=0.8){
     if (!this.ctx) return;
     const nodes = this.activeNodes.slice();
     this.activeNodes = [];
     this.playing = false;
-
-    if (this.master) {
-      this.master.gain.setTargetAtTime(0, this.ctx.currentTime, fadeSec / 3);
+    if (this.master){
+      this.master.gain.setTargetAtTime(0, this.ctx.currentTime, fadeSec/3);
     }
-
-    const delay = fadeSec * 1000 + 200;
     setTimeout(() => {
       nodes.forEach(n => {
-        try { if (n.stop) n.stop(); } catch (e) {}
-        try { n.disconnect(); } catch (e) {}
+        try { if (n.stop) n.stop(); } catch(e){}
+        try { n.disconnect(); } catch(e){}
       });
-      /* clear references */
       this._padGain = this._binGain = this._isoGain = this._noiseGain = null;
-      this._binL = this._binR = this._iso = null;
-      this._noiseSrc = null;
-    }, delay);
+      this._binL = this._binR = this._iso = this._isoLfo = null;
+      this._noiseSrc = this._padFilter = null;
+      this._padOscs = null;
+    }, fadeSec * 1000 + 200);
   }
 
-  async play(mode) {
+  async play(mode){
     await this.init();
     if (this.ctx.state === 'suspended') await this.ctx.resume();
 
-    /* stop anything already running */
     if (this.playing) await this.stop(0.4);
-
-    /* small settle */
     await new Promise(r => setTimeout(r, 450));
 
     this.mode = mode;
@@ -826,7 +886,6 @@ class Soundscape {
     const padGain = ctx.createGain();
     padGain.gain.value = 0;
     padGain.connect(this.dryBus);
-    /* reverb send from pad */
     const padRevSend = ctx.createGain();
     padRevSend.gain.value = mode.reverb * 0.6;
     padGain.connect(padRevSend);
@@ -838,23 +897,27 @@ class Soundscape {
     padFilter.frequency.value = mode.filter;
     padFilter.Q.value = 0.5;
     padFilter.connect(padGain);
+    this._padFilter = padFilter;
     this.activeNodes.push(padFilter);
 
-    /* 4 oscillators forming the pad chord, each slightly detuned */
-    mode.chord.forEach((f, i) => {
+    this._padOscs = [];
+    const chordLen = mode.chord.length;
+    /* always create 4 oscillators so hypnosis can shift chords smoothly */
+    for (let i=0; i<4; i++){
+      const f = mode.chord[i] !== undefined ? mode.chord[i] : mode.chord[chordLen-1] * (1 + 0.5*i);
       const osc = ctx.createOscillator();
       osc.type = i === 0 ? 'sine' : (i === 1 ? 'triangle' : 'sine');
       osc.frequency.value = f;
-      osc.detune.value = (i - 1.5) * 4;   /* gentle chorus */
+      osc.detune.value = (i - 1.5) * 4;
       const g = ctx.createGain();
-      g.gain.value = 0.28 / (i + 1);
+      g.gain.value = i < chordLen ? 0.28/(i+1) : 0.05;
       osc.connect(g);
       g.connect(padFilter);
       osc.start(now);
       this.activeNodes.push(osc, g);
-    });
+      this._padOscs.push(osc);
+    }
 
-    /* subtle slow LFO on pad filter for movement */
     const padLfo = ctx.createOscillator();
     padLfo.type = 'sine';
     padLfo.frequency.value = 0.07;
@@ -865,7 +928,7 @@ class Soundscape {
     padLfo.start(now);
     this.activeNodes.push(padLfo, padLfoGain);
 
-    /* ---------- BINAURAL BEATS ---------- */
+    /* ---------- BINAURAL ---------- */
     const binGain = ctx.createGain();
     binGain.gain.value = 0;
     binGain.connect(this.dryBus);
@@ -879,7 +942,6 @@ class Soundscape {
     const carrier = this.carrierOverride || mode.carrier;
     const beat = mode.beat;
 
-    /* left ear */
     const pannerL = ctx.createStereoPanner();
     pannerL.pan.value = -1;
     pannerL.connect(binGain);
@@ -891,7 +953,6 @@ class Soundscape {
     this._binL = binL;
     this.activeNodes.push(binL, pannerL);
 
-    /* right ear */
     const pannerR = ctx.createStereoPanner();
     pannerR.pan.value = 1;
     pannerR.connect(binGain);
@@ -903,7 +964,7 @@ class Soundscape {
     this._binR = binR;
     this.activeNodes.push(binR, pannerR);
 
-    /* ---------- ISOCHRONIC PULSE ---------- */
+    /* ---------- ISOCHRONIC ---------- */
     const isoGain = ctx.createGain();
     isoGain.gain.value = 0;
     isoGain.connect(this.dryBus);
@@ -914,7 +975,6 @@ class Soundscape {
     this._isoGain = isoGain;
     this.activeNodes.push(isoGain, isoRev);
 
-    /* carrier for the pulse, gated by an LFO on its gain */
     const iso = ctx.createOscillator();
     iso.type = 'sine';
     iso.frequency.value = carrier;
@@ -926,18 +986,18 @@ class Soundscape {
     this._iso = iso;
     this.activeNodes.push(iso, isoGate);
 
-    /* square LFO at the beat frequency drives the gate */
     const isoLfo = ctx.createOscillator();
     isoLfo.type = 'square';
     isoLfo.frequency.value = beat;
     const isoLfoGain = ctx.createGain();
-    isoLfoGain.gain.value = 0.5;   /* drives gain ±0.5 around 0.5 → 0..1 */
+    isoLfoGain.gain.value = 0.5;
     isoLfo.connect(isoLfoGain);
     isoLfoGain.connect(isoGate.gain);
     isoLfo.start(now);
+    this._isoLfo = isoLfo;
     this.activeNodes.push(isoLfo, isoLfoGain);
 
-    /* ---------- AMBIENT NOISE ---------- */
+    /* ---------- NOISE ---------- */
     const noiseGain = ctx.createGain();
     noiseGain.gain.value = 0;
     noiseGain.connect(this.dryBus);
@@ -948,7 +1008,7 @@ class Soundscape {
     noiseSrc.buffer = mode.noise === 'brown' ? this.brownBuf : this.pinkBuf;
     noiseSrc.loop = true;
     const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = mode.noise === 'brown' ? 'lowpass' : 'lowpass';
+    noiseFilter.type = 'lowpass';
     noiseFilter.frequency.value = mode.noise === 'brown' ? 900 : 2400;
     noiseFilter.Q.value = 0.4;
     noiseSrc.connect(noiseFilter);
@@ -959,17 +1019,96 @@ class Soundscape {
 
     /* ---------- FADE IN ---------- */
     const targetNoise = mode.noiseBase * (this.noiseLevel / 0.12);
-    padGain.gain.setTargetAtTime(this.usePad ? mode.padGain : 0, now, fade / 3);
-    binGain.gain.setTargetAtTime(this.useBinaural ? mode.binGain : 0, now, fade / 3);
-    isoGain.gain.setTargetAtTime(this.useIso ? 0.07 : 0, now, fade / 3);
-    noiseGain.gain.setTargetAtTime(Math.min(targetNoise, 0.5), now, fade / 3);
+    padGain.gain.setTargetAtTime(this.usePad ? mode.padGain : 0, now, fade/3);
+    binGain.gain.setTargetAtTime(this.useBinaural ? mode.binGain : 0, now, fade/3);
+    isoGain.gain.setTargetAtTime(this.useIso ? 0.07 : 0, now, fade/3);
+    noiseGain.gain.setTargetAtTime(Math.min(targetNoise, 0.5), now, fade/3);
 
     this.playing = true;
   }
 }
 
 /* ============================================================
-   DOM + UI
+   HYPNOSIS CONTROLLER — sequences through the 4 stages
+   ============================================================ */
+class HypnosisController {
+  constructor(engine, onStage, onProgress){
+    this.engine = engine;
+    this.onStage = onStage;
+    this.onProgress = onProgress;
+    this.active = false;
+    this.timer = null;
+    this.startTime = 0;
+    this.stageIdx = 0;
+    this.raf = null;
+  }
+
+  start(){
+    this.active = true;
+    this.stageIdx = 0;
+    this.startTime = performance.now();
+    this.applyStage(0);
+    this.tick();
+  }
+
+  stop(){
+    this.active = false;
+    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
+  }
+
+  applyStage(i){
+    const st = HYPNOSIS.stages[i];
+    this.stageIdx = i;
+    if (!this.engine.playing) return;
+
+    /* smooth shifts over ~6 s */
+    const t = 6;
+    this.engine.mode.beat = st.beat;
+    this.engine.mode.carrier = st.carrier;
+
+    /* pad chord + filter */
+    this.engine.shiftChord(st.chord, t);
+    this.engine.shiftFilter(st.filter, t);
+
+    /* carrier stays close to the current setting — we shift it gently */
+    const carrierTarget = this.engine.carrierOverride || st.carrier;
+    if (this.engine._binL && this.engine.ctx){
+      const now = this.engine.ctx.currentTime;
+      this.engine._binL.frequency.setTargetAtTime(carrierTarget, now, t/3);
+      this.engine._binR.frequency.setTargetAtTime(carrierTarget + st.beat, now, t/3);
+      if (this.engine._iso) this.engine._iso.frequency.setTargetAtTime(carrierTarget, now, t/3);
+      if (this.engine._isoLfo) this.engine._isoLfo.frequency.setTargetAtTime(st.beat, now, t/3);
+    }
+
+    /* update the UI */
+    if (this.onStage) this.onStage(i, st);
+  }
+
+  tick(){
+    if (!this.active) return;
+    const stages = HYPNOSIS.stages;
+    const st = stages[this.stageIdx];
+    const elapsed = (performance.now() - this.startTime) / 1000;
+    const pct = Math.min(1, elapsed / st.dur);
+
+    if (this.onProgress) this.onProgress(this.stageIdx, elapsed, st.dur, pct);
+
+    if (pct >= 1){
+      if (this.stageIdx < stages.length - 1){
+        this.startTime = performance.now();
+        this.applyStage(this.stageIdx + 1);
+      } else {
+        /* last stage loops forever on the suggestion state */
+        /* just keep the UI in sync */
+      }
+    }
+    this.raf = requestAnimationFrame(() => this.tick());
+  }
+}
+
+/* ============================================================
+   DOM
    ============================================================ */
 const $ = id => document.getElementById(id);
 const grid = $('grid');
@@ -977,6 +1116,7 @@ const player = $('player');
 const playBtn = $('playBtn');
 const nowTitle = $('nowTitle');
 const nowSub = $('nowSub');
+const nowStage = $('nowStage');
 const artSvg = $('artSvg');
 const vizMode = $('vizMode');
 const statBeat = $('statBeat');
@@ -986,25 +1126,50 @@ const timeDisplay = $('timeDisplay');
 const volEl = $('vol'), volOut = $('volOut');
 const noiseEl = $('noise'), noiseOut = $('noiseOut');
 const carrierEl = $('carrier'), carrierOut = $('carrierOut');
-const timersEl = $('timers');
-const timerOut = $('timerOut');
+const timersEl = $('timers'), timerOut = $('timerOut');
 const binBtn = $('binBtn'), padBtn = $('padBtn'), isoBtn = $('isoBtn');
 const statusPill = $('statusPill');
 const brandSub = $('brandSub');
 const brandDot = $('brandDot');
 const viz = $('viz'), vctx = viz.getContext('2d');
+const stagebar = $('stagebar');
+const stageName = $('stageName');
+const stageTime = $('stageTime');
+const stageProgress = $('stageProgress');
+const stageSteps = $('stageSteps');
 
 const engine = new Soundscape();
 
-/* ---------- state ---------- */
 let activeMode = null;
-let timerSeconds = 0;
-let timerRemaining = 0;
+let isHypnosis = false;
+let timerSeconds = 0, timerRemaining = 0;
 let timerInterval = null;
-let sessionStart = 0;
-let sessionInterval = null;
+let sessionStart = 0, sessionInterval = null;
 
-/* ---------- build mode grid ---------- */
+const hypno = new HypnosisController(
+  engine,
+  (i, st) => {
+    stageName.textContent = st.label + ' · ' + st.note;
+    nowStage.textContent = 'Stage ' + (i+1) + ' of 4 — ' + st.label;
+    [...stageSteps.children].forEach((el, idx) => {
+      el.classList.toggle('on', idx === i);
+      el.classList.toggle('done', idx < i);
+    });
+    /* update stat */
+    statBeat.textContent = st.beat + ' Hz';
+    statCarrier.textContent = st.carrier + ' Hz';
+  },
+  (i, elapsed, dur, pct) => {
+    stageProgress.style.width = (pct*100).toFixed(1) + '%';
+    const m = Math.floor(elapsed/60), s = Math.floor(elapsed%60);
+    const dm = Math.floor(dur/60), ds = Math.floor(dur%60);
+    stageTime.textContent = m + ':' + String(s).padStart(2,'0') + ' / ' + dm + ':' + String(ds).padStart(2,'0');
+  }
+);
+
+/* ============================================================
+   BUILD GRID
+   ============================================================ */
 MODES.forEach(m => {
   const btn = document.createElement('button');
   btn.className = 'mode';
@@ -1014,66 +1179,149 @@ MODES.forEach(m => {
     <div class="icon"><svg viewBox="0 0 24 24">${m.icon}</svg></div>
     <div class="name">${m.name}</div>
     <div class="band">${m.band}</div>
-    <div class="desc">${m.desc}</div>
   `;
   btn.addEventListener('click', () => selectMode(m));
   grid.appendChild(btn);
 });
 
-/* ---------- mode selection ---------- */
-async function selectMode(mode) {
-  /* update UI */
+/* hypnosis — featured, spans full width */
+(function(){
+  const btn = document.createElement('button');
+  btn.className = 'mode featured';
+  btn.dataset.id = HYPNOSIS.id;
+  btn.setAttribute('aria-label', HYPNOSIS.name + ' — ' + HYPNOSIS.band);
+  btn.innerHTML = `
+    <div class="icon"><svg viewBox="0 0 24 24">${HYPNOSIS.icon}</svg></div>
+    <div class="name">${HYPNOSIS.name}</div>
+    <div class="band">${HYPNOSIS.band}</div>
+    <div class="feat-desc">${HYPNOSIS.desc}</div>
+    <div class="stages">
+      <span>Induction</span>
+      <span>Deepening</span>
+      <span>Trance</span>
+      <span>Suggestion</span>
+    </div>
+  `;
+  btn.addEventListener('click', () => selectHypnosis());
+  grid.appendChild(btn);
+})();
+
+/* ============================================================
+   MODE SELECTION
+   ============================================================ */
+function applyModeTheme(id){
+  const el = document.querySelector(`.mode[data-id="${id}"]`);
+  if (!el) return;
+  const cs = getComputedStyle(el);
+  const c = cs.getPropertyValue('--m-color').trim();
+  const d = cs.getPropertyValue('--m-dim').trim();
+  document.documentElement.style.setProperty('--mode-color', c);
+  document.documentElement.style.setProperty('--mode-dim', d);
+  brandDot.style.background = c;
+  brandDot.style.boxShadow = '0 0 14px ' + c;
+}
+
+async function selectMode(mode){
+  /* stop hypnosis if active */
+  hypno.stop();
+  isHypnosis = false;
+  player.classList.remove('hypno');
+
   document.querySelectorAll('.mode').forEach(el => {
     el.classList.toggle('active', el.dataset.id === mode.id);
   });
+  applyModeTheme(mode.id);
 
-  /* theme */
-  document.documentElement.style.setProperty('--mode-color', getComputedStyle(document.querySelector(`.mode[data-id="${mode.id}"]`)).getPropertyValue('--m-color'));
-  document.documentElement.style.setProperty('--mode-dim', getComputedStyle(document.querySelector(`.mode[data-id="${mode.id}"]`)).getPropertyValue('--m-dim'));
-
-  /* player metadata */
   nowTitle.textContent = mode.name;
-  nowSub.textContent = mode.band + ' · ' + mode.desc.split('.')[0];
+  nowSub.textContent = mode.band + ' · ' + mode.desc;
   artSvg.innerHTML = mode.icon;
   vizMode.textContent = mode.name.toLowerCase();
   statBeat.textContent = mode.beat + ' Hz';
   statCarrier.textContent = mode.carrier + ' Hz';
 
   brandSub.textContent = mode.name + ' · ' + mode.band;
-  brandDot.style.background = getComputedStyle(document.querySelector(`.mode[data-id="${mode.id}"]`)).getPropertyValue('--m-color');
-
-  /* reset sliders to mode defaults */
   carrierEl.value = mode.carrier;
   carrierOut.textContent = mode.carrier + ' Hz';
   engine.carrierOverride = null;
-
   activeMode = mode;
 
-  /* start playing */
   try {
     await engine.play(mode);
     setPlayingState(true);
     startSessionTimer();
-  } catch (err) {
+  } catch (err){
     console.error(err);
     setPlayingState(false);
   }
 }
 
-function setPlayingState(on) {
+async function selectHypnosis(){
+  hypno.stop();
+  isHypnosis = true;
+  player.classList.add('hypno');
+
+  document.querySelectorAll('.mode').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === HYPNOSIS.id);
+  });
+  applyModeTheme(HYPNOSIS.id);
+
+  const first = HYPNOSIS.stages[0];
+  nowTitle.textContent = HYPNOSIS.name;
+  nowSub.textContent = HYPNOSIS.band;
+  nowStage.textContent = 'Stage 1 of 4 — ' + first.label;
+  artSvg.innerHTML = HYPNOSIS.icon;
+  vizMode.textContent = 'hypnosis';
+  statBeat.textContent = first.beat + ' Hz';
+  statCarrier.textContent = first.carrier + ' Hz';
+  brandSub.textContent = 'Hypnosis · ' + HYPNOSIS.band;
+  carrierEl.value = first.carrier;
+  carrierOut.textContent = first.carrier + ' Hz';
+  engine.carrierOverride = null;
+
+  /* build a synthetic mode object for the engine to start from */
+  const syntheticMode = {
+    id: HYPNOSIS.id,
+    name: HYPNOSIS.name,
+    beat: first.beat,
+    carrier: first.carrier,
+    chord: first.chord,
+    filter: first.filter,
+    noise: first.noise,
+    noiseBase: first.noiseBase,
+    reverb: first.reverb,
+    padGain: first.padGain,
+    binGain: first.binGain
+  };
+  activeMode = syntheticMode;
+
+  try {
+    await engine.play(syntheticMode);
+    setPlayingState(true);
+    startSessionTimer();
+    /* start the staged controller */
+    setTimeout(() => {
+      if (engine.playing && isHypnosis) hypno.start();
+    }, 500);
+  } catch (err){
+    console.error(err);
+    setPlayingState(false);
+  }
+}
+
+function setPlayingState(on){
   player.classList.toggle('playing', on);
   statusPill.classList.toggle('on', on);
   statusPill.textContent = on ? 'playing' : 'paused';
 }
 
-/* ---------- play / pause toggle ---------- */
+/* play / pause */
 playBtn.addEventListener('click', async () => {
-  if (!activeMode) {
-    /* if nothing selected, pick the first mode */
+  if (!activeMode){
     await selectMode(MODES[0]);
     return;
   }
-  if (engine.playing) {
+  if (engine.playing){
+    if (isHypnosis) hypno.stop();
     await engine.stop(0.6);
     setPlayingState(false);
     stopSessionTimer();
@@ -1081,11 +1329,20 @@ playBtn.addEventListener('click', async () => {
     await engine.play(activeMode);
     setPlayingState(true);
     startSessionTimer();
+    if (isHypnosis){
+      /* restart hypnosis from stage 1 */
+      const first = HYPNOSIS.stages[0];
+      engine.mode.beat = first.beat;
+      engine.mode.carrier = first.carrier;
+      setTimeout(() => {
+        if (engine.playing && isHypnosis) hypno.start();
+      }, 500);
+    }
   }
 });
 
-/* ---------- volume ---------- */
-function paintRange(el) {
+/* volume */
+function paintRange(el){
   const pct = ((+el.value - +el.min) / (+el.max - +el.min)) * 100;
   el.style.setProperty('--fill', pct + '%');
 }
@@ -1095,21 +1352,20 @@ volEl.addEventListener('input', () => {
   paintRange(volEl);
 });
 
-/* ---------- noise ---------- */
 noiseEl.addEventListener('input', () => {
   engine.setNoiseLevel(+noiseEl.value / 100);
   noiseOut.textContent = noiseEl.value + '%';
   paintRange(noiseEl);
 });
 
-/* ---------- carrier ---------- */
 carrierEl.addEventListener('input', () => {
   engine.setCarrier(+carrierEl.value);
   carrierOut.textContent = carrierEl.value + ' Hz';
   paintRange(carrierEl);
+  /* disable hypnosis auto-carrier if user is manually adjusting */
+  if (isHypnosis) engine.carrierOverride = +carrierEl.value;
 });
 
-/* ---------- layer toggles ---------- */
 binBtn.addEventListener('click', () => {
   engine.setBinaural(!engine.useBinaural);
   binBtn.classList.toggle('on', engine.useBinaural);
@@ -1123,7 +1379,7 @@ isoBtn.addEventListener('click', () => {
   isoBtn.classList.toggle('on', engine.useIso);
 });
 
-/* ---------- timer ---------- */
+/* timer */
 timersEl.addEventListener('click', e => {
   const b = e.target.closest('.tm');
   if (!b) return;
@@ -1131,7 +1387,7 @@ timersEl.addEventListener('click', e => {
   const min = +b.dataset.min;
   timerSeconds = min * 60;
   timerRemaining = timerSeconds;
-  if (min === 0) {
+  if (min === 0){
     timerOut.textContent = '∞';
     stopTimerInterval();
   } else {
@@ -1139,26 +1395,24 @@ timersEl.addEventListener('click', e => {
     startTimerInterval();
   }
 });
-
-function renderTimer() {
-  if (timerSeconds === 0) { timerOut.textContent = '∞'; return; }
+function renderTimer(){
+  if (timerSeconds === 0){ timerOut.textContent = '∞'; return; }
   const m = Math.floor(timerRemaining / 60);
   const s = timerRemaining % 60;
   timerOut.textContent = m + ':' + String(s).padStart(2, '0');
 }
-
-function startTimerInterval() {
+function startTimerInterval(){
   stopTimerInterval();
   if (timerSeconds === 0) return;
   timerInterval = setInterval(() => {
     if (!engine.playing) return;
     timerRemaining--;
-    if (timerRemaining <= 0) {
+    if (timerRemaining <= 0){
       timerRemaining = 0;
       renderTimer();
       stopTimerInterval();
-      /* fade out and pause */
       engine.stop(2);
+      if (isHypnosis) hypno.stop();
       setPlayingState(false);
       stopSessionTimer();
     } else {
@@ -1166,32 +1420,29 @@ function startTimerInterval() {
     }
   }, 1000);
 }
-
-function stopTimerInterval() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+function stopTimerInterval(){
+  if (timerInterval){ clearInterval(timerInterval); timerInterval = null; }
 }
 
-/* ---------- session time ---------- */
-function startSessionTimer() {
+function startSessionTimer(){
   stopSessionTimer();
   sessionStart = performance.now();
   sessionInterval = setInterval(() => {
     if (!engine.playing) return;
-    const ms = performance.now() - sessionStart;
-    const total = Math.floor(ms / 1000);
+    const total = Math.floor((performance.now() - sessionStart) / 1000);
     const m = Math.floor(total / 60);
     const s = total % 60;
-    timeDisplay.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    timeDisplay.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }, 500);
 }
-function stopSessionTimer() {
-  if (sessionInterval) { clearInterval(sessionInterval); sessionInterval = null; }
+function stopSessionTimer(){
+  if (sessionInterval){ clearInterval(sessionInterval); sessionInterval = null; }
 }
 
 /* ============================================================
    VISUALIZER
    ============================================================ */
-function sizeViz() {
+function sizeViz(){
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const r = viz.getBoundingClientRect();
   viz.width = Math.max(1, Math.round(r.width * dpr));
@@ -1200,47 +1451,35 @@ function sizeViz() {
 }
 window.addEventListener('resize', sizeViz);
 
-let freqData = null;
-let timeData = null;
-let vizRaf = null;
-let pulseT = 0;
+let freqData = null, timeData = null;
+let pulseT = 0, lastFrame = 0;
 
-function startViz() {
-  if (freqData) return;
-  freqData = new Uint8Array(engine.analyser.frequencyBinCount);
-  timeData = new Uint8Array(engine.analyser.fftSize);
+function startViz(){
   let last = performance.now();
-  function frame(now) {
-    vizRaf = requestAnimationFrame(frame);
-    const dt = Math.min((now - last) / 1000, 0.1);
+  function frame(now){
+    const dt = Math.min((now - last)/1000, 0.1);
     last = now;
     pulseT += dt;
     drawViz();
+    requestAnimationFrame(frame);
   }
-  vizRaf = requestAnimationFrame(frame);
+  requestAnimationFrame(frame);
 }
 
-function drawViz() {
-  const W = viz.clientWidth;
-  const H = viz.clientHeight;
+function drawViz(){
+  const W = viz.clientWidth, H = viz.clientHeight;
   if (!W || !H) return;
-
   vctx.clearRect(0, 0, W, H);
 
   const playing = engine.playing;
   const accent = getComputedStyle(document.documentElement).getPropertyValue('--mode-color').trim() || '#8b9dff';
-  const dim = getComputedStyle(document.documentElement).getPropertyValue('--mode-dim').trim() || 'rgba(139,157,255,.12)';
+  const cx = W/2, cy = H/2;
 
-  /* centre */
-  const cx = W / 2;
-  const cy = H / 2;
-
-  if (!playing || !engine.analyser) {
-    /* idle: quiet static ring */
+  if (!playing || !engine.analyser){
     vctx.strokeStyle = 'rgba(255,255,255,.06)';
     vctx.lineWidth = 1;
     vctx.beginPath();
-    vctx.arc(cx, cy, Math.min(W, H) * 0.28, 0, Math.PI * 2);
+    vctx.arc(cx, cy, Math.min(W,H)*0.28, 0, Math.PI*2);
     vctx.stroke();
     vctx.fillStyle = 'rgba(255,255,255,.15)';
     vctx.font = '11px ui-sans-serif';
@@ -1249,57 +1488,57 @@ function drawViz() {
     return;
   }
 
+  if (!freqData){
+    freqData = new Uint8Array(engine.analyser.frequencyBinCount);
+    timeData = new Uint8Array(engine.analyser.fftSize);
+  }
   engine.analyser.getByteFrequencyData(freqData);
   engine.analyser.getByteTimeDomainData(timeData);
 
-  /* ---- background ripple rings synced to beat ---- */
-  const beatHz = activeMode ? activeMode.beat : 4;
-  const baseR = Math.min(W, H) * 0.22;
+  const beatHz = engine.mode ? engine.mode.beat : 4;
+  const baseR = Math.min(W,H) * 0.22;
 
-  for (let r = 0; r < 3; r++) {
-    const phase = (pulseT * beatHz + r * 0.33) % 1;
-    const radius = baseR + phase * Math.min(W, H) * 0.28;
+  /* ripple rings */
+  for (let r=0; r<3; r++){
+    const phase = (pulseT * beatHz + r*0.33) % 1;
+    const radius = baseR + phase * Math.min(W,H) * 0.28;
     const alpha = (1 - phase) * 0.35;
-    vctx.strokeStyle = accent.replace(')', ', ' + alpha + ')').replace('rgb(', 'rgba(');
-    /* simpler alpha handling */
     vctx.strokeStyle = hexToRgba(accent, alpha);
     vctx.lineWidth = 1.4;
     vctx.beginPath();
-    vctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    vctx.arc(cx, cy, radius, 0, Math.PI*2);
     vctx.stroke();
   }
 
-  /* ---- breathing core ---- */
+  /* breathing core */
   const beatPhase = (Math.sin(pulseT * beatHz * Math.PI * 2) + 1) / 2;
   const coreR = baseR * (0.75 + beatPhase * 0.28);
 
-  /* glow */
-  const grad = vctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 2.2);
+  const grad = vctx.createRadialGradient(cx, cy, 0, cx, cy, coreR*2.2);
   grad.addColorStop(0, hexToRgba(accent, 0.35));
   grad.addColorStop(0.5, hexToRgba(accent, 0.10));
   grad.addColorStop(1, hexToRgba(accent, 0));
   vctx.fillStyle = grad;
   vctx.fillRect(0, 0, W, H);
 
-  /* core disc */
   vctx.fillStyle = hexToRgba(accent, 0.12);
   vctx.beginPath();
-  vctx.arc(cx, cy, coreR, 0, Math.PI * 2);
+  vctx.arc(cx, cy, coreR, 0, Math.PI*2);
   vctx.fill();
   vctx.strokeStyle = hexToRgba(accent, 0.55);
   vctx.lineWidth = 1.3;
   vctx.stroke();
 
-  /* ---- frequency ring ---- */
+  /* FFT ring */
   const bins = freqData.length;
-  const step = Math.floor(bins / 96);
+  const step = Math.floor(bins/96);
   const R = baseR * 1.55;
   vctx.beginPath();
-  for (let i = 0; i <= 96; i++) {
+  for (let i=0; i<=96; i++){
     const bin = i * step;
     const v = freqData[bin] / 255;
-    const angle = (i / 96) * Math.PI * 2 - Math.PI / 2;
-    const r = R + v * Math.min(W, H) * 0.20;
+    const angle = (i/96) * Math.PI * 2 - Math.PI/2;
+    const r = R + v * Math.min(W,H) * 0.20;
     const x = cx + Math.cos(angle) * r;
     const y = cy + Math.sin(angle) * r;
     if (i === 0) vctx.moveTo(x, y);
@@ -1310,12 +1549,12 @@ function drawViz() {
   vctx.lineWidth = 1.4;
   vctx.stroke();
 
-  /* ---- waveform underlay ---- */
+  /* waveform */
   vctx.beginPath();
   const wN = timeData.length;
-  for (let x = 0; x < W; x++) {
-    const i = Math.floor((x / W) * wN);
-    const v = (timeData[i] - 128) / 128;
+  for (let x=0; x<W; x++){
+    const i = Math.floor((x/W)*wN);
+    const v = (timeData[i]-128)/128;
     const y = cy + v * (H * 0.35);
     if (x === 0) vctx.moveTo(x, y);
     else vctx.lineTo(x, y);
@@ -1324,41 +1563,32 @@ function drawViz() {
   vctx.lineWidth = 1;
   vctx.stroke();
 
-  /* ---- NR stat (rough SNR estimate) ---- */
-  let peak = 0, rms = 0;
-  for (let i = 0; i < wN; i++) {
-    const v = (timeData[i] - 128) / 128;
-    const a = Math.abs(v);
+  /* peak meter */
+  let peak = 0;
+  for (let i=0; i<wN; i++){
+    const a = Math.abs((timeData[i]-128)/128);
     if (a > peak) peak = a;
-    rms += v * v;
   }
-  rms = Math.sqrt(rms / wN);
-  const snr = peak > 0 ? (20 * Math.log10(peak / (rms + 1e-6))) : 0;
-  statNR.textContent = snr.toFixed(0) + ' dB';
+  statNR.textContent = (peak*100).toFixed(0) + '%';
 }
 
-/* hex → rgba helper */
-function hexToRgba(hex, a) {
+function hexToRgba(hex, a){
   hex = hex.trim();
-  if (hex.startsWith('rgb')) {
-    /* already rgb/rgba */
+  if (hex.startsWith('rgb')){
     const m = hex.match(/[\d.]+/g);
     if (m) return `rgba(${m[0]},${m[1]},${m[2]},${a})`;
     return hex;
   }
   if (hex.startsWith('#')) hex = hex.slice(1);
-  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
   const n = parseInt(hex, 16);
-  const r = (n >> 16) & 255;
-  const g = (n >> 8) & 255;
-  const b = n & 255;
-  return `rgba(${r},${g},${b},${a})`;
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
 }
 
 /* ============================================================
    INIT
    ============================================================ */
-function init() {
+function init(){
   sizeViz();
   paintRange(volEl);
   paintRange(noiseEl);
@@ -1368,27 +1598,25 @@ function init() {
   carrierOut.textContent = carrierEl.value + ' Hz';
   timerOut.textContent = '∞';
   startViz();
+
+  /* default theme */
+  document.documentElement.style.setProperty('--mode-color', '#5eead4');
+  document.documentElement.style.setProperty('--mode-dim', 'rgba(94,234,212,.13)');
 }
 
-/* set default active mode colouring (no audio yet) */
-const firstStyle = getComputedStyle(document.documentElement);
-document.documentElement.style.setProperty('--mode-color', '#5eead4');
-document.documentElement.style.setProperty('--mode-dim', 'rgba(94,234,212,.13)');
-
-init();
-
-/* unlock audio context on first user interaction anywhere */
 let unlocked = false;
-async function unlock() {
+async function unlock(){
   if (unlocked) return;
   unlocked = true;
   try {
     await engine.init();
     if (engine.ctx.state === 'suspended') await engine.ctx.resume();
-  } catch (e) {}
+  } catch(e){}
 }
-window.addEventListener('pointerdown', unlock, { once: false });
-window.addEventListener('keydown', unlock, { once: false });
+window.addEventListener('pointerdown', unlock);
+window.addEventListener('keydown', unlock);
+
+init();
 
 })();
 </script>
