@@ -4,137 +4,86 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>ANC.live — FxLMS Hybrid Engine</title>
+<title>ANC.live — Feedback Adaptive</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#07090c; --panel:#0d1219; --line:rgba(255,255,255,.07);
-    --txt:#e6edf3; --dim:#7b8a99; --accent:#00e5c0; --anti:#ff4d6d;
-    --warn:#ffb020; --blue:#5b9dff;
-  }
-  html,body{height:100%}
-  body{
-    background:
-      radial-gradient(900px 600px at 50% -10%, rgba(0,229,192,.07), transparent 60%),
-      radial-gradient(700px 500px at 90% 110%, rgba(91,157,255,.06), transparent 60%),
-      var(--bg);
-    color:var(--txt);
-    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;justify-content:center;
-    padding:22px 16px 40px; min-height:100%;
-  }
-  .wrap{width:100%;max-width:600px;display:flex;flex-direction:column;gap:16px}
-
+  :root{--bg:#07090c;--panel:#0d1219;--line:rgba(255,255,255,.07);--txt:#e6edf3;--dim:#7b8a99;--accent:#00e5c0;--anti:#ff4d6d}
+  body{background:radial-gradient(900px 600px at 50% -10%,rgba(0,229,192,.07),transparent 60%),var(--bg);color:var(--txt);
+    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;display:flex;justify-content:center;
+    padding:22px 16px 40px;min-height:100vh}
+  .wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:16px}
   .top{display:flex;align-items:center;justify-content:space-between}
   .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:15px}
   .logo em{font-style:normal;color:var(--dim);font-weight:500}
   .pulse{width:9px;height:9px;border-radius:50%;background:#2a3542;transition:.3s}
   .pulse.live{background:var(--accent);box-shadow:0 0 12px var(--accent);animation:blink 1.6s infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  .pill{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
-    padding:6px 12px;border-radius:999px;border:1px solid var(--line);
-    background:rgba(255,255,255,.02);color:var(--dim);transition:.3s;white-space:nowrap}
+  .pill{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--dim);transition:.3s}
   .pill.on{color:var(--accent);border-color:rgba(0,229,192,.35);background:rgba(0,229,192,.06)}
-  .pill.cal{color:var(--warn);border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.06)}
-
-  .stage{display:flex;flex-direction:column;align-items:center;gap:16px;
-    padding:26px 20px 22px;border:1px solid var(--line);border-radius:24px;
-    background:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0))}
-  .power{position:relative;width:150px;height:150px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.09);
-    background:radial-gradient(circle at 50% 32%, #182330, #0a0e13 72%);
-    color:#63717f;cursor:pointer;display:grid;place-items:center;
-    transition:color .3s, box-shadow .4s, border-color .4s, transform .12s;
-    -webkit-tap-highlight-color:transparent;outline:none}
+  .stage{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 20px 22px;
+    border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
+  .power{position:relative;width:150px;height:150px;border-radius:50%;border:1px solid rgba(255,255,255,.09);
+    background:radial-gradient(circle at 50% 32%,#182330,#0a0e13 72%);color:#63717f;cursor:pointer;display:grid;
+    place-items:center;transition:color .3s,box-shadow .4s,border-color .4s,transform .12s;-webkit-tap-highlight-color:transparent;outline:none}
   .power:active{transform:scale(.97)}
   .power svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
   .power.on{color:var(--accent);border-color:rgba(0,229,192,.45);
-    box-shadow:0 0 0 1px rgba(0,229,192,.25), 0 0 60px rgba(0,229,192,.22), inset 0 0 40px rgba(0,229,192,.08)}
-  .power.cal{color:var(--warn);border-color:rgba(255,176,32,.45);
-    box-shadow:0 0 0 1px rgba(255,176,32,.25), 0 0 60px rgba(255,176,32,.22)}
+    box-shadow:0 0 0 1px rgba(0,229,192,.25),0 0 60px rgba(0,229,192,.22),inset 0 0 40px rgba(0,229,192,.08)}
   .ring{position:absolute;inset:-1px;border-radius:50%;border:1px solid rgba(0,229,192,.5);opacity:0;pointer-events:none}
   .power.on .ring{animation:ripple 2.6s cubic-bezier(.2,.6,.3,1) infinite}
-  .power.cal .ring{border-color:rgba(255,176,32,.5);animation:ripple 1.2s cubic-bezier(.2,.6,.3,1) infinite}
   .power.on .ring.r2{animation-delay:1.3s}
   @keyframes ripple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
-  .hint{font-size:13.5px;color:var(--dim);text-align:center;line-height:1.5;max-width:380px;min-height:20px}
+  .hint{font-size:13.5px;color:var(--dim);text-align:center;line-height:1.5;max-width:360px;min-height:20px}
   .hint b{color:var(--txt);font-weight:600}
-  .hint .warn{color:var(--warn)}
-
-  .viz{position:relative;border:1px solid var(--line);border-radius:18px;
-    background:linear-gradient(180deg,#0a0f15,#080b10);overflow:hidden;height:150px}
+  .viz{position:relative;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0a0f15,#080b10);overflow:hidden;height:150px}
   #scope{width:100%;height:100%;display:block}
-  .legend{position:absolute;top:10px;left:12px;display:flex;gap:14px;
-    font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+  .legend{position:absolute;top:10px;left:12px;display:flex;gap:14px;font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;font-weight:600}
   .legend span{display:flex;align-items:center;gap:6px;color:var(--dim)}
   .legend i{width:14px;height:2px;border-radius:2px;display:block}
   .legend .i-in i{background:rgba(0,229,192,.55)}
   .legend .i-out i{background:var(--anti)}
-  .legend .i-err i{background:var(--warn)}
-
   .meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .meter{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.015)}
-  .meter-head{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:9px}
+  .meter-head{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--dim);font-weight:600;margin-bottom:9px}
   .bar{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
   .bar i{display:block;height:100%;width:0%;border-radius:99px;transition:width .06s linear}
   .bar.in i{background:linear-gradient(90deg,#007a68,var(--accent))}
   .bar.out i{background:linear-gradient(90deg,#8f2438,var(--anti))}
-  .bar.err i{background:linear-gradient(90deg,#8f6a18,var(--warn))}
-  .bar.nr i{background:linear-gradient(90deg,#2d4a7a,var(--blue))}
-
   .panel{border:1px solid var(--line);border-radius:20px;padding:18px 18px 6px;background:var(--panel)}
-  .panel h2{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-    font-weight:700;margin-bottom:16px}
+  .panel h2{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:16px}
   .ctrl{display:block;margin-bottom:20px}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
   .ctrl-head b{font-size:13px;font-weight:600;color:#cbd6e0}
   .ctrl-head output{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
   input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;display:block}
   input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;
-    background:#0e141b;border:2px solid var(--accent);margin-top:-6.5px;
-    box-shadow:0 0 10px rgba(0,229,192,.4);transition:transform .15s}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:#0e141b;
+    border:2px solid var(--accent);margin-top:-6.5px;box-shadow:0 0 10px rgba(0,229,192,.4);transition:transform .15s}
   input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
   input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#0e141b;
-    border:2px solid var(--accent);box-shadow:0 0 10px rgba(0,229,192,.4)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#0e141b;border:2px solid var(--accent);
+    box-shadow:0 0 10px rgba(0,229,192,.4)}
   input[type=range]:disabled{opacity:.35;pointer-events:none}
-
   .toggles{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:16px}
-  .tgl{flex:1 1 auto;min-width:130px;padding:11px 14px;border-radius:12px;cursor:pointer;
-    font-size:12.5px;font-weight:600;background:rgba(255,255,255,.03);
-    border:1px solid var(--line);color:var(--dim);transition:.22s;font-family:inherit}
+  .tgl{flex:1 1 auto;min-width:130px;padding:11px 14px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:600;
+    background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--dim);transition:.22s;font-family:inherit}
   .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.08)}
   .tgl:active{transform:scale(.98)}
-
-  .note{border:1px solid var(--line);border-radius:18px;padding:16px 18px;
-    background:rgba(255,255,255,.015);font-size:12.5px;line-height:1.65;color:var(--dim)}
-  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:7px;font-size:12px;
-    letter-spacing:.05em;text-transform:uppercase}
+  .note{border:1px solid var(--line);border-radius:18px;padding:16px 18px;background:rgba(255,255,255,.015);
+    font-size:12.5px;line-height:1.65;color:var(--dim)}
+  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:7px;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
   .note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
   .note li{padding-left:16px;position:relative}
-  .note li::before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;
-    border-radius:50%;background:var(--accent);opacity:.6}
-  .note .warn::before{background:var(--warn)}
-  .note .blue::before{background:var(--blue)}
-
-  .arch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-  .arch div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;
-    font-size:11.5px;color:var(--dim);line-height:1.45}
-  .arch b{display:block;color:var(--txt);font-size:11px;letter-spacing:.06em;
-    text-transform:uppercase;margin-bottom:4px}
+  .note li::before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.6}
+  .note .warn::before{background:#ffb020}
   footer{text-align:center;font-size:11px;color:#3f4a56;letter-spacing:.05em}
-  @media(max-width:400px){
-    .power{width:126px;height:126px}.power svg{width:44px;height:44px}
-    .arch{grid-template-columns:1fr}
-  }
 </style>
 </head>
 <body>
 <div class="wrap">
-
   <header class="top">
     <div class="logo"><span class="pulse" id="pulse"></span>ANC<em>.live</em></div>
     <div class="pill" id="statusPill">standby</div>
@@ -143,90 +92,65 @@
   <section class="stage">
     <button class="power" id="powerBtn" aria-label="Toggle noise cancellation">
       <span class="ring"></span><span class="ring r2"></span>
-      <svg viewBox="0 0 24 24">
-        <path d="M12 2.5v9"/>
-        <path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><path d="M12 2.5v9"/><path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/></svg>
     </button>
-    <p class="hint" id="hint">Tap to begin. The system will first <b>calibrate</b> — playing a chirp to learn the speaker→ear path — then start cancelling.</p>
+    <p class="hint" id="hint">Wear <b>headphones</b>, then tap. Single-mic feedback ANC — it can only cancel <b>low rumbling</b> noise, not speech.</p>
   </section>
 
   <section class="viz">
     <canvas id="scope"></canvas>
     <div class="legend">
-      <span class="i-in"><i></i>Room / ref</span>
+      <span class="i-in"><i></i>Mic</span>
       <span class="i-out"><i></i>Anti-noise</span>
-      <span class="i-err"><i></i>Residual</span>
     </div>
   </section>
 
   <section class="meters">
     <div class="meter">
-      <div class="meter-head"><span>Reference</span><span id="inDb">−∞ dB</span></div>
+      <div class="meter-head"><span>Input</span><span id="inDb">−∞ dB</span></div>
       <div class="bar in"><i id="inBar"></i></div>
     </div>
     <div class="meter">
-      <div class="meter-head"><span>Anti-noise out</span><span id="outDb">−∞ dB</span></div>
+      <div class="meter-head"><span>Output</span><span id="outDb">−∞ dB</span></div>
       <div class="bar out"><i id="outBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>Residual (error)</span><span id="errDb">−∞ dB</span></div>
-      <div class="bar err"><i id="errBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>Cancellation</span><span id="nrDb">0 dB</span></div>
-      <div class="bar nr"><i id="nrBar"></i></div>
     </div>
   </section>
 
   <section class="panel">
-    <h2>FxLMS controller</h2>
-
+    <h2>Adaptive controller</h2>
     <label class="ctrl">
-      <span class="ctrl-head"><b>Adaptation step (μ)</b><output id="muOut">0.00040</output></span>
-      <input type="range" id="mu" min="1" max="200" value="40" step="1" disabled>
+      <span class="ctrl-head"><b>Adaptation rate (μ)</b><output id="muOut">0.00050</output></span>
+      <input type="range" id="mu" min="1" max="100" value="50" step="1" disabled>
     </label>
-
     <label class="ctrl">
-      <span class="ctrl-head"><b>Filter taps</b><output id="tapsOut">256</output></span>
-      <input type="range" id="taps" min="32" max="512" value="256" step="32" disabled>
+      <span class="ctrl-head"><b>Filter taps</b><output id="tapsOut">32</output></span>
+      <input type="range" id="taps" min="8" max="128" value="32" step="8" disabled>
     </label>
-
     <label class="ctrl">
-      <span class="ctrl-head"><b>Leakage (regularization)</b><output id="leakOut">0.9999</output></span>
-      <input type="range" id="leak" min="0" max="100" value="100" step="1" disabled>
+      <span class="ctrl-head"><b>Loop delay</b><output id="delayOut">32 samples</output></span>
+      <input type="range" id="delay" min="4" max="128" value="32" step="4" disabled>
     </label>
-
     <label class="ctrl">
-      <span class="ctrl-head"><b>Anti-noise output limit</b><output id="outLimOut">0.70</output></span>
-      <input type="range" id="outLim" min="10" max="100" value="70" step="1" disabled>
+      <span class="ctrl-head"><b>Output ceiling</b><output id="outLimOut">0.50</output></span>
+      <input type="range" id="outLim" min="5" max="100" value="50" step="1" disabled>
     </label>
-
     <div class="toggles">
-      <button class="tgl on" id="ffBtn">Feedforward</button>
-      <button class="tgl on" id="fbBtn">Feedback</button>
-      <button class="tgl on" id="normBtn">Normalize</button>
-      <button class="tgl" id="spmBtn">Online SPM</button>
+      <button class="tgl on" id="flipBtn">Polarity −</button>
+      <button class="tgl on" id="guardBtn">Howl guard</button>
     </div>
   </section>
 
   <section class="note">
-    <strong>What this actually is</strong>
+    <strong>Why this is not "real" ANC</strong>
     <ul>
-      <li><b>Feedforward FxLMS</b> — the mic captures ambient noise, the adaptive FIR filter generates the optimal anti-noise, and the error mic measures residual to update the weights. This is the core of every commercial ANC chip.[reference:8]</li>
-      <li><b>Secondary path estimation</b> — the speaker→ear transfer function is not flat. Without compensating for it, FxLMS diverges. The calibration chirp measures it before you start.[reference:9]</li>
-      <li><b>Online SPM</b> — continuously re-estimates the secondary path using a low-level dither, so it adapts if you move your head or change the fit.[reference:10]</li>
-      <li class="warn"><b>Latency reality</b> — browser audio runs at 10–30 ms round trip. Commercial ANC chips run at &lt;1 ms. This system cancels &lt;30 Hz effectively, and partially up to ~100 Hz. Above that, digital latency is too large for destructive interference.</li>
+      <li>Big-tech ANC uses <b>two mics</b> (feedforward + feedback) and a chip running at <b>&lt;1 ms</b> latency. Browser audio is 10–30 ms, which caps cancellation at ~25 Hz.</li>
+      <li>With one mic, only <b>feedback ANC</b> is mathematically valid. That's what this uses: <code>y = −W · e_past</code>, NLMS-adapted.</li>
+      <li class="warn">Without headphones this self-oscillates instantly. The howl guard limits it, but headphones are the correct setup.</li>
+      <li>It cancels steady low-frequency rumble (fans, engines, HVAC). It cannot cancel speech, music, or transients — no ANC can.</li>
     </ul>
-    <div class="arch">
-      <div><b>FF path</b>Reference mic → FxLMS → anti-noise → error mic</div>
-      <div><b>FB path</b>Error mic → FxLMS → anti-noise (narrowband)</div>
-      <div><b>SPM</b>Dither → LMS secondary model → filters reference</div>
-      <div><b>Output</b>Limiter → master gain → speaker</div>
-    </div>
   </section>
 
-  <footer>FxLMS · NLMS · Hybrid FF+FB · Online SPM · AudioWorklet</footer>
+  <footer>Feedback ANC · NLMS · AudioWorklet · on-device</footer>
 </div>
 
 <script>
@@ -234,418 +158,207 @@
 "use strict";
 
 /* ============================================================
-   AudioWorklet processor — the FxLMS ANC engine.
-   Implements:
-     • Feedforward FxLMS adaptive FIR filter
-     • Feedback FxLMS adaptive FIR filter (hybrid)
-     • Online secondary path modelling (SPM) with dither
-     • Normalized step size (FxNLMS)
-     • Leakage for regularization
+   AudioWorklet — feedback ANC with NLMS-adapted FIR filter.
+   No O(N²) filtered-x loop. Runs in real time.
    ============================================================ */
 const WORKLET_SRC = `
 class ANCProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors() {
     return [
-      { name: 'mu',      defaultValue: 0.0004, minValue: 0.000001, maxValue: 0.01, automationRate: 'k-rate' },
-      { name: 'leak',    defaultValue: 0.9999, minValue: 0.9,      maxValue: 1.0,  automationRate: 'k-rate' },
-      { name: 'outLim',  defaultValue: 0.7,    minValue: 0.05,     maxValue: 1.5,  automationRate: 'k-rate' },
-      { name: 'ffOn',    defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'fbOn',    defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'normOn',  defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'spmOn',   defaultValue: 0,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'taps',    defaultValue: 256,    minValue: 32,       maxValue: 512,  automationRate: 'k-rate' },
-      { name: 'epoch',   defaultValue: 0,      minValue: 0,        maxValue: 10,   automationRate: 'k-rate' }
+      { name: 'mu',     defaultValue: 0.0005, minValue: 0,    maxValue: 0.05, automationRate: 'k-rate' },
+      { name: 'taps',   defaultValue: 32,     minValue: 8,    maxValue: 128,  automationRate: 'k-rate' },
+      { name: 'delay',  defaultValue: 32,     minValue: 4,    maxValue: 256,  automationRate: 'k-rate' },
+      { name: 'outLim', defaultValue: 0.5,    minValue: 0.01, maxValue: 1.5,  automationRate: 'k-rate' },
+      { name: 'flip',   defaultValue: 1,      minValue: 0,    maxValue: 1,    automationRate: 'k-rate' }
     ];
   }
 
   constructor() {
     super();
-
-    this.N = 2048;                    // ring buffer size
-    this.MAXTAPS = 512;
-
-    /* ---------- ring buffers ---------- */
-    this.bufRef = new Float32Array(this.N);   // reference (room mic)
-    this.bufErr = new Float32Array(this.N);   // error (residual)
-    this.bufOut = new Float32Array(this.N);   // anti-noise output
-    this.w = 0;
-
-    /* ---------- FxLMS adaptive filters ---------- */
-    // Feedforward filter
-    this.wFF = new Float32Array(this.MAXTAPS);
-    // Feedback filter
-    this.wFB = new Float32Array(this.MAXTAPS);
-    // Secondary path estimate (speaker → ear)
-    this.wS  = new Float32Array(this.MAXTAPS);
-    // Secondary path modelling filter (online)
-    this.wSPM = new Float32Array(this.MAXTAPS);
-
-    this.mu = 0.0004;
-    this.leak = 0.9999;
-    this.outLim = 0.7;
-
-    this.ffOn = 1; this.fbOn = 1; this.normOn = 1; this.spmOn = 0;
-
-    this.taps = 256;
-
-    /* ---------- SPM state ---------- */
-    this.dither = 0;
-    this.ditherPhase = 0;
-    this.spmInitialized = false;
-    this.spmSamples = 0;
-    this.spmDur = 3 * sampleRate;      // 3 seconds of SPM adaptation
-
-    /* ---------- calibration chirp ---------- */
-    this.calibrating = true;
-    this.calPos = 0;
-    this.calLen = Math.floor(2.5 * sampleRate);
-    this.calDone = false;
-
-    /* ---------- measurement ---------- */
-    this.refPow = 0;
-    this.errPow = 0;
-    this.outPow = 0;
-    this.nrDb = 0;
-    this.frameCount = 0;
-  }
-
-  /* ---------- generate calibration chirp (log sweep 20 Hz–8 kHz) ---------- */
-  calChirp(i) {
-    const t = i / sampleRate;
-    const T = this.calLen / sampleRate;
-    const f0 = 20, f1 = 8000;
-    const k = Math.log(f1 / f0);
-    const phase = 2 * Math.PI * f0 * T / k * (Math.exp(k * t / T) - 1);
-    const env = Math.sin(Math.PI * Math.min(1, i / this.calLen));
-    return Math.sin(phase) * env * 0.35;
+    this.N = 1024;                    // ring buffer for error history
+    this.eHist = new Float32Array(this.N);
+    this.w = new Float32Array(128);   // adaptive FIR weights
+    this.wIdx = 0;
+    this.power = 1e-6;                // running power estimate
+    this.lastTaps = 32;
+    this.frac = 0;                    // fractional sample accumulator
   }
 
   process(inputs, outputs, params) {
-    const input  = inputs[0];
+    const input = inputs[0];
     const output = outputs[0];
-    const out0   = output[0];
-    const n      = out0.length;
-    const in0    = (input && input.length) ? input[0] : null;
-    if (!in0) { out0.fill(0); return true; }
+    const out0 = output[0];
+    const n = out0.length;
 
-    this.mu      = params.mu[0];
-    this.leak    = params.leak[0];
-    this.outLim  = params.outLim[0];
-    this.ffOn    = params.ffOn[0]   > 0.5 ? 1 : 0;
-    this.fbOn    = params.fbOn[0]   > 0.5 ? 1 : 0;
-    this.normOn  = params.normOn[0] > 0.5 ? 1 : 0;
-    this.spmOn   = params.spmOn[0]  > 0.5 ? 1 : 0;
-    this.taps    = Math.max(32, Math.min(this.MAXTAPS, Math.round(params.taps[0])));
-
-    /* ---------- calibration phase ---------- */
-    if (this.calibrating) {
-      for (let i = 0; i < n; i++) {
-        if (this.calPos < this.calLen) {
-          out0[i] = this.calChirp(this.calPos);
-          this.calPos++;
-        } else {
-          out0[i] = 0;
-          if (!this.calDone) {
-            this.calDone = true;
-            this.calibrating = false;
-            this.port.postMessage({ type: 'calDone' });
-          }
-        }
-      }
-      /* during calibration we also adapt the SPM filter using the chirp */
-      this.adaptSPM(in0, out0, n, 0.002);
-      /* post level */
-      this.port.postMessage({
-        type: 'level',
-        ref: this.rms(in0, n),
-        out: this.rms(out0, n),
-        err: this.rms(in0, n),
-        nr: 0,
-        taps: this.taps
-      });
+    // If no input connected (silent frame), output silence and keep state.
+    if (!input || !input.length || !input[0]) {
+      out0.fill(0);
+      for (let c = 1; c < output.length; c++) output[c].fill(0);
       return true;
     }
 
-    /* ---------- main FxLMS loop ---------- */
+    const in0 = input[0];
+
+    const mu    = params.mu[0];
+    const taps  = Math.min(128, Math.max(8, Math.round(params.taps[0])));
+    const delay = Math.max(0, Math.round(params.delay[0]));
+    const outLim= params.outLim[0];
+    const flip  = params.flip[0] > 0.5 ? -1 : 1;
+
     const N = this.N;
-    let w = this.w;
-
-    const bufRef = this.bufRef;
-    const bufErr = this.bufErr;
-    const bufOut = this.bufOut;
-
-    /* dither signal for online SPM (low-level pseudo-random) */
-    let ditherAcc = 0;
+    const eHist = this.eHist;
+    const w = this.w;
+    let wIdx = this.wIdx;
+    let power = this.power;
 
     for (let i = 0; i < n; i++) {
-      /* 1. read reference (room mic) and error (residual) */
-      const xRef = in0[i];
-      const xErr = in0[i];   // same mic during operation; error = residual
+      const e = in0[i];
 
-      /* 2. generate dither for online SPM */
-      if (this.spmOn && this.calDone) {
-        // simple LCG noise, low level
-        this.dither = (this.dither * 1103515245 + 12345) & 0x7fffffff;
-        const d = (this.dither / 0x7fffffff - 0.5) * 0.02;
-        ditherAcc = d;
-      } else {
-        ditherAcc = 0;
+      // ---- compute anti-noise: y = flip * sum_k w[k] * e[n - k - delay] ----
+      let y = 0;
+      for (let k = 0; k < taps; k++) {
+        let idx = wIdx - k - delay;
+        if (idx < 0) idx += N;
+        y += w[k] * eHist[idx];
       }
+      y *= flip;
 
-      /* 3. compute anti-noise output */
-      let yFF = 0, yFB = 0;
+      // ---- hard output limit ----
+      if (y >  outLim) y =  outLim;
+      else if (y < -outLim) y = -outLim;
 
-      if (this.ffOn) {
-        // feedforward: filter reference through wFF
-        let sum = 0;
-        for (let k = 0; k < this.taps; k++) {
-          let idx = w - k;
-          if (idx < 0) idx += N;
-          sum += this.wFF[k] * bufRef[idx];
-        }
-        yFF = sum;
+      // NaN safety: if anything went non-finite, hard reset.
+      if (!isFinite(y)) {
+        y = 0;
+        for (let k = 0; k < this.w.length; k++) this.w[k] = 0;
       }
-
-      if (this.fbOn) {
-        // feedback: filter error through wFB
-        let sum = 0;
-        for (let k = 0; k < this.taps; k++) {
-          let idx = w - k;
-          if (idx < 0) idx += N;
-          sum += this.wFB[k] * bufErr[idx];
-        }
-        yFB = sum;
-      }
-
-      let y = yFF + yFB + ditherAcc;
-
-      /* 4. output limiter (critical for stability) */
-      if (y >  this.outLim) y =  this.outLim;
-      if (y < -this.outLim) y = -this.outLim;
 
       out0[i] = y;
 
-      /* 5. store in ring buffers */
-      bufRef[w] = xRef;
-      bufErr[w] = xErr + ditherAcc;   // error includes the dither for SPM
-      bufOut[w] = y;
+      // ---- store current error ----
+      eHist[wIdx] = e;
 
-      /* 6. update adaptive filters (FxLMS) */
-      // Normalize step size
-      const power = bufRef[w] * bufRef[w] + 1e-8;
-      const muNorm = this.normOn ? this.mu / (1 + power * 10) : this.mu;
+      // ---- normalized LMS weight update ----
+      // w[k] += mu * e * eHist[n-k-delay] / (power + eps)
+      power = power * 0.999 + e * e * 0.001;
+      const norm = mu / (power + 1e-5);
 
-      // --- update feedforward filter ---
-      if (this.ffOn) {
-        for (let k = 0; k < this.taps; k++) {
-          let idx = w - k;
+      if (isFinite(norm) && norm > 0) {
+        for (let k = 0; k < taps; k++) {
+          let idx = wIdx - k - delay;
           if (idx < 0) idx += N;
-          // filtered-x: convolve reference with secondary path estimate
-          let fx = 0;
-          const SK = Math.min(k + 1, this.taps);
-          for (let j = 0; j < SK; j++) {
-            let sidx = w - k + j;
-            if (sidx < 0) sidx += N;
-            if (sidx >= N) sidx -= N;
-            fx += this.wS[j] * bufRef[sidx];
+          const xk = eHist[idx];
+          if (isFinite(xk)) {
+            w[k] += norm * e * xk;
           }
-          this.wFF[k] = this.leak * this.wFF[k] - muNorm * xErr * fx;
         }
       }
 
-      // --- update feedback filter ---
-      if (this.fbOn) {
-        for (let k = 0; k < this.taps; k++) {
-          let idx = w - k;
-          if (idx < 0) idx += N;
-          let fx = 0;
-          const SK = Math.min(k + 1, this.taps);
-          for (let j = 0; j < SK; j++) {
-            let sidx = w - k + j;
-            if (sidx < 0) sidx += N;
-            if (sidx >= N) sidx -= N;
-            fx += this.wS[j] * bufErr[sidx];
-          }
-          this.wFB[k] = this.leak * this.wFB[k] - muNorm * xErr * fx;
-        }
-      }
-
-      /* 7. online secondary path modelling */
-      if (this.spmOn && this.calDone && ditherAcc !== 0) {
-        // adapt wSPM so that wSPM * dither ≈ error contribution
-        for (let k = 0; k < this.taps; k++) {
-          let idx = w - k;
-          if (idx < 0) idx += N;
-          this.wSPM[k] -= 0.0005 * xErr * ditherAcc * bufOut[idx];
-        }
-      }
-
-      w++;
-      if (w >= N) w = 0;
-
-      /* ---- periodic measurement ---- */
-      this.refPow = this.refPow * 0.999 + xRef * xRef * 0.001;
-      this.errPow = this.errPow * 0.999 + xErr * xErr * 0.001;
-      this.outPow = this.outPow * 0.999 + y * y * 0.001;
-
-      this.frameCount++;
-      if (this.frameCount >= 1024) {
-        this.frameCount = 0;
-        const refDb = 10 * Math.log10(this.refPow + 1e-12);
-        const errDb = 10 * Math.log10(this.errPow + 1e-12);
-        const nrDb  = refDb - errDb;
-        this.nrDb = nrDb;
-        this.port.postMessage({
-          type: 'level',
-          ref: Math.sqrt(this.refPow),
-          out: Math.sqrt(this.outPow),
-          err: Math.sqrt(this.errPow),
-          nr: nrDb,
-          taps: this.taps
-        });
-      }
+      wIdx++;
+      if (wIdx >= N) wIdx = 0;
     }
 
-    this.w = w;
+    this.wIdx = wIdx;
+    this.power = power;
 
-    /* duplicate to all channels */
+    // copy to all output channels
     for (let c = 1; c < output.length; c++) output[c].set(out0);
 
     return true;
   }
-
-  rms(arr, n) {
-    let s = 0;
-    for (let i = 0; i < n; i++) s += arr[i] * arr[i];
-    return Math.sqrt(s / n);
-  }
-
-  adaptSPM(ref, out, n, mu) {
-    /* offline-ish SPM during calibration: adapt wSPM to model the
-       path from output back to the microphone. We use a simple LMS
-       with the chirp as excitation. */
-    const N = this.N;
-    let w = this.w;
-    for (let i = 0; i < n; i++) {
-      // write output into buffer
-      this.bufOut[w] = out[i];
-      // predicted error from SPM model
-      let pred = 0;
-      for (let k = 0; k < this.taps; k++) {
-        let idx = w - k;
-        if (idx < 0) idx += N;
-        pred += this.wSPM[k] * this.bufOut[idx];
-      }
-      const e = ref[i] - pred;
-      // LMS update
-      for (let k = 0; k < this.taps; k++) {
-        let idx = w - k;
-        if (idx < 0) idx += N;
-        this.wSPM[k] += mu * e * this.bufOut[idx];
-      }
-      w++;
-      if (w >= N) w = 0;
-    }
-    this.w = w;
-    // copy SPM model into wS (the filtered-x reference filter)
-    this.wS.set(this.wSPM);
-  }
 }
-registerProcessor('anc-fxlms', ANCProcessor);
+registerProcessor('anc-feedback', ANCProcessor);
 `;
 
 /* ============================================================
-   DOM refs
+   DOM
    ============================================================ */
 const $ = id => document.getElementById(id);
-const powerBtn  = $('powerBtn');
-const statusPill= $('statusPill');
-const pulse     = $('pulse');
-const hint      = $('hint');
-
-const scope     = $('scope');
-const sctx      = scope.getContext('2d');
-
-const inBar = $('inBar'),  outBar = $('outBar');
-const errBar= $('errBar'), nrBar  = $('nrBar');
-const inDb  = $('inDb'),   outDb  = $('outDb');
-const errDb = $('errDb'),  nrDb   = $('nrDb');
-
-const muEl   = $('mu'),     muOut   = $('muOut');
-const tapsEl = $('taps'),   tapsOut = $('tapsOut');
-const leakEl = $('leak'),   leakOut = $('leakOut');
+const powerBtn = $('powerBtn');
+const statusPill = $('statusPill');
+const pulse = $('pulse');
+const hint = $('hint');
+const scope = $('scope');
+const sctx = scope.getContext('2d');
+const inBar = $('inBar'), outBar = $('outBar');
+const inDb = $('inDb'), outDb = $('outDb');
+const muEl = $('mu'), muOut = $('muOut');
+const tapsEl = $('taps'), tapsOut = $('tapsOut');
+const delayEl = $('delay'), delayOut = $('delayOut');
 const outLimEl = $('outLim'), outLimOut = $('outLimOut');
-const ffBtn  = $('ffBtn');
-const fbBtn  = $('fbBtn');
-const normBtn= $('normBtn');
-const spmBtn = $('spmBtn');
-
-const sliders = [muEl, tapsEl, leakEl, outLimEl];
+const flipBtn = $('flipBtn'), guardBtn = $('guardBtn');
+const sliders = [muEl, tapsEl, delayEl, outLimEl];
 
 /* ============================================================
    State
    ============================================================ */
-let ctx = null;
-let stream = null;
-let srcNode = null;
+let ctx = null, stream = null, srcNode = null;
 let analyserIn = null, analyserOut = null;
-let worklet = null, lpNode = null, hpNode = null, limiter = null, master = null;
-
-let running = false;
-let calibrating = false;
-let rafId = null;
+let worklet = null, master = null, limiter = null;
+let running = false, rafId = null;
 let bufIn = null, bufOut = null;
-
-let guardGain = 1;
-let guardEnabled = true;
-let ffOn = true, fbOn = true, normOn = true, spmOn = false;
-
+let guardGain = 1, guardEnabled = true;
+let flipOn = true;
 const BASE_VOLUME = 0.85;
 
 /* ============================================================
-   Canvas sizing
+   UI
    ============================================================ */
 function sizeCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const rect = scope.getBoundingClientRect();
-  scope.width  = Math.max(1, Math.round(rect.width  * dpr));
-  scope.height = Math.max(1, Math.round(rect.height * dpr));
+  const r = scope.getBoundingClientRect();
+  scope.width = Math.max(1, Math.round(r.width * dpr));
+  scope.height = Math.max(1, Math.round(r.height * dpr));
   sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 window.addEventListener('resize', sizeCanvas);
 
-/* ============================================================
-   UI helpers
-   ============================================================ */
-function setStatus(text, cls) {
+function setStatus(text, on) {
   statusPill.textContent = text;
-  statusPill.className = 'pill' + (cls ? ' ' + cls : '');
-  pulse.classList.toggle('live', cls === 'on');
+  statusPill.classList.toggle('on', !!on);
+  pulse.classList.toggle('live', !!on);
 }
+function setControls(on) { sliders.forEach(s => s.disabled = !on); }
 
-function setControlsEnabled(on) {
-  sliders.forEach(s => s.disabled = !on);
-}
-
-function updateLeakLabel() {
-  leakOut.textContent = (1 - (+leakEl.value) / 10000).toFixed(4);
-}
-
-function updateMuLabel() {
-  muOut.textContent = ((+muEl.value) * 0.00001).toFixed(6);
-}
-
-function updateOutLimLabel() {
+function updateLabels() {
+  muOut.textContent = ((+muEl.value) * 0.00001).toFixed(5);
+  tapsOut.textContent = tapsEl.value;
+  delayOut.textContent = delayEl.value + ' samples';
   outLimOut.textContent = ((+outLimEl.value) / 100).toFixed(2);
 }
+
+/* ============================================================
+   Parameter plumbing
+   ============================================================ */
+function pushParams() {
+  if (!worklet || !ctx) return;
+  const t = ctx.currentTime;
+  worklet.parameters.get('mu').setValueAtTime((+muEl.value) * 0.00001, t);
+  worklet.parameters.get('taps').setValueAtTime(+tapsEl.value, t);
+  worklet.parameters.get('delay').setValueAtTime(+delayEl.value, t);
+  worklet.parameters.get('outLim').setValueAtTime((+outLimEl.value) / 100, t);
+  worklet.parameters.get('flip').setValueAtTime(flipOn ? 1 : 0, t);
+}
+sliders.forEach(s => s.addEventListener('input', () => { updateLabels(); pushParams(); }));
+flipBtn.addEventListener('click', () => {
+  flipOn = !flipOn;
+  flipBtn.classList.toggle('on', flipOn);
+  flipBtn.textContent = flipOn ? 'Polarity −' : 'Polarity +';
+  pushParams();
+});
+guardBtn.addEventListener('click', () => {
+  guardEnabled = !guardEnabled;
+  guardBtn.classList.toggle('on', guardEnabled);
+  if (!guardEnabled) guardGain = 1;
+});
 
 /* ============================================================
    Start / stop
    ============================================================ */
 async function start() {
   if (running) return;
-  setStatus('mic…', 'cal');
-  hint.innerHTML = 'Requesting microphone access…';
+  setStatus('requesting mic', false);
+  hint.textContent = 'Waiting for microphone…';
 
   try {
     stream = await navigator.mediaDevices.getUserMedia({
@@ -659,110 +372,78 @@ async function start() {
     });
   } catch (err) {
     console.error(err);
-    setStatus('blocked');
-    hint.innerHTML = 'Microphone denied. Allow access (page must be <b>https</b> or localhost) and try again.';
+    setStatus('mic blocked', false);
+    hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
     return;
   }
 
   try {
-    ctx = new (window.AudioContext || window.webkitAudioContext)({
-      latencyHint: 'interactive'
-    });
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
     if (ctx.state === 'suspended') await ctx.resume();
 
     const blob = new Blob([WORKLET_SRC], { type: 'application/javascript' });
-    const url  = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     await ctx.audioWorklet.addModule(url);
     URL.revokeObjectURL(url);
   } catch (err) {
     console.error(err);
     stopTracks();
-    setStatus('unsupported');
-    hint.textContent = 'AudioWorklet engine could not start. Try Chrome, Edge, Firefox, or Safari.';
+    setStatus('unsupported', false);
+    hint.textContent = 'AudioWorklet not supported. Try Chrome, Edge, Firefox, Safari 14.1+.';
     return;
   }
 
   srcNode = ctx.createMediaStreamSource(stream);
 
   analyserIn = ctx.createAnalyser();
-  analyserIn.fftSize = 2048;
-  analyserIn.smoothingTimeConstant = 0.6;
+  analyserIn.fftSize = 1024;
+  analyserIn.smoothingTimeConstant = 0.7;
 
   analyserOut = ctx.createAnalyser();
-  analyserOut.fftSize = 2048;
-  analyserOut.smoothingTimeConstant = 0.6;
+  analyserOut.fftSize = 1024;
+  analyserOut.smoothingTimeConstant = 0.7;
 
-  worklet = new AudioWorkletNode(ctx, 'anc-fxlms', {
-    numberOfInputs: 1,
-    numberOfOutputs: 1,
-    outputChannelCount: [2]
+  worklet = new AudioWorkletNode(ctx, 'anc-feedback', {
+    numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2]
   });
 
-  lpNode = ctx.createBiquadFilter();
-  lpNode.type = 'lowpass';
-  lpNode.frequency.value = 6000;
-  lpNode.Q.value = 0.7;
-
-  hpNode = ctx.createBiquadFilter();
-  hpNode.type = 'highpass';
-  hpNode.frequency.value = 20;
-  hpNode.Q.value = 0.7;
-
+  // output chain: gentle DC block + safety limiter
   limiter = ctx.createDynamicsCompressor();
-  limiter.threshold.value = -6;
+  limiter.threshold.value = -8;
   limiter.knee.value = 0;
   limiter.ratio.value = 20;
-  limiter.attack.value = 0.002;
-  limiter.release.value = 0.08;
+  limiter.attack.value = 0.003;
+  limiter.release.value = 0.1;
+
+  const dcBlock = ctx.createBiquadFilter();
+  dcBlock.type = 'highpass';
+  dcBlock.frequency.value = 15;
+  dcBlock.Q.value = 0.7;
 
   master = ctx.createGain();
   master.gain.value = 0;
 
   srcNode.connect(analyserIn);
   analyserIn.connect(worklet);
-  worklet.connect(lpNode);
-  lpNode.connect(hpNode);
-  hpNode.connect(limiter);
+  worklet.connect(dcBlock);
+  dcBlock.connect(limiter);
   limiter.connect(analyserOut);
   analyserOut.connect(master);
   master.connect(ctx.destination);
 
-  worklet.port.onmessage = e => {
-    const msg = e.data;
-    if (msg.type === 'calDone') {
-      calibrating = false;
-      setStatus('cancelling', 'on');
-      powerBtn.classList.remove('cal');
-      powerBtn.classList.add('on');
-      hint.innerHTML = 'Calibration complete. FxLMS is adapting. Put on <b>headphones</b> and let it settle for 5–10 seconds.';
-    }
-    if (msg.type === 'level') {
-      setMeter(inBar, inDb, msg.ref);
-      setMeter(outBar, outDb, msg.out);
-      setMeter(errBar, errDb, msg.err);
-      setNR(msg.nr);
-    }
-  };
-
-  bufIn  = new Float32Array(analyserIn.fftSize);
+  bufIn = new Float32Array(analyserIn.fftSize);
   bufOut = new Float32Array(analyserOut.fftSize);
 
-  applyMu();
-  applyTaps();
-  applyLeak();
-  applyOutLim();
-  applyToggles();
-
-  master.gain.setTargetAtTime(BASE_VOLUME, ctx.currentTime, 0.25);
+  pushParams();
+  updateLabels();
+  master.gain.setTargetAtTime(BASE_VOLUME, ctx.currentTime, 0.3);
 
   running = true;
-  calibrating = true;
   guardGain = 1;
-
-  powerBtn.classList.add('cal');
-  setControlsEnabled(true);
-  setStatus('calibrating', 'cal');
-  hint.innerHTML = 'Calibrating — playing a chirp to measure the speaker→mic path. <span class="warn">Stay still.</span>';
+  powerBtn.classList.add('on');
+  setControls(true);
+  setStatus('cancelling', true);
+  hint.innerHTML = 'Live. Slowly raise <b>Adaptation rate</b> if the rumble isn\'t dropping. If it howls, lower it.';
 
   sizeCanvas();
   rafId = requestAnimationFrame(loop);
@@ -771,105 +452,39 @@ async function start() {
 function stop() {
   if (!running && !ctx) return;
   running = false;
-  calibrating = false;
-
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-
-  powerBtn.classList.remove('on', 'cal');
-  setControlsEnabled(false);
-  setStatus('standby');
-  hint.textContent = 'Stopped. Tap to calibrate and restart.';
+  powerBtn.classList.remove('on');
+  setControls(false);
+  setStatus('standby', false);
+  hint.textContent = 'Stopped. Tap to restart.';
 
   const dying = ctx;
-  const dyingMaster = master;
-  if (dyingMaster && dying) {
-    try { dyingMaster.gain.setTargetAtTime(0, dying.currentTime, 0.08); } catch (e) {}
+  if (master && dying) {
+    try { master.gain.setTargetAtTime(0, dying.currentTime, 0.08); } catch (e) {}
   }
-
   setTimeout(() => {
     stopTracks();
     if (dying && dying.state !== 'closed') dying.close().catch(() => {});
-    ctx = null; master = null; worklet = null;
+    ctx = master = worklet = limiter = srcNode = null;
     analyserIn = analyserOut = null;
-    lpNode = hpNode = limiter = srcNode = null;
-  }, 320);
+  }, 300);
 
   const w = scope.clientWidth, h = scope.clientHeight;
   sctx.clearRect(0, 0, w, h);
-  [inBar, outBar, errBar, nrBar].forEach(b => b.style.width = '0%');
-  inDb.textContent = outDb.textContent = errDb.textContent = '−∞ dB';
-  nrDb.textContent = '0 dB';
+  inBar.style.width = '0%';
+  outBar.style.width = '0%';
+  inDb.textContent = '−∞ dB';
+  outDb.textContent = '−∞ dB';
 }
 
 function stopTracks() {
-  if (stream) {
-    stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
-    stream = null;
-  }
+  if (stream) { stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }); stream = null; }
 }
 
 /* ============================================================
-   Parameter plumbing
+   Power
    ============================================================ */
-function applyMu() {
-  if (worklet) {
-    const v = (+muEl.value) * 0.00001;
-    worklet.parameters.get('mu').setTargetAtTime(v, ctx.currentTime, 0.02);
-  }
-  updateMuLabel();
-}
-
-function applyTaps() {
-  if (worklet) {
-    worklet.parameters.get('taps').setTargetAtTime(+tapsEl.value, ctx.currentTime, 0.02);
-  }
-  tapsOut.textContent = tapsEl.value;
-}
-
-function applyLeak() {
-  if (worklet) {
-    const v = 1 - (+leakEl.value) / 10000;
-    worklet.parameters.get('leak').setTargetAtTime(v, ctx.currentTime, 0.02);
-  }
-  updateLeakLabel();
-}
-
-function applyOutLim() {
-  if (worklet) {
-    const v = (+outLimEl.value) / 100;
-    worklet.parameters.get('outLim').setTargetAtTime(v, ctx.currentTime, 0.02);
-  }
-  updateOutLimLabel();
-}
-
-function applyToggles() {
-  if (worklet) {
-    const t = ctx.currentTime;
-    worklet.parameters.get('ffOn').setTargetAtTime(ffOn ? 1 : 0, t, 0.02);
-    worklet.parameters.get('fbOn').setTargetAtTime(fbOn ? 1 : 0, t, 0.02);
-    worklet.parameters.get('normOn').setTargetAtTime(normOn ? 1 : 0, t, 0.02);
-    worklet.parameters.get('spmOn').setTargetAtTime(spmOn ? 1 : 0, t, 0.02);
-  }
-  ffBtn.classList.toggle('on', ffOn);
-  fbBtn.classList.toggle('on', fbOn);
-  normBtn.classList.toggle('on', normOn);
-  spmBtn.classList.toggle('on', spmOn);
-}
-
-muEl.addEventListener('input', applyMu);
-tapsEl.addEventListener('input', applyTaps);
-leakEl.addEventListener('input', applyLeak);
-outLimEl.addEventListener('input', applyOutLim);
-
-ffBtn.addEventListener('click', () => { ffOn = !ffOn; applyToggles(); });
-fbBtn.addEventListener('click', () => { fbOn = !fbOn; applyToggles(); });
-normBtn.addEventListener('click', () => { normOn = !normOn; applyToggles(); });
-spmBtn.addEventListener('click', () => { spmOn = !spmOn; applyToggles(); });
-
-/* ============================================================
-   Power + keyboard
-   ============================================================ */
-powerBtn.addEventListener('click', () => { running ? stop() : start(); });
+powerBtn.addEventListener('click', () => running ? stop() : start());
 window.addEventListener('keydown', e => {
   if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
     e.preventDefault();
@@ -878,10 +493,9 @@ window.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Render loop
+   Render
    ============================================================ */
 let rmsInSmoothed = 0;
-
 function loop() {
   if (!running) return;
   rafId = requestAnimationFrame(loop);
@@ -899,7 +513,6 @@ function loop() {
     const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i];
     if (a > peakOut) peakOut = a;
   }
-
   const rms = Math.sqrt(sumSq / bufIn.length);
   rmsInSmoothed = rmsInSmoothed * 0.85 + rms * 0.15;
 
@@ -907,51 +520,35 @@ function loop() {
   setMeter(outBar, outDb, peakOut);
 
   if (guardEnabled && master && ctx) {
-    if (rmsInSmoothed > 0.16) {
-      guardGain = Math.max(0.12, guardGain - 0.035);
-    } else {
-      guardGain = Math.min(1, guardGain + 0.004);
-    }
+    if (rmsInSmoothed > 0.16) guardGain = Math.max(0.1, guardGain - 0.04);
+    else guardGain = Math.min(1, guardGain + 0.003);
     master.gain.setTargetAtTime(BASE_VOLUME * guardGain, ctx.currentTime, 0.06);
   }
 
   drawScope();
 }
 
-function setMeter(barEl, labelEl, peak) {
+function setMeter(bar, label, peak) {
   const db = peak > 0.00001 ? 20 * Math.log10(peak) : -100;
   const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
-  barEl.style.width = pct.toFixed(1) + '%';
-  labelEl.textContent = db <= -99 ? '−∞ dB' : db.toFixed(0) + ' dB';
+  bar.style.width = pct.toFixed(1) + '%';
+  label.textContent = db <= -99 ? '−∞ dB' : db.toFixed(0) + ' dB';
 }
 
-function setNR(nr) {
-  const clamped = Math.max(-20, Math.min(40, nr));
-  const pct = ((clamped + 20) / 60) * 100;
-  nrBar.style.width = pct.toFixed(1) + '%';
-  nrDb.textContent = (nr >= 0 ? '+' : '') + nr.toFixed(1) + ' dB';
-}
-
-/* ============================================================
-   Scope
-   ============================================================ */
 function drawScope() {
   const W = scope.clientWidth, H = scope.clientHeight;
   if (!W || !H) return;
   sctx.clearRect(0, 0, W, H);
-
   sctx.strokeStyle = 'rgba(255,255,255,0.045)';
   sctx.lineWidth = 1;
   sctx.beginPath();
   for (let x = 0; x <= W; x += W / 8) { sctx.moveTo(Math.round(x)+0.5,0); sctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { sctx.moveTo(0,Math.round(y)+0.5); sctx.lineTo(W,Math.round(y)+0.5); }
   sctx.stroke();
-
   sctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  sctx.beginPath(); sctx.moveTo(0, H/2); sctx.lineTo(W, H/2); sctx.stroke();
-
-  drawWave(bufIn,  'rgba(0,229,192,0.45)', 1.2, W, H);
-  drawWave(bufOut, '#ff4d6d',              1.6, W, H);
+  sctx.beginPath(); sctx.moveTo(0,H/2); sctx.lineTo(W,H/2); sctx.stroke();
+  drawWave(bufIn, 'rgba(0,229,192,0.5)', 1.2, W, H);
+  drawWave(bufOut, '#ff4d6d', 1.6, W, H);
 }
 
 function drawWave(data, color, lw, W, H) {
@@ -960,7 +557,8 @@ function drawWave(data, color, lw, W, H) {
   sctx.beginPath();
   sctx.strokeStyle = color;
   sctx.lineWidth = lw;
-  sctx.lineJoin = 'round'; sctx.lineCap = 'round';
+  sctx.lineJoin = 'round';
+  sctx.lineCap = 'round';
   for (let x = 0; x < W; x++) {
     let i0 = Math.floor(x * step);
     let i1 = Math.floor((x + 1) * step);
@@ -973,9 +571,10 @@ function drawWave(data, color, lw, W, H) {
       if (v > mx) mx = v;
     }
     if (mn > mx) { mn = 0; mx = 0; }
-    const yTop = H/2 - mx*amp, yBot = H/2 - mn*amp;
-    sctx.moveTo(x+0.5, yTop);
-    sctx.lineTo(x+0.5, yBot < yTop + 0.6 ? yTop + 0.6 : yBot);
+    const yTop = H / 2 - mx * amp;
+    const yBot = H / 2 - mn * amp;
+    sctx.moveTo(x + 0.5, yTop);
+    sctx.lineTo(x + 0.5, yBot < yTop + 0.6 ? yTop + 0.6 : yBot);
   }
   sctx.stroke();
 }
@@ -984,10 +583,8 @@ function drawWave(data, color, lw, W, H) {
    Init
    ============================================================ */
 sizeCanvas();
-updateMuLabel(); updateLeakLabel(); updateOutLimLabel();
-tapsOut.textContent = tapsEl.value;
-setControlsEnabled(false);
-
+updateLabels();
+setControls(false);
 })();
 </script>
 </body>
