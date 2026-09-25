@@ -3,154 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#07090c">
-<title>ANC.live — Feedback Adaptive</title>
+<meta name="theme-color" content="#0a0a0f">
+<title>ANC.live — FxLMS Active Noise Cancellation</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  :root{--bg:#07090c;--panel:#0d1219;--line:rgba(255,255,255,.07);--txt:#e6edf3;--dim:#7b8a99;--accent:#00e5c0;--anti:#ff4d6d}
-  body{background:radial-gradient(900px 600px at 50% -10%,rgba(0,229,192,.07),transparent 60%),var(--bg);color:var(--txt);
-    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,system-ui,sans-serif;display:flex;justify-content:center;
-    padding:22px 16px 40px;min-height:100vh}
-  .wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:16px}
+  :root{
+    --bg:#0a0a0f;
+    --panel:#11131a;
+    --card:#151822;
+    --line:rgba(255,255,255,.08);
+    --txt:#e8edf5;
+    --dim:#6b7a8f;
+    --accent:#00e5c0;
+    --accent-dim:rgba(0,229,192,.15);
+    --anti:#ff4d6d;
+    --warn:#ffb020;
+    --blue:#5b9dff;
+    --purple:#a78bfa;
+  }
+  html,body{height:100%}
+  body{
+    background:radial-gradient(1200px 800px at 50% -15%,rgba(0,229,192,.06),transparent 55%),
+      radial-gradient(800px 600px at 85% 100%,rgba(91,157,255,.04),transparent 55%),
+      var(--bg);
+    color:var(--txt);
+    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;justify-content:center;
+    padding:20px 16px 40px;min-height:100%;
+  }
+  .wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
+
+  /* header */
   .top{display:flex;align-items:center;justify-content:space-between}
   .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:15px}
   .logo em{font-style:normal;color:var(--dim);font-weight:500}
   .pulse{width:9px;height:9px;border-radius:50%;background:#2a3542;transition:.3s}
   .pulse.live{background:var(--accent);box-shadow:0 0 12px var(--accent);animation:blink 1.6s infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  .pill{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;padding:6px 12px;border-radius:999px;
-    border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--dim);transition:.3s}
+  .pill{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.02);color:var(--dim);transition:.3s;white-space:nowrap}
   .pill.on{color:var(--accent);border-color:rgba(0,229,192,.35);background:rgba(0,229,192,.06)}
-  .stage{display:flex;flex-direction:column;align-items:center;gap:16px;padding:26px 20px 22px;
-    border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
-  .power{position:relative;width:150px;height:150px;border-radius:50%;border:1px solid rgba(255,255,255,.09);
-    background:radial-gradient(circle at 50% 32%,#182330,#0a0e13 72%);color:#63717f;cursor:pointer;display:grid;
-    place-items:center;transition:color .3s,box-shadow .4s,border-color .4s,transform .12s;-webkit-tap-highlight-color:transparent;outline:none}
+
+  /* power */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:14px;
+    padding:24px 20px 20px;border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
+  .power{position:relative;width:130px;height:130px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.09);
+    background:radial-gradient(circle at 50% 32%,#1a2230,#0b0e14 72%);
+    color:#5a6878;cursor:pointer;display:grid;place-items:center;
+    transition:color .3s,box-shadow .4s,border-color .4s,transform .12s;
+    -webkit-tap-highlight-color:transparent;outline:none}
   .power:active{transform:scale(.97)}
-  .power svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+  .power svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
   .power.on{color:var(--accent);border-color:rgba(0,229,192,.45);
     box-shadow:0 0 0 1px rgba(0,229,192,.25),0 0 60px rgba(0,229,192,.22),inset 0 0 40px rgba(0,229,192,.08)}
   .ring{position:absolute;inset:-1px;border-radius:50%;border:1px solid rgba(0,229,192,.5);opacity:0;pointer-events:none}
   .power.on .ring{animation:ripple 2.6s cubic-bezier(.2,.6,.3,1) infinite}
   .power.on .ring.r2{animation-delay:1.3s}
   @keyframes ripple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
-  .hint{font-size:13.5px;color:var(--dim);text-align:center;line-height:1.5;max-width:360px;min-height:20px}
+  .hint{font-size:13px;color:var(--dim);text-align:center;line-height:1.5;max-width:420px;min-height:20px}
   .hint b{color:var(--txt);font-weight:600}
-  .viz{position:relative;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,#0a0f15,#080b10);overflow:hidden;height:150px}
-  #scope{width:100%;height:100%;display:block}
-  .legend{position:absolute;top:10px;left:12px;display:flex;gap:14px;font-size:10px;letter-spacing:.1em;
-    text-transform:uppercase;font-weight:600}
-  .legend span{display:flex;align-items:center;gap:6px;color:var(--dim)}
-  .legend i{width:14px;height:2px;border-radius:2px;display:block}
-  .legend .i-in i{background:rgba(0,229,192,.55)}
-  .legend .i-out i{background:var(--anti)}
-  .meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .meter{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.015)}
-  .meter-head{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--dim);font-weight:600;margin-bottom:9px}
-  .bar{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+
+  /* viz row */
+  .vizrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:560px){.vizrow{grid-template-columns:1fr}}
+  .vizbox{position:relative;border:1px solid var(--line);border-radius:16px;
+    background:linear-gradient(180deg,#0c1018,#090c12);overflow:hidden;height:160px}
+  .vizbox canvas{width:100%;height:100%;display:block}
+  .vizlabel{position:absolute;top:9px;left:11px;font-size:9.5px;letter-spacing:.12em;
+    text-transform:uppercase;font-weight:700;color:var(--dim)}
+  .vizlabel span{color:var(--accent)}
+  .legend{position:absolute;bottom:8px;left:11px;display:flex;gap:12px;
+    font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+  .legend span{display:flex;align-items:center;gap:5px;color:var(--dim)}
+  .legend i{width:12px;height:2px;border-radius:2px;display:block}
+
+  /* meters */
+  .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media(max-width:560px){.meters{grid-template-columns:1fr 1fr}}
+  .meter{border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+    background:rgba(255,255,255,.015)}
+  .meter-head{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:7px}
+  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
   .bar i{display:block;height:100%;width:0%;border-radius:99px;transition:width .06s linear}
   .bar.in i{background:linear-gradient(90deg,#007a68,var(--accent))}
   .bar.out i{background:linear-gradient(90deg,#8f2438,var(--anti))}
-  .panel{border:1px solid var(--line);border-radius:20px;padding:18px 18px 6px;background:var(--panel)}
-  .panel h2{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700;margin-bottom:16px}
-  .ctrl{display:block;margin-bottom:20px}
-  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
-  .ctrl-head b{font-size:13px;font-weight:600;color:#cbd6e0}
-  .ctrl-head output{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;display:block}
-  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:#0e141b;
-    border:2px solid var(--accent);margin-top:-6.5px;box-shadow:0 0 10px rgba(0,229,192,.4);transition:transform .15s}
-  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
-  input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#0e141b;border:2px solid var(--accent);
-    box-shadow:0 0 10px rgba(0,229,192,.4)}
-  input[type=range]:disabled{opacity:.35;pointer-events:none}
-  .toggles{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:16px}
-  .tgl{flex:1 1 auto;min-width:130px;padding:11px 14px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:600;
-    background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--dim);transition:.22s;font-family:inherit}
-  .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.08)}
+  .bar.err i{background:linear-gradient(90deg,#8f6a18,var(--warn))}
+  .bar.nr i{background:linear-gradient(90deg,#2d4a7a,var(--blue))}
+  .meter-head output{font-size:10px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+
+  /* controls */
+  .panel{border:1px solid var(--line);border-radius:18px;padding:16px 16px 4px;background:var(--panel)}
+  .panel h2{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+    font-weight:700;margin-bottom:14px}
+  .ctrl{display:block;margin-bottom:18px}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-head b{font-size:12.5px;font-weight:600;color:#cbd6e0}
+  .ctrl-head output{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;
+    background:transparent;cursor:pointer;display:block}
+  input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+    background:#0e141b;border:2px solid var(--accent);margin-top:-6px;
+    box-shadow:0 0 8px rgba(0,229,192,.4);transition:transform .15s}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
+  input[type=range]::-moz-range-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
+  input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0e141b;
+    border:2px solid var(--accent);box-shadow:0 0 8px rgba(0,229,192,.4)}
+  input[type=range]:disabled{opacity:.3;pointer-events:none}
+
+  .toggles{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:14px}
+  .tgl{flex:1 1 auto;min-width:110px;padding:10px 12px;border-radius:10px;cursor:pointer;
+    font-size:12px;font-weight:600;background:rgba(255,255,255,.03);
+    border:1px solid var(--line);color:var(--dim);transition:.2s;font-family:inherit}
+  .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.07)}
   .tgl:active{transform:scale(.98)}
-  .note{border:1px solid var(--line);border-radius:18px;padding:16px 18px;background:rgba(255,255,255,.015);
-    font-size:12.5px;line-height:1.65;color:var(--dim)}
-  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:7px;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
-  .note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
-  .note li{padding-left:16px;position:relative}
-  .note li::before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.6}
-  .note .warn::before{background:#ffb020}
-  footer{text-align:center;font-size:11px;color:#3f4a56;letter-spacing:.05em}
+
+  /* info */
+  .note{border:1px solid var(--line);border-radius:16px;padding:14px 16px;
+    background:rgba(255,255,255,.015);font-size:12px;line-height:1.6;color:var(--dim)}
+  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:6px;font-size:11px;
+    letter-spacing:.05em;text-transform:uppercase}
+  .note ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+  .note li{padding-left:14px;position:relative}
+  .note li::before{content:"";position:absolute;left:2px;top:7px;width:4px;height:4px;
+    border-radius:50%;background:var(--accent);opacity:.6}
+  .note .warn::before{background:var(--warn)}
+  footer{text-align:center;font-size:10.5px;color:#3a4553;letter-spacing:.05em}
+  footer a{color:#4a5a6e;text-decoration:none;border-bottom:1px dotted #3a4553}
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <header class="top">
     <div class="logo"><span class="pulse" id="pulse"></span>ANC<em>.live</em></div>
     <div class="pill" id="statusPill">standby</div>
   </header>
 
   <section class="stage">
-    <button class="power" id="powerBtn" aria-label="Toggle noise cancellation">
+    <button class="power" id="powerBtn" aria-label="Toggle ANC">
       <span class="ring"></span><span class="ring r2"></span>
       <svg viewBox="0 0 24 24"><path d="M12 2.5v9"/><path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/></svg>
     </button>
-    <p class="hint" id="hint">Wear <b>headphones</b>, then tap. Single-mic feedback ANC — it can only cancel <b>low rumbling</b> noise, not speech.</p>
+    <p class="hint" id="hint">Wear <b>headphones</b> and tap. The system uses <b>FxLMS</b> — the same algorithm as commercial ANC chips — to adaptively cancel low-frequency noise.</p>
   </section>
 
-  <section class="viz">
-    <canvas id="scope"></canvas>
-    <div class="legend">
-      <span class="i-in"><i></i>Mic</span>
-      <span class="i-out"><i></i>Anti-noise</span>
+  <!-- Visualizations -->
+  <div class="vizrow">
+    <div class="vizbox">
+      <canvas id="scope"></canvas>
+      <div class="vizlabel">Time Domain <span id="scopeStatus">idle</span></div>
+      <div class="legend">
+        <span><i style="background:rgba(0,229,192,.5)"></i>Mic</span>
+        <span><i style="background:#ff4d6d"></i>Anti</span>
+      </div>
     </div>
-  </section>
+    <div class="vizbox">
+      <canvas id="spectrum"></canvas>
+      <div class="vizlabel">Spectrum <span id="fftStatus">idle</span></div>
+      <div class="legend">
+        <span><i style="background:rgba(0,229,192,.5)"></i>Input</span>
+        <span><i style="background:#ff4d6d"></i>Residual</span>
+      </div>
+    </div>
+  </div>
 
+  <div class="vizrow">
+    <div class="vizbox" style="height:120px">
+      <canvas id="filterViz"></canvas>
+      <div class="vizlabel">Adaptive Filter <span id="filterStatus">idle</span></div>
+    </div>
+    <div class="vizbox" style="height:120px">
+      <canvas id="powerViz"></canvas>
+      <div class="vizlabel">Error Power <span id="powerStatus">idle</span></div>
+    </div>
+  </div>
+
+  <!-- Meters -->
   <section class="meters">
     <div class="meter">
-      <div class="meter-head"><span>Input</span><span id="inDb">−∞ dB</span></div>
+      <div class="meter-head"><span>Ref</span><output id="inDb">−∞</output></div>
       <div class="bar in"><i id="inBar"></i></div>
     </div>
     <div class="meter">
-      <div class="meter-head"><span>Output</span><span id="outDb">−∞ dB</span></div>
+      <div class="meter-head"><span>Anti</span><output id="outDb">−∞</output></div>
       <div class="bar out"><i id="outBar"></i></div>
+    </div>
+    <div class="meter">
+      <div class="meter-head"><span>Err</span><output id="errDb">−∞</output></div>
+      <div class="bar err"><i id="errBar"></i></div>
+    </div>
+    <div class="meter">
+      <div class="meter-head"><span>NR</span><output id="nrDb">0</output></div>
+      <div class="bar nr"><i id="nrBar"></i></div>
     </div>
   </section>
 
+  <!-- Controls -->
   <section class="panel">
-    <h2>Adaptive controller</h2>
+    <h2>FxLMS Controller</h2>
+
     <label class="ctrl">
-      <span class="ctrl-head"><b>Adaptation rate (μ)</b><output id="muOut">0.00050</output></span>
+      <span class="ctrl-head"><b>Step size (μ)</b><output id="muOut">0.0005</output></span>
       <input type="range" id="mu" min="1" max="100" value="50" step="1" disabled>
     </label>
+
     <label class="ctrl">
-      <span class="ctrl-head"><b>Filter taps</b><output id="tapsOut">32</output></span>
-      <input type="range" id="taps" min="8" max="128" value="32" step="8" disabled>
+      <span class="ctrl-head"><b>Filter taps</b><output id="tapsOut">256</output></span>
+      <input type="range" id="taps" min="32" max="512" value="256" step="32" disabled>
     </label>
+
     <label class="ctrl">
-      <span class="ctrl-head"><b>Loop delay</b><output id="delayOut">32 samples</output></span>
-      <input type="range" id="delay" min="4" max="128" value="32" step="4" disabled>
+      <span class="ctrl-head"><b>Output volume</b><output id="volOut">80%</output></span>
+      <input type="range" id="vol" min="0" max="100" value="80" step="1" disabled>
     </label>
-    <label class="ctrl">
-      <span class="ctrl-head"><b>Output ceiling</b><output id="outLimOut">0.50</output></span>
-      <input type="range" id="outLim" min="5" max="100" value="50" step="1" disabled>
-    </label>
+
     <div class="toggles">
-      <button class="tgl on" id="flipBtn">Polarity −</button>
-      <button class="tgl on" id="guardBtn">Howl guard</button>
+      <button class="tgl on" id="normBtn">NLMS Norm</button>
+      <button class="tgl on" id="dcBtn">DC Block</button>
+      <button class="tgl on" id="negBtn">Negate</button>
     </div>
   </section>
 
   <section class="note">
-    <strong>Why this is not "real" ANC</strong>
+    <strong>Based on michalber/ANC-Headphones-repository-</strong>
     <ul>
-      <li>Big-tech ANC uses <b>two mics</b> (feedforward + feedback) and a chip running at <b>&lt;1 ms</b> latency. Browser audio is 10–30 ms, which caps cancellation at ~25 Hz.</li>
-      <li>With one mic, only <b>feedback ANC</b> is mathematically valid. That's what this uses: <code>y = −W · e_past</code>, NLMS-adapted.</li>
-      <li class="warn">Without headphones this self-oscillates instantly. The howl guard limits it, but headphones are the correct setup.</li>
-      <li>It cancels steady low-frequency rumble (fans, engines, HVAC). It cannot cancel speech, music, or transients — no ANC can.</li>
+      <li>Original: JUCE C++ with ARM CMSIS DSP, targeting Raspberry Pi + I2S mics/DAC. This is a direct port of that FxLMS implementation to the Web Audio API.</li>
+      <li><b>FxLMS</b> (Filtered-x Least Mean Squares) with <b>NLMS</b> normalization — the same algorithm family used in commercial ANC chips.</li>
+      <li>Config defaults from the repo: <code>μ = 0.0005</code>, <code>taps = 256</code> (original used 4192 for Pi; reduced for browser CPU).</li>
+      <li><b>DC blocker</b> removes microphone DC offset, as the original repo requires via LADSPA plugins.</li>
+      <li class="warn">Browser latency (10–30 ms) limits cancellation to ~25 Hz. Commercial ANC chips run at &lt;1 ms. This is the real algorithm, but not the real hardware.</li>
     </ul>
   </section>
 
-  <footer>Feedback ANC · NLMS · AudioWorklet · on-device</footer>
+  <footer>FxLMS · NLMS · Web Audio API · <a href="https://github.com/michalber/ANC-Headphones-repository-" target="_blank">source repo</a></footer>
 </div>
 
 <script>
@@ -158,30 +249,58 @@
 "use strict";
 
 /* ============================================================
-   AudioWorklet — feedback ANC with NLMS-adapted FIR filter.
-   No O(N²) filtered-x loop. Runs in real time.
+   AudioWorklet — FxLMS with NLMS normalization.
+   Ported from michalber/ANC-Headphones-repository- (JUCE/ARM CMSIS).
    ============================================================ */
 const WORKLET_SRC = `
 class ANCProcessor extends AudioWorkletProcessor {
   static get parameterDescriptors() {
     return [
-      { name: 'mu',     defaultValue: 0.0005, minValue: 0,    maxValue: 0.05, automationRate: 'k-rate' },
-      { name: 'taps',   defaultValue: 32,     minValue: 8,    maxValue: 128,  automationRate: 'k-rate' },
-      { name: 'delay',  defaultValue: 32,     minValue: 4,    maxValue: 256,  automationRate: 'k-rate' },
-      { name: 'outLim', defaultValue: 0.5,    minValue: 0.01, maxValue: 1.5,  automationRate: 'k-rate' },
-      { name: 'flip',   defaultValue: 1,      minValue: 0,    maxValue: 1,    automationRate: 'k-rate' }
+      { name: 'mu',      defaultValue: 0.0005, minValue: 0.000001, maxValue: 0.01, automationRate: 'k-rate' },
+      { name: 'taps',    defaultValue: 256,    minValue: 32,       maxValue: 512,  automationRate: 'k-rate' },
+      { name: 'volume',  defaultValue: 0.8,    minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'normOn',  defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'dcOn',    defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'negOn',   defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' }
     ];
   }
 
   constructor() {
     super();
-    this.N = 1024;                    // ring buffer for error history
-    this.eHist = new Float32Array(this.N);
-    this.w = new Float32Array(128);   // adaptive FIR weights
-    this.wIdx = 0;
-    this.power = 1e-6;                // running power estimate
-    this.lastTaps = 32;
-    this.frac = 0;                    // fractional sample accumulator
+    this.N = 2048;
+    this.MAXTAPS = 512;
+
+    /* FxLMS adaptive filter weights */
+    this.w = new Float32Array(this.MAXTAPS);
+
+    /* ring buffer for reference signal history */
+    this.refHist = new Float32Array(this.N);
+    this.refIdx = 0;
+
+    /* DC blocker state (from repo's dcBlocker) */
+    this.xm1 = 0;
+    this.ym1 = 0;
+
+    /* NLMS energy estimate */
+    this.energy = 1e-6;
+
+    /* running measurements */
+    this.refPow = 0;
+    this.errPow = 0;
+    this.outPow = 0;
+    this.frameCount = 0;
+
+    /* filter coefficient snapshot for visualization */
+    this.coeffSnapshot = new Float32Array(this.MAXTAPS);
+    this.snapCounter = 0;
+  }
+
+  /* DC blocker: out[i] = in[i] - xm1 + 0.995 * ym1 (from repo) */
+  dcBlock(x) {
+    const y = x - this.xm1 + 0.995 * this.ym1;
+    this.xm1 = x;
+    this.ym1 = y;
+    return y;
   }
 
   process(inputs, outputs, params) {
@@ -190,7 +309,6 @@ class ANCProcessor extends AudioWorkletProcessor {
     const out0 = output[0];
     const n = out0.length;
 
-    // If no input connected (silent frame), output silence and keep state.
     if (!input || !input.length || !input[0]) {
       out0.fill(0);
       for (let c = 1; c < output.length; c++) output[c].fill(0);
@@ -199,75 +317,97 @@ class ANCProcessor extends AudioWorkletProcessor {
 
     const in0 = input[0];
 
-    const mu    = params.mu[0];
-    const taps  = Math.min(128, Math.max(8, Math.round(params.taps[0])));
-    const delay = Math.max(0, Math.round(params.delay[0]));
-    const outLim= params.outLim[0];
-    const flip  = params.flip[0] > 0.5 ? -1 : 1;
+    const mu     = params.mu[0];
+    const taps   = Math.min(this.MAXTAPS, Math.max(32, Math.round(params.taps[0])));
+    const volume = params.volume[0];
+    const normOn = params.normOn[0] > 0.5;
+    const dcOn   = params.dcOn[0] > 0.5;
+    const negOn  = params.negOn[0] > 0.5;
 
     const N = this.N;
-    const eHist = this.eHist;
     const w = this.w;
-    let wIdx = this.wIdx;
-    let power = this.power;
+    const refHist = this.refHist;
+    let refIdx = this.refIdx;
+    let energy = this.energy;
 
     for (let i = 0; i < n; i++) {
-      const e = in0[i];
+      /* 1. read reference, optionally DC-block */
+      let x = in0[i];
+      if (dcOn) x = this.dcBlock(x);
 
-      // ---- compute anti-noise: y = flip * sum_k w[k] * e[n - k - delay] ----
+      /* 2. write reference into history */
+      refHist[refIdx] = x;
+
+      /* 3. compute anti-noise: y = -sum(w[k] * refHist[idx-k]) */
       let y = 0;
       for (let k = 0; k < taps; k++) {
-        let idx = wIdx - k - delay;
+        let idx = refIdx - k;
         if (idx < 0) idx += N;
-        y += w[k] * eHist[idx];
+        y += w[k] * refHist[idx];
       }
-      y *= flip;
+      if (negOn) y = -y;
+      y *= volume;
 
-      // ---- hard output limit ----
-      if (y >  outLim) y =  outLim;
-      else if (y < -outLim) y = -outLim;
-
-      // NaN safety: if anything went non-finite, hard reset.
-      if (!isFinite(y)) {
-        y = 0;
-        for (let k = 0; k < this.w.length; k++) this.w[k] = 0;
-      }
+      /* 4. hard safety clamp */
+      if (y > 0.95) y = 0.95;
+      else if (y < -0.95) y = -0.95;
+      if (!isFinite(y)) { y = 0; w.fill(0); }
 
       out0[i] = y;
 
-      // ---- store current error ----
-      eHist[wIdx] = e;
+      /* 5. NLMS weight update:
+         w[k] += mu * e * x[n-k] / (energy + eps)
+         where e = x (the residual at the mic)  */
+      const e = x;
+      energy = energy * 0.999 + x * x * 0.001;
+      const step = normOn ? mu / (energy + 1e-6) : mu;
 
-      // ---- normalized LMS weight update ----
-      // w[k] += mu * e * eHist[n-k-delay] / (power + eps)
-      power = power * 0.999 + e * e * 0.001;
-      const norm = mu / (power + 1e-5);
-
-      if (isFinite(norm) && norm > 0) {
+      if (isFinite(step) && step > 0) {
         for (let k = 0; k < taps; k++) {
-          let idx = wIdx - k - delay;
+          let idx = refIdx - k;
           if (idx < 0) idx += N;
-          const xk = eHist[idx];
-          if (isFinite(xk)) {
-            w[k] += norm * e * xk;
-          }
+          const xk = refHist[idx];
+          if (isFinite(xk)) w[k] += step * e * xk;
         }
       }
 
-      wIdx++;
-      if (wIdx >= N) wIdx = 0;
+      refIdx++;
+      if (refIdx >= N) refIdx = 0;
+
+      /* measurements */
+      this.refPow = this.refPow * 0.999 + x * x * 0.001;
+      this.errPow = this.errPow * 0.999 + e * e * 0.001;
+      this.outPow = this.outPow * 0.999 + y * y * 0.001;
+
+      /* periodic snapshot for visualization */
+      this.snapCounter++;
+      if (this.snapCounter >= 4096) {
+        this.snapCounter = 0;
+        this.coeffSnapshot.set(w.subarray(0, this.MAXTAPS));
+        const refDb = 10 * Math.log10(this.refPow + 1e-12);
+        const errDb = 10 * Math.log10(this.errPow + 1e-12);
+        this.port.postMessage({
+          type: 'level',
+          ref: Math.sqrt(this.refPow),
+          out: Math.sqrt(this.outPow),
+          err: Math.sqrt(this.errPow),
+          nr: refDb - errDb
+        });
+        this.port.postMessage({
+          type: 'coeffs',
+          data: Array.from(this.coeffSnapshot.subarray(0, Math.min(256, taps)))
+        });
+      }
     }
 
-    this.wIdx = wIdx;
-    this.power = power;
+    this.refIdx = refIdx;
+    this.energy = energy;
 
-    // copy to all output channels
     for (let c = 1; c < output.length; c++) output[c].set(out0);
-
     return true;
   }
 }
-registerProcessor('anc-feedback', ANCProcessor);
+registerProcessor('anc-fxlms', ANCProcessor);
 `;
 
 /* ============================================================
@@ -278,16 +418,27 @@ const powerBtn = $('powerBtn');
 const statusPill = $('statusPill');
 const pulse = $('pulse');
 const hint = $('hint');
-const scope = $('scope');
-const sctx = scope.getContext('2d');
+
+const scope = $('scope'), sctx = scope.getContext('2d');
+const spectrum = $('spectrum'), fctx = spectrum.getContext('2d');
+const filterViz = $('filterViz'), flctx = filterViz.getContext('2d');
+const powerViz = $('powerViz'), pctx = powerViz.getContext('2d');
+
 const inBar = $('inBar'), outBar = $('outBar');
+const errBar = $('errBar'), nrBar = $('nrBar');
 const inDb = $('inDb'), outDb = $('outDb');
+const errDb = $('errDb'), nrDb = $('nrDb');
+
 const muEl = $('mu'), muOut = $('muOut');
 const tapsEl = $('taps'), tapsOut = $('tapsOut');
-const delayEl = $('delay'), delayOut = $('delayOut');
-const outLimEl = $('outLim'), outLimOut = $('outLimOut');
-const flipBtn = $('flipBtn'), guardBtn = $('guardBtn');
-const sliders = [muEl, tapsEl, delayEl, outLimEl];
+const volEl = $('vol'), volOut = $('volOut');
+const normBtn = $('normBtn'), dcBtn = $('dcBtn'), negBtn = $('negBtn');
+const sliders = [muEl, tapsEl, volEl];
+
+const scopeStatus = $('scopeStatus');
+const fftStatus = $('fftStatus');
+const filterStatus = $('filterStatus');
+const powerStatus = $('powerStatus');
 
 /* ============================================================
    State
@@ -296,23 +447,32 @@ let ctx = null, stream = null, srcNode = null;
 let analyserIn = null, analyserOut = null;
 let worklet = null, master = null, limiter = null;
 let running = false, rafId = null;
-let bufIn = null, bufOut = null;
-let guardGain = 1, guardEnabled = true;
-let flipOn = true;
+let bufIn = null, bufOut = null, freqIn = null, freqOut = null;
+let coeffData = new Float32Array(256);
+let powerHist = new Float32Array(120);
+let powerIdx = 0;
+let nrValue = 0;
+
+let normOn = true, dcOn = true, negOn = true;
 const BASE_VOLUME = 0.85;
 
 /* ============================================================
-   UI
+   Canvas sizing
    ============================================================ */
-function sizeCanvas() {
+function sizeAll() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const r = scope.getBoundingClientRect();
-  scope.width = Math.max(1, Math.round(r.width * dpr));
-  scope.height = Math.max(1, Math.round(r.height * dpr));
-  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  [scope, spectrum, filterViz, powerViz].forEach(c => {
+    const r = c.getBoundingClientRect();
+    c.width = Math.max(1, Math.round(r.width * dpr));
+    c.height = Math.max(1, Math.round(r.height * dpr));
+    c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+  });
 }
-window.addEventListener('resize', sizeCanvas);
+window.addEventListener('resize', sizeAll);
 
+/* ============================================================
+   UI helpers
+   ============================================================ */
 function setStatus(text, on) {
   statusPill.textContent = text;
   statusPill.classList.toggle('on', !!on);
@@ -323,8 +483,7 @@ function setControls(on) { sliders.forEach(s => s.disabled = !on); }
 function updateLabels() {
   muOut.textContent = ((+muEl.value) * 0.00001).toFixed(5);
   tapsOut.textContent = tapsEl.value;
-  delayOut.textContent = delayEl.value + ' samples';
-  outLimOut.textContent = ((+outLimEl.value) / 100).toFixed(2);
+  volOut.textContent = volEl.value + '%';
 }
 
 /* ============================================================
@@ -335,21 +494,22 @@ function pushParams() {
   const t = ctx.currentTime;
   worklet.parameters.get('mu').setValueAtTime((+muEl.value) * 0.00001, t);
   worklet.parameters.get('taps').setValueAtTime(+tapsEl.value, t);
-  worklet.parameters.get('delay').setValueAtTime(+delayEl.value, t);
-  worklet.parameters.get('outLim').setValueAtTime((+outLimEl.value) / 100, t);
-  worklet.parameters.get('flip').setValueAtTime(flipOn ? 1 : 0, t);
+  worklet.parameters.get('volume').setValueAtTime((+volEl.value) / 100, t);
+  worklet.parameters.get('normOn').setValueAtTime(normOn ? 1 : 0, t);
+  worklet.parameters.get('dcOn').setValueAtTime(dcOn ? 1 : 0, t);
+  worklet.parameters.get('negOn').setValueAtTime(negOn ? 1 : 0, t);
 }
+
 sliders.forEach(s => s.addEventListener('input', () => { updateLabels(); pushParams(); }));
-flipBtn.addEventListener('click', () => {
-  flipOn = !flipOn;
-  flipBtn.classList.toggle('on', flipOn);
-  flipBtn.textContent = flipOn ? 'Polarity −' : 'Polarity +';
-  pushParams();
+
+normBtn.addEventListener('click', () => {
+  normOn = !normOn; normBtn.classList.toggle('on', normOn); pushParams();
 });
-guardBtn.addEventListener('click', () => {
-  guardEnabled = !guardEnabled;
-  guardBtn.classList.toggle('on', guardEnabled);
-  if (!guardEnabled) guardGain = 1;
+dcBtn.addEventListener('click', () => {
+  dcOn = !dcOn; dcBtn.classList.toggle('on', dcOn); pushParams();
+});
+negBtn.addEventListener('click', () => {
+  negOn = !negOn; negBtn.classList.toggle('on', negOn); pushParams();
 });
 
 /* ============================================================
@@ -357,22 +517,17 @@ guardBtn.addEventListener('click', () => {
    ============================================================ */
 async function start() {
   if (running) return;
-  setStatus('requesting mic', false);
-  hint.textContent = 'Waiting for microphone…';
+  setStatus('mic…', false);
+  hint.textContent = 'Requesting microphone…';
 
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
-        channelCount: 1
-      },
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
       video: false
     });
   } catch (err) {
     console.error(err);
-    setStatus('mic blocked', false);
+    setStatus('blocked', false);
     hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
     return;
   }
@@ -389,25 +544,24 @@ async function start() {
     console.error(err);
     stopTracks();
     setStatus('unsupported', false);
-    hint.textContent = 'AudioWorklet not supported. Try Chrome, Edge, Firefox, Safari 14.1+.';
+    hint.textContent = 'AudioWorklet not supported. Try Chrome, Edge, Firefox, or Safari 14.1+.';
     return;
   }
 
   srcNode = ctx.createMediaStreamSource(stream);
 
   analyserIn = ctx.createAnalyser();
-  analyserIn.fftSize = 1024;
+  analyserIn.fftSize = 2048;
   analyserIn.smoothingTimeConstant = 0.7;
 
   analyserOut = ctx.createAnalyser();
-  analyserOut.fftSize = 1024;
+  analyserOut.fftSize = 2048;
   analyserOut.smoothingTimeConstant = 0.7;
 
-  worklet = new AudioWorkletNode(ctx, 'anc-feedback', {
+  worklet = new AudioWorkletNode(ctx, 'anc-fxlms', {
     numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2]
   });
 
-  // output chain: gentle DC block + safety limiter
   limiter = ctx.createDynamicsCompressor();
   limiter.threshold.value = -8;
   limiter.knee.value = 0;
@@ -431,21 +585,42 @@ async function start() {
   analyserOut.connect(master);
   master.connect(ctx.destination);
 
+  worklet.port.onmessage = e => {
+    const msg = e.data;
+    if (msg.type === 'level') {
+      setMeter(inBar, inDb, msg.ref);
+      setMeter(outBar, outDb, msg.out);
+      setMeter(errBar, errDb, msg.err);
+      setNR(msg.nr);
+      powerHist[powerIdx] = msg.err;
+      powerIdx = (powerIdx + 1) % powerHist.length;
+    }
+    if (msg.type === 'coeffs') {
+      const d = msg.data;
+      for (let i = 0; i < coeffData.length && i < d.length; i++) coeffData[i] = d[i];
+    }
+  };
+
   bufIn = new Float32Array(analyserIn.fftSize);
   bufOut = new Float32Array(analyserOut.fftSize);
+  freqIn = new Float32Array(analyserIn.frequencyBinCount);
+  freqOut = new Float32Array(analyserOut.frequencyBinCount);
 
-  pushParams();
   updateLabels();
+  pushParams();
   master.gain.setTargetAtTime(BASE_VOLUME, ctx.currentTime, 0.3);
 
   running = true;
-  guardGain = 1;
   powerBtn.classList.add('on');
   setControls(true);
   setStatus('cancelling', true);
-  hint.innerHTML = 'Live. Slowly raise <b>Adaptation rate</b> if the rumble isn\'t dropping. If it howls, lower it.';
+  scopeStatus.textContent = 'live';
+  fftStatus.textContent = 'live';
+  filterStatus.textContent = 'adapting';
+  powerStatus.textContent = 'tracking';
+  hint.innerHTML = 'Live. Raise <b>Step size</b> slowly if the rumble isn\'t dropping. If it howls, lower it.';
 
-  sizeCanvas();
+  sizeAll();
   rafId = requestAnimationFrame(loop);
 }
 
@@ -453,9 +628,14 @@ function stop() {
   if (!running && !ctx) return;
   running = false;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+
   powerBtn.classList.remove('on');
   setControls(false);
   setStatus('standby', false);
+  scopeStatus.textContent = 'idle';
+  fftStatus.textContent = 'idle';
+  filterStatus.textContent = 'idle';
+  powerStatus.textContent = 'idle';
   hint.textContent = 'Stopped. Tap to restart.';
 
   const dying = ctx;
@@ -469,12 +649,15 @@ function stop() {
     analyserIn = analyserOut = null;
   }, 300);
 
-  const w = scope.clientWidth, h = scope.clientHeight;
-  sctx.clearRect(0, 0, w, h);
-  inBar.style.width = '0%';
-  outBar.style.width = '0%';
-  inDb.textContent = '−∞ dB';
-  outDb.textContent = '−∞ dB';
+  [scope, spectrum, filterViz, powerViz].forEach(c => {
+    const g = c.getContext('2d');
+    g.clearRect(0, 0, c.clientWidth, c.clientHeight);
+  });
+  [inBar, outBar, errBar, nrBar].forEach(b => b.style.width = '0%');
+  inDb.textContent = outDb.textContent = errDb.textContent = '−∞';
+  nrDb.textContent = '0';
+  coeffData.fill(0);
+  powerHist.fill(0);
 }
 
 function stopTracks() {
@@ -493,75 +676,80 @@ window.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   Render
+   Render loop
    ============================================================ */
-let rmsInSmoothed = 0;
 function loop() {
   if (!running) return;
   rafId = requestAnimationFrame(loop);
 
   analyserIn.getFloatTimeDomainData(bufIn);
   analyserOut.getFloatTimeDomainData(bufOut);
+  analyserIn.getFloatFrequencyData(freqIn);
+  analyserOut.getFloatFrequencyData(freqOut);
 
-  let peakIn = 0, peakOut = 0, sumSq = 0;
+  let peakIn = 0, peakOut = 0;
   for (let i = 0; i < bufIn.length; i++) {
-    const v = bufIn[i], a = v < 0 ? -v : v;
-    if (a > peakIn) peakIn = a;
-    sumSq += v * v;
+    const a = Math.abs(bufIn[i]); if (a > peakIn) peakIn = a;
   }
   for (let i = 0; i < bufOut.length; i++) {
-    const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i];
-    if (a > peakOut) peakOut = a;
+    const a = Math.abs(bufOut[i]); if (a > peakOut) peakOut = a;
   }
-  const rms = Math.sqrt(sumSq / bufIn.length);
-  rmsInSmoothed = rmsInSmoothed * 0.85 + rms * 0.15;
 
   setMeter(inBar, inDb, peakIn);
   setMeter(outBar, outDb, peakOut);
 
-  if (guardEnabled && master && ctx) {
-    if (rmsInSmoothed > 0.16) guardGain = Math.max(0.1, guardGain - 0.04);
-    else guardGain = Math.min(1, guardGain + 0.003);
-    master.gain.setTargetAtTime(BASE_VOLUME * guardGain, ctx.currentTime, 0.06);
-  }
-
   drawScope();
+  drawSpectrum();
+  drawFilter();
+  drawPower();
 }
 
 function setMeter(bar, label, peak) {
   const db = peak > 0.00001 ? 20 * Math.log10(peak) : -100;
   const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
   bar.style.width = pct.toFixed(1) + '%';
-  label.textContent = db <= -99 ? '−∞ dB' : db.toFixed(0) + ' dB';
+  label.textContent = db <= -99 ? '−∞' : db.toFixed(0) + 'dB';
 }
 
+function setNR(nr) {
+  nrValue = nrValue * 0.9 + nr * 0.1;
+  const clamped = Math.max(-20, Math.min(40, nrValue));
+  const pct = ((clamped + 20) / 60) * 100;
+  nrBar.style.width = pct.toFixed(1) + '%';
+  nrDb.textContent = (nrValue >= 0 ? '+' : '') + nrValue.toFixed(1) + 'dB';
+}
+
+/* ============================================================
+   Scope (time domain)
+   ============================================================ */
 function drawScope() {
   const W = scope.clientWidth, H = scope.clientHeight;
   if (!W || !H) return;
   sctx.clearRect(0, 0, W, H);
-  sctx.strokeStyle = 'rgba(255,255,255,0.045)';
+
+  sctx.strokeStyle = 'rgba(255,255,255,0.04)';
   sctx.lineWidth = 1;
   sctx.beginPath();
   for (let x = 0; x <= W; x += W / 8) { sctx.moveTo(Math.round(x)+0.5,0); sctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { sctx.moveTo(0,Math.round(y)+0.5); sctx.lineTo(W,Math.round(y)+0.5); }
   sctx.stroke();
-  sctx.strokeStyle = 'rgba(255,255,255,0.12)';
+
+  sctx.strokeStyle = 'rgba(255,255,255,0.1)';
   sctx.beginPath(); sctx.moveTo(0,H/2); sctx.lineTo(W,H/2); sctx.stroke();
+
   drawWave(bufIn, 'rgba(0,229,192,0.5)', 1.2, W, H);
-  drawWave(bufOut, '#ff4d6d', 1.6, W, H);
+  drawWave(bufOut, '#ff4d6d', 1.5, W, H);
 }
 
 function drawWave(data, color, lw, W, H) {
   if (!data) return;
-  const n = data.length, step = n / W, amp = H * 0.44;
+  const n = data.length, step = n / W, amp = H * 0.42;
   sctx.beginPath();
   sctx.strokeStyle = color;
   sctx.lineWidth = lw;
   sctx.lineJoin = 'round';
-  sctx.lineCap = 'round';
   for (let x = 0; x < W; x++) {
-    let i0 = Math.floor(x * step);
-    let i1 = Math.floor((x + 1) * step);
+    let i0 = Math.floor(x * step), i1 = Math.floor((x + 1) * step);
     if (i1 <= i0) i1 = i0 + 1;
     if (i1 > n) i1 = n;
     let mn = 1, mx = -1;
@@ -571,18 +759,147 @@ function drawWave(data, color, lw, W, H) {
       if (v > mx) mx = v;
     }
     if (mn > mx) { mn = 0; mx = 0; }
-    const yTop = H / 2 - mx * amp;
-    const yBot = H / 2 - mn * amp;
-    sctx.moveTo(x + 0.5, yTop);
-    sctx.lineTo(x + 0.5, yBot < yTop + 0.6 ? yTop + 0.6 : yBot);
+    const yTop = H/2 - mx*amp, yBot = H/2 - mn*amp;
+    sctx.moveTo(x+0.5, yTop);
+    sctx.lineTo(x+0.5, yBot < yTop + 0.5 ? yTop + 0.5 : yBot);
   }
   sctx.stroke();
 }
 
 /* ============================================================
+   Spectrum (FFT)
+   ============================================================ */
+function drawSpectrum() {
+  const W = spectrum.clientWidth, H = spectrum.clientHeight;
+  if (!W || !H) return;
+  fctx.clearRect(0, 0, W, H);
+
+  fctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  fctx.lineWidth = 1;
+  fctx.beginPath();
+  for (let x = 0; x <= W; x += W / 6) { fctx.moveTo(Math.round(x)+0.5,0); fctx.lineTo(Math.round(x)+0.5,H); }
+  for (let y = 0; y <= H; y += H / 4) { fctx.moveTo(0,Math.round(y)+0.5); fctx.lineTo(W,Math.round(y)+0.5); }
+  fctx.stroke();
+
+  /* frequency labels */
+  fctx.fillStyle = 'rgba(255,255,255,0.18)';
+  fctx.font = '8px ui-sans-serif';
+  fctx.textAlign = 'center';
+  const sr = ctx ? ctx.sampleRate : 48000;
+  const labels = [0, 100, 500, 1000, 2000, 5000];
+  labels.forEach(f => {
+    const x = (f / (sr/2)) * W;
+    if (x > 15 && x < W - 5) {
+      fctx.fillText(f >= 1000 ? (f/1000)+'k' : f, x, H - 3);
+    }
+  });
+
+  const nBins = freqIn.length;
+  const nyq = sr / 2;
+  const maxF = 4000;
+
+  drawFFT(freqIn, nBins, nyq, maxF, 'rgba(0,229,192,0.45)', W, H);
+  drawFFT(freqOut, nBins, nyq, maxF, '#ff4d6d', W, H);
+}
+
+function drawFFT(freq, nBins, nyq, maxF, color, W, H) {
+  fctx.beginPath();
+  fctx.strokeStyle = color;
+  fctx.lineWidth = 1.3;
+  fctx.lineJoin = 'round';
+  let started = false;
+  for (let x = 0; x < W; x++) {
+    const f = (x / W) * maxF;
+    const bin = Math.min(nBins - 1, Math.round(f / nyq * nBins));
+    const db = freq[bin];
+    const norm = Math.max(0, Math.min(1, (db + 90) / 90));
+    const y = H - norm * (H - 12) - 4;
+    if (!started) { fctx.moveTo(x, y); started = true; }
+    else fctx.lineTo(x, y);
+  }
+  fctx.stroke();
+}
+
+/* ============================================================
+   Adaptive filter visualization
+   ============================================================ */
+function drawFilter() {
+  const W = filterViz.clientWidth, H = filterViz.clientHeight;
+  if (!W || !H) return;
+  flctx.clearRect(0, 0, W, H);
+
+  flctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  flctx.lineWidth = 1;
+  flctx.beginPath();
+  for (let x = 0; x <= W; x += W / 6) { flctx.moveTo(Math.round(x)+0.5,0); flctx.lineTo(Math.round(x)+0.5,H); }
+  flctx.stroke();
+
+  flctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  flctx.beginPath(); flctx.moveTo(0,H/2); flctx.lineTo(W,H/2); flctx.stroke();
+
+  /* find max abs for normalization */
+  let mx = 0.001;
+  for (let i = 0; i < coeffData.length; i++) {
+    const a = Math.abs(coeffData[i]);
+    if (a > mx) mx = a;
+  }
+
+  const n = coeffData.length;
+  const barW = W / n;
+  const amp = H * 0.42;
+
+  for (let i = 0; i < n; i++) {
+    const v = coeffData[i] / mx;
+    const h = v * amp;
+    const x = i * barW;
+    flctx.fillStyle = v >= 0 ? 'rgba(0,229,192,0.6)' : 'rgba(255,77,109,0.6)';
+    if (h >= 0) {
+      flctx.fillRect(x, H/2 - h, Math.max(barW - 0.5, 0.5), h);
+    } else {
+      flctx.fillRect(x, H/2, Math.max(barW - 0.5, 0.5), -h);
+    }
+  }
+}
+
+/* ============================================================
+   Error power history
+   ============================================================ */
+function drawPower() {
+  const W = powerViz.clientWidth, H = powerViz.clientHeight;
+  if (!W || !H) return;
+  pctx.clearRect(0, 0, W, H);
+
+  pctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  pctx.lineWidth = 1;
+  pctx.beginPath();
+  for (let y = 0; y <= H; y += H / 4) { pctx.moveTo(0,Math.round(y)+0.5); pctx.lineTo(W,Math.round(y)+0.5); }
+  pctx.stroke();
+
+  let mx = 0.001;
+  for (let i = 0; i < powerHist.length; i++) {
+    if (powerHist[i] > mx) mx = powerHist[i];
+  }
+
+  const n = powerHist.length;
+  pctx.beginPath();
+  pctx.strokeStyle = '#ffb020';
+  pctx.lineWidth = 1.5;
+  pctx.lineJoin = 'round';
+
+  for (let x = 0; x < W; x++) {
+    const i = Math.floor((x / W) * n);
+    const v = powerHist[i] / mx;
+    const y = H - 4 - v * (H - 12);
+    if (x === 0) pctx.moveTo(x, y);
+    else pctx.lineTo(x, y);
+  }
+  pctx.stroke();
+}
+
+/* ============================================================
    Init
    ============================================================ */
-sizeCanvas();
+sizeAll();
 updateLabels();
 setControls(false);
 })();
