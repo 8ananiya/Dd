@@ -1,740 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#07090c">
-<title>ANC.live — Active Noise Cancellation</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#07090c;
-    --panel:#0d1219;
-    --line:rgba(255,255,255,.07);
-    --txt:#e6edf3;
-    --dim:#7b8a99;
-    --accent:#00e5c0;
-    --anti:#ff4d6d;
-  }
-  html,body{height:100%}
-  body{
-    background:
-      radial-gradient(900px 600px at 50% -10%, rgba(0,229,192,.07), transparent 60%),
-      radial-gradient(700px 500px at 90% 110%, rgba(255,77,109,.06), transparent 60%),
-      var(--bg);
-    color:var(--txt);
-    font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;justify-content:center;
-    padding:22px 16px 40px;
-    min-height:100%;
-  }
-  .wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:18px}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Audio ANC & Transparency Concept</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #f8fafc; /* slate-50 */
+        }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #10b981; /* emerald-500 */
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #10b981;
+        }
+        .toggle-checkbox-trans:checked {
+            right: 0;
+            border-color: #3b82f6; /* blue-500 */
+        }
+        .toggle-checkbox-trans:checked + .toggle-label-trans {
+            background-color: #3b82f6;
+        }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7); /* slate-800 with opacity */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-  /* ---------- header ---------- */
-  .top{display:flex;align-items:center;justify-content:space-between}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:15px}
-  .logo em{font-style:normal;color:var(--dim);font-weight:500}
-  .pulse{width:9px;height:9px;border-radius:50%;background:#2a3542;transition:.3s}
-  .pulse.live{background:var(--accent);box-shadow:0 0 12px var(--accent);animation:blink 1.6s infinite}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  .pill{
-    font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
-    padding:6px 12px;border-radius:999px;
-    border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--dim);
-    transition:.3s;white-space:nowrap;
-  }
-  .pill.on{color:var(--accent);border-color:rgba(0,229,192,.35);background:rgba(0,229,192,.06)}
+        canvas {
+            width: 100%;
+            height: 80px;
+            display: block;
+            border-radius: 0.5rem;
+            background-color: #020617; /* slate-950 */
+        }
+        
+        .pulse-emerald {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
 
-  /* ---------- power stage ---------- */
-  .stage{
-    display:flex;flex-direction:column;align-items:center;gap:16px;
-    padding:26px 20px 22px;
-    border:1px solid var(--line);border-radius:24px;
-    background:linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,0));
-  }
-  .power{
-    position:relative;width:150px;height:150px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.09);
-    background:radial-gradient(circle at 50% 32%, #182330, #0a0e13 72%);
-    color:#63717f;cursor:pointer;
-    display:grid;place-items:center;
-    transition:color .3s, box-shadow .4s, border-color .4s, transform .12s;
-    -webkit-tap-highlight-color:transparent;
-    outline:none;
-  }
-  .power:active{transform:scale(.97)}
-  .power svg{width:52px;height:52px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
-  .power.on{
-    color:var(--accent);
-    border-color:rgba(0,229,192,.45);
-    box-shadow:0 0 0 1px rgba(0,229,192,.25), 0 0 60px rgba(0,229,192,.22), inset 0 0 40px rgba(0,229,192,.08);
-  }
-  .ring{
-    position:absolute;inset:-1px;border-radius:50%;
-    border:1px solid rgba(0,229,192,.5);opacity:0;pointer-events:none;
-  }
-  .power.on .ring{animation:ripple 2.6s cubic-bezier(.2,.6,.3,1) infinite}
-  .power.on .ring.r2{animation-delay:1.3s}
-  @keyframes ripple{
-    0%{transform:scale(1);opacity:.55}
-    100%{transform:scale(1.55);opacity:0}
-  }
-  .hint{font-size:13.5px;color:var(--dim);text-align:center;line-height:1.5;max-width:340px;min-height:20px}
-  .hint b{color:var(--txt);font-weight:600}
-
-  /* ---------- visualiser ---------- */
-  .viz{
-    position:relative;border:1px solid var(--line);border-radius:18px;
-    background:linear-gradient(180deg,#0a0f15,#080b10);
-    overflow:hidden;height:150px;
-  }
-  #scope{width:100%;height:100%;display:block}
-  .legend{
-    position:absolute;top:10px;left:12px;display:flex;gap:14px;
-    font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
-  }
-  .legend span{display:flex;align-items:center;gap:6px;color:var(--dim)}
-  .legend i{width:14px;height:2px;border-radius:2px;display:block}
-  .legend .i-in i{background:rgba(0,229,192,.55)}
-  .legend .i-out i{background:var(--anti)}
-
-  /* ---------- meters ---------- */
-  .meters{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .meter{
-    border:1px solid var(--line);border-radius:14px;padding:12px 14px;
-    background:rgba(255,255,255,.015);
-  }
-  .meter-head{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:9px}
-  .bar{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
-  .bar i{display:block;height:100%;width:0%;border-radius:99px;transition:width .06s linear}
-  .bar.in i{background:linear-gradient(90deg,#007a68,var(--accent))}
-  .bar.out i{background:linear-gradient(90deg,#8f2438,var(--anti))}
-
-  /* ---------- controls ---------- */
-  .panel{border:1px solid var(--line);border-radius:20px;padding:18px 18px 6px;background:var(--panel)}
-  .panel h2{
-    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-    font-weight:700;margin-bottom:16px;
-  }
-  .ctrl{display:block;margin-bottom:20px}
-  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
-  .ctrl-head b{font-size:13px;font-weight:600;color:#cbd6e0}
-  .ctrl-head output{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;cursor:pointer;display:block;
-  }
-  input[type=range]::-webkit-slider-runnable-track{
-    height:4px;border-radius:99px;background:rgba(255,255,255,.1);
-  }
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;width:17px;height:17px;border-radius:50%;
-    background:#0e141b;border:2px solid var(--accent);
-    margin-top:-6.5px;box-shadow:0 0 10px rgba(0,229,192,.4);transition:transform .15s;
-  }
-  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.18)}
-  input[type=range]::-moz-range-track{height:4px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-moz-range-thumb{
-    width:15px;height:15px;border-radius:50%;background:#0e141b;
-    border:2px solid var(--accent);box-shadow:0 0 10px rgba(0,229,192,.4);
-  }
-  input[type=range]:disabled{opacity:.35;pointer-events:none}
-
-  .toggles{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:16px}
-  .tgl{
-    flex:1 1 auto;min-width:130px;
-    padding:11px 14px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:600;
-    background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--dim);
-    transition:.22s;font-family:inherit;
-  }
-  .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.08)}
-  .tgl:active{transform:scale(.98)}
-
-  /* ---------- info ---------- */
-  .note{
-    border:1px solid var(--line);border-radius:18px;padding:16px 18px;
-    background:rgba(255,255,255,.015);font-size:12.5px;line-height:1.65;color:var(--dim);
-  }
-  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:7px;font-size:12px;
-    letter-spacing:.05em;text-transform:uppercase}
-  .note ul{list-style:none;display:flex;flex-direction:column;gap:6px}
-  .note li{padding-left:16px;position:relative}
-  .note li::before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;
-    border-radius:50%;background:var(--accent);opacity:.6}
-  .note .warn::before{background:#ffb020}
-  footer{text-align:center;font-size:11px;color:#3f4a56;letter-spacing:.05em}
-  @media(max-width:400px){
-    .power{width:126px;height:126px}
-    .power svg{width:44px;height:44px}
-  }
-</style>
+        .pulse-blue {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            animation: pulse-blue-anim 2s infinite;
+        }
+        @keyframes pulse-blue-anim {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+    </style>
 </head>
-<body>
-<div class="wrap">
-
-  <header class="top">
-    <div class="logo"><span class="pulse" id="pulse"></span>ANC<em>.live</em></div>
-    <div class="pill" id="statusPill">standby</div>
-  </header>
-
-  <section class="stage">
-    <button class="power" id="powerBtn" aria-label="Toggle noise cancellation">
-      <span class="ring"></span>
-      <span class="ring r2"></span>
-      <svg viewBox="0 0 24 24">
-        <path d="M12 2.5v9"/>
-        <path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/>
-      </svg>
-    </button>
-    <p class="hint" id="hint">Tap to begin — your mic will listen to the room and the speaker will emit the inverted wave.</p>
-  </section>
-
-  <section class="viz">
-    <canvas id="scope"></canvas>
-    <div class="legend">
-      <span class="i-in"><i></i>Room</span>
-      <span class="i-out"><i></i>Anti-noise</span>
-    </div>
-  </section>
-
-  <section class="meters">
-    <div class="meter">
-      <div class="meter-head"><span>Input</span><span id="inDb">−∞ dB</span></div>
-      <div class="bar in"><i id="inBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>Anti-noise</span><span id="outDb">−∞ dB</span></div>
-      <div class="bar out"><i id="outBar"></i></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h2>Signal shaping</h2>
-
-    <label class="ctrl">
-      <span class="ctrl-head"><b>Intensity</b><output id="gainOut">80%</output></span>
-      <input type="range" id="gain" min="0" max="200" value="80" step="1" disabled>
-    </label>
-
-    <label class="ctrl">
-      <span class="ctrl-head"><b>Phase alignment</b><output id="delayOut">0.00 ms</output></span>
-      <input type="range" id="delay" min="0" max="960" value="0" step="1" disabled>
-    </label>
-
-    <label class="ctrl">
-      <span class="ctrl-head"><b>Focus — low-pass</b><output id="lpOut">1200 Hz</output></span>
-      <input type="range" id="lp" min="100" max="8000" value="1200" step="10" disabled>
-    </label>
-
-    <label class="ctrl">
-      <span class="ctrl-head"><b>Rumble cut — high-pass</b><output id="hpOut">40 Hz</output></span>
-      <input type="range" id="hp" min="10" max="300" value="40" step="1" disabled>
-    </label>
-
-    <div class="toggles">
-      <button class="tgl on" id="polarityBtn">Invert phase</button>
-      <button class="tgl on" id="guardBtn">Howl guard</button>
-    </div>
-  </section>
-
-  <section class="note">
-    <strong>Read this first</strong>
-    <ul>
-      <li>Wear <b>headphones</b> — that's the only configuration where this behaves like real ANC (mic outside, anti-noise at your ear).</li>
-      <li>It works best on <b>steady low-frequency</b> sound: fans, engines, road rumble, air conditioning. Speech and music will not cancel.</li>
-      <li>If you hear a rising whistle, hit stop or lower intensity — that's acoustic feedback.</li>
-      <li class="warn">Browser audio latency (10–30 ms) limits cancellation to roughly 30–80 Hz. Real ANC chips run at under 1 ms. This is a demo of the principle, not a replacement for hardware.</li>
-    </ul>
-  </section>
-
-  <footer>Web Audio API · AudioWorklet · no data leaves your device</footer>
-</div>
-
-<script>
-(() => {
-"use strict";
-
-/* ============================================================
-   AudioWorklet processor — the actual anti-noise generator.
-   Written as a string so the whole app stays in one file.
-   ============================================================ */
-const WORKLET_SRC = `
-class ANCProcessor extends AudioWorkletProcessor {
-  static get parameterDescriptors() {
-    return [
-      { name: 'gain',   defaultValue: 0.8, minValue: 0, maxValue: 4,   automationRate: 'k-rate' },
-      { name: 'delay',  defaultValue: 0,   minValue: 0, maxValue: 1024, automationRate: 'k-rate' },
-      { name: 'invert', defaultValue: 1,   minValue: 0, maxValue: 1,   automationRate: 'k-rate' }
-    ];
-  }
-
-  constructor() {
-    super();
-    this.N = 2048;                       // ring buffer (~42 ms @ 48k)
-    this.buf = new Float32Array(this.N);
-    this.w = 0;
-  }
-
-  process(inputs, outputs, params) {
-    const input  = inputs[0];
-    const output = outputs[0];
-    const out0   = output[0];
-    const n      = out0.length;
-    const in0    = (input && input.length) ? input[0] : null;
-
-    const gain  = params.gain[0];
-    const delay = Math.round(params.delay[0]);
-    const inv   = params.invert[0] > 0.5 ? -1 : 1;
-
-    const buf = this.buf;
-    const N   = this.N;
-    let w     = this.w;
-
-    for (let i = 0; i < n; i++) {
-      const x = in0 ? in0[i] : 0;
-
-      // write current sample
-      buf[w] = x;
-
-      // read the delayed sample
-      let r = w - delay;
-      if (r < 0) r += N;
-
-      // ANTI-NOISE: invert + scale
-      out0[i] = buf[r] * gain * inv;
-
-      w++;
-      if (w >= N) w = 0;
-    }
-    this.w = w;
-
-    // duplicate mono anti-noise to all output channels
-    for (let c = 1; c < output.length; c++) output[c].set(out0);
-
-    return true;
-  }
-}
-registerProcessor('anc-processor', ANCProcessor);
-`;
-
-/* ============================================================
-   DOM refs
-   ============================================================ */
-const $ = id => document.getElementById(id);
-const powerBtn  = $('powerBtn');
-const statusPill= $('statusPill');
-const pulse     = $('pulse');
-const hint      = $('hint');
-
-const scope     = $('scope');
-const sctx      = scope.getContext('2d');
-
-const inBar = $('inBar'),  outBar = $('outBar');
-const inDb  = $('inDb'),   outDb  = $('outDb');
-
-const gainEl = $('gain'),  gainOut = $('gainOut');
-const delEl  = $('delay'), delOut  = $('delayOut');
-const lpEl   = $('lp'),    lpOut   = $('lpOut');
-const hpEl   = $('hp'),    hpOut   = $('hpOut');
-const polBtn = $('polarityBtn');
-const grdBtn = $('guardBtn');
-
-const sliders = [gainEl, delEl, lpEl, hpEl];
-
-/* ============================================================
-   State
-   ============================================================ */
-let ctx = null;
-let stream = null;
-let srcNode = null;
-let analyserIn = null, analyserOut = null;
-let worklet = null, lpNode = null, hpNode = null, limiter = null, master = null;
-
-let running = false;
-let rafId = null;
-
-let bufIn  = null;
-let bufOut = null;
-
-let guardGain = 1;          // 0..1, dynamically reduced on feedback
-let guardEnabled = true;
-let invertOn = true;
-
-const BASE_VOLUME = 0.9;
-
-/* ============================================================
-   Canvas sizing
-   ============================================================ */
-function sizeCanvas() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const rect = scope.getBoundingClientRect();
-  scope.width  = Math.max(1, Math.round(rect.width  * dpr));
-  scope.height = Math.max(1, Math.round(rect.height * dpr));
-  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', sizeCanvas);
-
-/* ============================================================
-   UI helpers
-   ============================================================ */
-function setStatus(text, live) {
-  statusPill.textContent = text;
-  statusPill.classList.toggle('on', !!live);
-  pulse.classList.toggle('live', !!live);
-}
-
-function setControlsEnabled(on) {
-  sliders.forEach(s => s.disabled = !on);
-}
-
-function updateDelayLabel() {
-  const samples = +delEl.value;
-  const sr = ctx ? ctx.sampleRate : 48000;
-  delOut.textContent = (samples / sr * 1000).toFixed(2) + ' ms';
-}
-
-/* ============================================================
-   Audio graph
-   ============================================================ */
-async function start() {
-  if (running) return;
-  setStatus('requesting mic', false);
-  hint.textContent = 'Waiting for microphone permission…';
-
-  /* ---- 1. microphone ---------------------------------- */
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: false,   // MUST be off or it fights the anti-noise
-        noiseSuppression: false,   // MUST be off or it eats the ambient signal
-        autoGainControl: false,    // MUST be off or levels pump
-        channelCount: 1
-      },
-      video: false
-    });
-  } catch (err) {
-    console.error(err);
-    setStatus('mic blocked', false);
-    hint.innerHTML = 'Microphone access was denied. Allow it in your browser settings (the page must be served over <b>https</b> or localhost) and try again.';
-    return;
-  }
-
-  /* ---- 2. context + worklet --------------------------- */
-  try {
-    ctx = new (window.AudioContext || window.webkitAudioContext)({
-      latencyHint: 'interactive'
-    });
-    if (ctx.state === 'suspended') await ctx.resume();
-
-    const blob = new Blob([WORKLET_SRC], { type: 'application/javascript' });
-    const url  = URL.createObjectURL(blob);
-    await ctx.audioWorklet.addModule(url);
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error(err);
-    stopTracks();
-    setStatus('unsupported', false);
-    hint.textContent = 'This browser could not start the AudioWorklet engine. Try a recent Chrome, Edge, Firefox or Safari.';
-    return;
-  }
-
-  /* ---- 3. nodes --------------------------------------- */
-  srcNode = ctx.createMediaStreamSource(stream);
-
-  analyserIn = ctx.createAnalyser();
-  analyserIn.fftSize = 2048;
-  analyserIn.smoothingTimeConstant = 0.6;
-
-  analyserOut = ctx.createAnalyser();
-  analyserOut.fftSize = 2048;
-  analyserOut.smoothingTimeConstant = 0.6;
-
-  worklet = new AudioWorkletNode(ctx, 'anc-processor', {
-    numberOfInputs: 1,
-    numberOfOutputs: 1,
-    outputChannelCount: [2]
-  });
-
-  lpNode = ctx.createBiquadFilter();
-  lpNode.type = 'lowpass';
-  lpNode.frequency.value = +lpEl.value;
-  lpNode.Q.value = 0.7;
-
-  hpNode = ctx.createBiquadFilter();
-  hpNode.type = 'highpass';
-  hpNode.frequency.value = +hpEl.value;
-  hpNode.Q.value = 0.7;
-
-  limiter = ctx.createDynamicsCompressor();
-  limiter.threshold.value = -8;
-  limiter.knee.value = 0;
-  limiter.ratio.value = 20;
-  limiter.attack.value = 0.003;
-  limiter.release.value = 0.1;
-
-  master = ctx.createGain();
-  master.gain.value = 0;   // faded in below
-
-  /* ---- 4. wiring -------------------------------------- */
-  srcNode.connect(analyserIn);
-  analyserIn.connect(worklet);
-  worklet.connect(lpNode);
-  lpNode.connect(hpNode);
-  hpNode.connect(limiter);
-  limiter.connect(analyserOut);
-  analyserOut.connect(master);
-  master.connect(ctx.destination);
-
-  /* ---- 5. state --------------------------------------- */
-  bufIn  = new Float32Array(analyserIn.fftSize);
-  bufOut = new Float32Array(analyserOut.fftSize);
-
-  applyGain();
-  applyDelay();
-  applyPolarity();
-  updateDelayLabel();
-
-  master.gain.setTargetAtTime(BASE_VOLUME, ctx.currentTime, 0.25);
-
-  running = true;
-  guardGain = 1;
-
-  powerBtn.classList.add('on');
-  setControlsEnabled(true);
-  setStatus('cancelling', true);
-  hint.innerHTML = 'Live. Put on <b>headphones</b> and slowly raise intensity until the rumble drops.';
-
-  sizeCanvas();
-  rafId = requestAnimationFrame(loop);
-}
-
-function stop() {
-  if (!running && !ctx) return;
-  running = false;
-
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-
-  powerBtn.classList.remove('on');
-  setControlsEnabled(false);
-  setStatus('standby', false);
-  hint.textContent = 'Stopped. Tap to begin again.';
-
-  const dying = ctx;
-  const dyingMaster = master;
-
-  if (dyingMaster && dying) {
-    try { dyingMaster.gain.setTargetAtTime(0, dying.currentTime, 0.08); } catch (e) {}
-  }
-
-  setTimeout(() => {
-    stopTracks();
-    if (dying && dying.state !== 'closed') dying.close().catch(() => {});
-    ctx = null; master = null; worklet = null;
-    analyserIn = analyserOut = null;
-    lpNode = hpNode = limiter = srcNode = null;
-  }, 320);
-
-  // blank the scope
-  const w = scope.clientWidth, h = scope.clientHeight;
-  sctx.clearRect(0, 0, w, h);
-  inBar.style.width = '0%';
-  outBar.style.width = '0%';
-  inDb.textContent = '−∞ dB';
-  outDb.textContent = '−∞ dB';
-}
-
-function stopTracks() {
-  if (stream) {
-    stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
-    stream = null;
-  }
-}
-
-/* ============================================================
-   Parameter plumbing
-   ============================================================ */
-function applyGain() {
-  if (worklet) {
-    const g = +gainEl.value / 100;
-    worklet.parameters.get('gain').setTargetAtTime(g, ctx.currentTime, 0.02);
-  }
-  gainOut.textContent = gainEl.value + '%';
-}
-
-function applyDelay() {
-  if (worklet) {
-    worklet.parameters.get('delay').setTargetAtTime(+delEl.value, ctx.currentTime, 0.02);
-  }
-  updateDelayLabel();
-}
-
-function applyPolarity() {
-  if (worklet) {
-    worklet.parameters.get('invert').setTargetAtTime(invertOn ? 1 : 0, ctx.currentTime, 0.02);
-  }
-  polBtn.classList.toggle('on', invertOn);
-}
-
-gainEl.addEventListener('input', applyGain);
-delEl.addEventListener('input', applyDelay);
-lpEl.addEventListener('input', () => {
-  if (lpNode) lpNode.frequency.setTargetAtTime(+lpEl.value, ctx.currentTime, 0.02);
-  lpOut.textContent = lpEl.value + ' Hz';
-});
-hpEl.addEventListener('input', () => {
-  if (hpNode) hpNode.frequency.setTargetAtTime(+hpEl.value, ctx.currentTime, 0.02);
-  hpOut.textContent = hpEl.value + ' Hz';
-});
-
-polBtn.addEventListener('click', () => { invertOn = !invertOn; applyPolarity(); });
-grdBtn.addEventListener('click', () => {
-  guardEnabled = !guardEnabled;
-  grdBtn.classList.toggle('on', guardEnabled);
-  if (!guardEnabled) { guardGain = 1; }
-});
-
-/* ============================================================
-   Power button + keyboard
-   ============================================================ */
-powerBtn.addEventListener('click', () => { running ? stop() : start(); });
-window.addEventListener('keydown', e => {
-  if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
-    e.preventDefault();
-    running ? stop() : start();
-  }
-});
-
-/* ============================================================
-   Render loop
-   ============================================================ */
-let rmsInSmoothed = 0;
-
-function loop() {
-  if (!running) return;
-  rafId = requestAnimationFrame(loop);
-
-  analyserIn.getFloatTimeDomainData(bufIn);
-  analyserOut.getFloatTimeDomainData(bufOut);
-
-  /* ---- levels ---------------------------------------- */
-  let peakIn = 0, peakOut = 0, sumSq = 0;
-  for (let i = 0; i < bufIn.length; i++) {
-    const v = bufIn[i];
-    const a = v < 0 ? -v : v;
-    if (a > peakIn) peakIn = a;
-    sumSq += v * v;
-  }
-  for (let i = 0; i < bufOut.length; i++) {
-    const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i];
-    if (a > peakOut) peakOut = a;
-  }
-
-  const rms = Math.sqrt(sumSq / bufIn.length);
-  rmsInSmoothed = rmsInSmoothed * 0.85 + rms * 0.15;
-
-  setMeter(inBar, inDb, peakIn);
-  setMeter(outBar, outDb, peakOut);
-
-  /* ---- howl guard ------------------------------------ */
-  if (guardEnabled && master && ctx) {
-    if (rmsInSmoothed > 0.16) {
-      guardGain = Math.max(0.12, guardGain - 0.035);      // fast duck
-    } else {
-      guardGain = Math.min(1, guardGain + 0.004);          // slow recover
-    }
-    master.gain.setTargetAtTime(BASE_VOLUME * guardGain, ctx.currentTime, 0.06);
-  }
-
-  drawScope();
-}
-
-function setMeter(barEl, labelEl, peak) {
-  const db = peak > 0.00001 ? 20 * Math.log10(peak) : -100;
-  const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
-  barEl.style.width = pct.toFixed(1) + '%';
-  labelEl.textContent = db <= -99 ? '−∞ dB' : db.toFixed(0) + ' dB';
-}
-
-/* ============================================================
-   Oscilloscope
-   ============================================================ */
-function drawScope() {
-  const W = scope.clientWidth;
-  const H = scope.clientHeight;
-  if (!W || !H) return;
-
-  sctx.clearRect(0, 0, W, H);
-
-  /* grid */
-  sctx.strokeStyle = 'rgba(255,255,255,0.045)';
-  sctx.lineWidth = 1;
-  sctx.beginPath();
-  for (let x = 0; x <= W; x += W / 8) {
-    sctx.moveTo(Math.round(x) + 0.5, 0);
-    sctx.lineTo(Math.round(x) + 0.5, H);
-  }
-  for (let y = 0; y <= H; y += H / 4) {
-    sctx.moveTo(0, Math.round(y) + 0.5);
-    sctx.lineTo(W, Math.round(y) + 0.5);
-  }
-  sctx.stroke();
-
-  /* centre line */
-  sctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  sctx.beginPath();
-  sctx.moveTo(0, H / 2);
-  sctx.lineTo(W, H / 2);
-  sctx.stroke();
-
-  /* waveforms */
-  drawWave(bufIn,  'rgba(0,229,192,0.45)', 1.2, W, H);
-  drawWave(bufOut, '#ff4d6d',              1.6, W, H);
-}
-
-function drawWave(data, color, lw, W, H) {
-  if (!data) return;
-  const n = data.length;
-  const step = n / W;
-  const amp = H * 0.44;
-
-  sctx.beginPath();
-  sctx.strokeStyle = color;
-  sctx.lineWidth = lw;
-  sctx.lineJoin = 'round';
-  sctx.lineCap = 'round';
-
-  for (let x = 0; x < W; x++) {
-    let i0 = Math.floor(x * step);
-    let i1 = Math.floor((x + 1) * step);
-    if (i1 <= i0) i1 = i0 + 1;
-    if (i1 > n) i1 = n;
-
-    let mn = 1, mx = -1;
-    for (let i = i0; i < i1; i++) {
-      const v = data[i];
-      if (v < mn) mn = v;
-      if (v > mx) mx = v;
-    }
-    if (mn > mx) { mn = 0; mx = 0; }
-
-    const yTop = H / 2 - mx * amp;
-    const yBot = H / 2 - mn * amp;
-
-    sctx.moveTo(x + 0.5, yTop);
-    sctx.lineTo(x + 0.5, yBot < yTop + 0.6 ? yTop + 0.6 : yBot);
-  }
-  sctx.stroke();
-}
-
-/* ============================================================
-   Init
-   ============================================================ */
-sizeCanvas();
-updateDelayLabel();
-setControlsEnabled(false);
-
-})();
-</script>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-start overflow-x-hidden">
+
+    <header class="w-full max-w-4xl mb-8 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-blue-500 mb-2">
+            Audio Phase Inversion & Passthrough
+        </h1>
+        <p class="text-slate-400">Conceptual Web Audio API Experiment</p>
+    </header>
+
+    <main class="w-full max-w-4xl space-y-6">
+        
+        <!-- Crucial Warnings -->
+        <div class="bg-red-900/40 border border-red-500/50 rounded-xl p-5 shadow-lg">
+            <h2 class="text-xl font-bold text-red-400 mb-2 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                CRITICAL: Wear Headphones!
+            </h2>
+            <p class="text-red-200 text-sm mb-4">
+                Activating these features without headphones will create an immediate, extremely loud, and potentially damaging <strong>audio feedback loop</strong> (howling). Do not proceed unless your audio output is routed to headphones.
+            </p>
+            <div class="bg-slate-900/50 p-4 rounded-lg border border-orange-500/30">
+                <h3 class="text-orange-400 font-semibold mb-1">Educational Disclaimer: Browser Latency</h3>
+                <p class="text-orange-200/80 text-xs md:text-sm leading-relaxed">
+                    Real-world Active Noise Cancellation (ANC) requires specialized hardware to process and invert audio waves in under 1 millisecond. Web browsers and Bluetooth stacks introduce <strong>10ms to 50ms of latency</strong>. Because of this delay, feeding an inverted phase signal (gain = -1) back to your ears will <em>not</em> cancel ambient noise. Instead, it will create an echo, a flanging effect, or amplify the noise. This app demonstrates the <em>programming concept</em> of phase inversion and mic routing, not a viable ANC product.
+                </p>
+            </div>
+        </div>
+
+        <section class="glass-panel rounded-xl p-6 shadow-xl">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-slate-700 pb-4">
+                <div>
+                    <h2 class="text-2xl font-semibold text-white">Device Configuration</h2>
+                    <p class="text-sm text-slate-400 mt-1">Request permissions and map your microphones.</p>
+                </div>
+                <button id="requestPermissionsBtn" class="mt-4 md:mt-0 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-colors shadow-lg shadow-blue-500/20 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    Initialize & Fetch Devices
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- ANC Device Select -->
+                <div class="space-y-2">
+                    <label for="ancDevice" class="block text-sm font-medium text-emerald-400">Device Mic (for ANC logic)</label>
+                    <p class="text-xs text-slate-500 mb-2">Typically an external mic picking up ambient room noise.</p>
+                    <select id="ancDevice" disabled class="block w-full bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-emerald-500 focus:border-emerald-500 p-3 disabled:opacity-50 appearance-none">
+                        <option value="">Awaiting permissions...</option>
+                    </select>
+                </div>
+
+                <!-- Transparency Device Select -->
+                <div class="space-y-2">
+                    <label for="transDevice" class="block text-sm font-medium text-blue-400">Headset Mic (for Transparency)</label>
+                    <p class="text-xs text-slate-500 mb-2">Typically a headset mic picking up near-field sound.</p>
+                    <select id="transDevice" disabled class="block w-full bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 p-3 disabled:opacity-50 appearance-none">
+                        <option value="">Awaiting permissions...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="deviceErrorMsg" class="hidden mt-4 text-sm text-red-400 bg-red-900/20 p-3 rounded border border-red-800/50"></div>
+        </section>
+
+        <section class="glass-panel rounded-xl p-6 shadow-xl">
+            <h2 class="text-2xl font-semibold text-white mb-6">Mode Controls</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- ANC Control Card -->
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-emerald-400">ANC Mode</h3>
+                            <p class="text-xs text-slate-400 mt-1">Phase inverted (Gain = -1)</p>
+                        </div>
+                        <!-- Toggle Switch -->
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="ancToggle" disabled class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-all duration-300 right-6 border-slate-500"/>
+                            <label for="ancToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-600 cursor-pointer disabled:cursor-not-allowed transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="relative h-20 w-full rounded-lg overflow-hidden border border-slate-700/50">
+                        <canvas id="ancCanvas"></canvas>
+                        <div id="ancOverlay" class="absolute inset-0 bg-slate-900/80 flex items-center justify-center backdrop-blur-[2px] transition-opacity duration-300">
+                            <span class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Offline</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-xs font-mono text-slate-500 bg-slate-900/50 p-2 rounded">
+                        Routing: Mic -> Inverted Gain -> Dest
+                    </div>
+                </div>
+
+                <!-- Transparency Control Card -->
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700 flex flex-col justify-between">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-blue-400">Transparency</h3>
+                            <p class="text-xs text-slate-400 mt-1">Passthrough (Gain = 1)</p>
+                        </div>
+                        <!-- Toggle Switch -->
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="transToggle" disabled class="toggle-checkbox-trans absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed z-10 transition-all duration-300 right-6 border-slate-500"/>
+                            <label for="transToggle" class="toggle-label-trans block overflow-hidden h-6 rounded-full bg-slate-600 cursor-pointer disabled:cursor-not-allowed transition-colors duration-300"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="relative h-20 w-full rounded-lg overflow-hidden border border-slate-700/50">
+                        <canvas id="transCanvas"></canvas>
+                        <div id="transOverlay" class="absolute inset-0 bg-slate-900/80 flex items-center justify-center backdrop-blur-[2px] transition-opacity duration-300">
+                            <span class="text-xs text-slate-500 uppercase tracking-widest font-semibold">Offline</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-xs font-mono text-slate-500 bg-slate-900/50 p-2 rounded">
+                        Routing: Mic -> Normal Gain -> Dest
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Audio Context and Nodes state
+        let audioCtx;
+        
+        // ANC State
+        let ancStream = null;
+        let ancSource = null;
+        let ancGain = null;
+        let ancAnalyser = null;
+        let ancAnimationId = null;
+        
+        // Transparency State
+        let transStream = null;
+        let transSource = null;
+        let transGain = null;
+        let transAnalyser = null;
+        let transAnimationId = null;
+
+        // UI Elements
+        const btnRequest = document.getElementById('requestPermissionsBtn');
+        const selAncDevice = document.getElementById('ancDevice');
+        const selTransDevice = document.getElementById('transDevice');
+        const errortext = document.getElementById('deviceErrorMsg');
+        
+        const tglAnc = document.getElementById('ancToggle');
+        const tglTrans = document.getElementById('transToggle');
+        
+        const ancCanvas = document.getElementById('ancCanvas');
+        const transCanvas = document.getElementById('transCanvas');
+        const ancCanvasCtx = ancCanvas.getContext('2d');
+        const transCanvasCtx = transCanvas.getContext('2d');
+        const ancOverlay = document.getElementById('ancOverlay');
+        const transOverlay = document.getElementById('transOverlay');
+
+        // Setup Canvas sizes
+        function resizeCanvas() {
+            ancCanvas.width = ancCanvas.parentElement.clientWidth;
+            ancCanvas.height = ancCanvas.parentElement.clientHeight;
+            transCanvas.width = transCanvas.parentElement.clientWidth;
+            transCanvas.height = transCanvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // initial
+
+        btnRequest.addEventListener('click', async () => {
+            errortext.classList.add('hidden');
+            try {
+                // Request initial generic audio permission to ungate device labels
+                const initialStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Immediately stop the track as we only needed permission
+                initialStream.getTracks().forEach(track => track.stop());
+
+                // Fetch devices
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const audioInputs = devices.filter(device => device.kind === 'audioinput');
+
+                if (audioInputs.length === 0) {
+                    throw new Error("No microphones found on this device.");
+                }
+
+                // Populate selects
+                selAncDevice.innerHTML = '';
+                selTransDevice.innerHTML = '';
+                
+                audioInputs.forEach((device, index) => {
+                    const label = device.label || `Microphone ${index + 1}`;
+                    const option1 = new Option(label, device.deviceId);
+                    const option2 = new Option(label, device.deviceId);
+                    
+                    selAncDevice.add(option1);
+                    selTransDevice.add(option2);
+                });
+
+                // Enable UI
+                selAncDevice.disabled = false;
+                selTransDevice.disabled = false;
+                tglAnc.disabled = false;
+                tglTrans.disabled = false;
+                
+                btnRequest.classList.add('bg-slate-700', 'text-slate-300', 'cursor-default', 'hover:bg-slate-700', 'shadow-none');
+                btnRequest.innerHTML = `<svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Devices Loaded`;
+                btnRequest.disabled = true;
+
+                // Initialize Audio Context (requires user gesture, which click satisfies)
+                initAudioContext();
+
+            } catch (err) {
+                console.error("Error accessing media devices.", err);
+                errortext.textContent = `Error: ${err.message}. Please allow microphone access.`;
+                errortext.classList.remove('hidden');
+            }
+        });
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                // Use standard or webkit prefixed for wider compatibility
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // --- ANC Logic (Phase Inversion) ---
+        tglAnc.addEventListener('change', async (e) => {
+            initAudioContext(); // ensure active
+            
+            if (e.target.checked) {
+                try {
+                    const deviceId = selAncDevice.value;
+                    const constraints = deviceId ? { audio: { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false } } : { audio: true };
+                    
+                    ancStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    
+                    // Route: Source -> Analyser -> Inverted Gain -> Destination
+                    ancSource = audioCtx.createMediaStreamSource(ancStream);
+                    
+                    ancAnalyser = audioCtx.createAnalyser();
+                    ancAnalyser.fftSize = 2048;
+                    
+                    ancGain = audioCtx.createGain();
+                    // THE CORE CONCEPT: Phase Inversion
+                    ancGain.gain.value = -1; 
+                    
+                    ancSource.connect(ancAnalyser);
+                    ancAnalyser.connect(ancGain);
+                    ancGain.connect(audioCtx.destination);
+                    
+                    // Update UI
+                    ancOverlay.style.opacity = '0';
+                    tglAnc.nextElementSibling.classList.add('pulse-emerald');
+                    drawOscilloscope(ancAnalyser, ancCanvasCtx, ancCanvas.width, ancCanvas.height, '#34d399', 'anc'); // emerald-400
+                    
+                } catch (err) {
+                    console.error("Error starting ANC stream", err);
+                    alert("Could not start ANC stream: " + err.message);
+                    e.target.checked = false;
+                }
+            } else {
+                // Stop ANC
+                if (ancStream) {
+                    ancStream.getTracks().forEach(track => track.stop());
+                    ancStream = null;
+                }
+                if (ancSource) {
+                    ancSource.disconnect();
+                    ancSource = null;
+                }
+                if (ancGain) {
+                    ancGain.disconnect();
+                    ancGain = null;
+                }
+                if (ancAnimationId) {
+                    cancelAnimationFrame(ancAnimationId);
+                    ancCanvasCtx.clearRect(0, 0, ancCanvas.width, ancCanvas.height);
+                }
+                
+                ancOverlay.style.opacity = '1';
+                tglAnc.nextElementSibling.classList.remove('pulse-emerald');
+            }
+        });
+
+        // --- Transparency Logic (Passthrough) ---
+        tglTrans.addEventListener('change', async (e) => {
+            initAudioContext();
+            
+            if (e.target.checked) {
+                try {
+                    const deviceId = selTransDevice.value;
+                    const constraints = deviceId ? { audio: { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false } } : { audio: true };
+                    
+                    transStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    
+                    // Route: Source -> Analyser -> Normal Gain -> Destination
+                    transSource = audioCtx.createMediaStreamSource(transStream);
+                    
+                    transAnalyser = audioCtx.createAnalyser();
+                    transAnalyser.fftSize = 2048;
+                    
+                    transGain = audioCtx.createGain();
+                    // THE CORE CONCEPT: Passthrough (No inversion)
+                    transGain.gain.value = 1; 
+                    
+                    transSource.connect(transAnalyser);
+                    transAnalyser.connect(transGain);
+                    transGain.connect(audioCtx.destination);
+                    
+                    // Update UI
+                    transOverlay.style.opacity = '0';
+                    tglTrans.nextElementSibling.classList.add('pulse-blue');
+                    drawOscilloscope(transAnalyser, transCanvasCtx, transCanvas.width, transCanvas.height, '#60a5fa', 'trans'); // blue-400
+                    
+                } catch (err) {
+                    console.error("Error starting Transparency stream", err);
+                    alert("Could not start Transparency stream: " + err.message);
+                    e.target.checked = false;
+                }
+            } else {
+                // Stop Transparency
+                if (transStream) {
+                    transStream.getTracks().forEach(track => track.stop());
+                    transStream = null;
+                }
+                if (transSource) {
+                    transSource.disconnect();
+                    transSource = null;
+                }
+                if (transGain) {
+                    transGain.disconnect();
+                    transGain = null;
+                }
+                if (transAnimationId) {
+                    cancelAnimationFrame(transAnimationId);
+                    transCanvasCtx.clearRect(0, 0, transCanvas.width, transCanvas.height);
+                }
+                
+                transOverlay.style.opacity = '1';
+                tglTrans.nextElementSibling.classList.remove('pulse-blue');
+            }
+        });
+
+        function drawOscilloscope(analyser, ctx, width, height, color, modeStr) {
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = color;
+
+            function draw() {
+                const animId = requestAnimationFrame(draw);
+                if(modeStr === 'anc') ancAnimationId = animId;
+                if(modeStr === 'trans') transAnimationId = animId;
+
+                analyser.getByteTimeDomainData(dataArray);
+
+                ctx.fillStyle = '#020617'; // Match slate-950 background
+                ctx.fillRect(0, 0, width, height);
+
+                ctx.beginPath();
+
+                const sliceWidth = width * 1.0 / bufferLength;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const v = dataArray[i] / 128.0;
+                    
+                    // If ANC, visually invert the waveform display purely for effect 
+                    // (the audio is already inverted in the GainNode, this just makes the UI represent it conceptually)
+                    let y = (v * height / 2);
+                    if (modeStr === 'anc') {
+                         y = height - y; 
+                    }
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    x += sliceWidth;
+                }
+
+                ctx.lineTo(width, height / 2);
+                ctx.stroke();
+            }
+
+            draw();
+        }
+        
+    </script>
 </body>
 </html>
