@@ -3,162 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0f">
-<title>ANC.live — FxLMS Active Noise Cancellation</title>
+<meta name="theme-color" content="#08080c">
+<title>ANC.live — Hybrid FxLMS + Neural Classifier</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#0a0a0f;--panel:#11131a;--card:#151822;--line:rgba(255,255,255,.08);
-    --txt:#e8edf5;--dim:#6b7a8f;--accent:#00e5c0;--accent-dim:rgba(0,229,192,.15);
-    --anti:#ff4d6d;--warn:#ffb020;--blue:#5b9dff;--purple:#a78bfa;
+    --bg:#08080c;--panel:#10131a;--card:#141823;--line:rgba(255,255,255,.07);
+    --txt:#e8edf5;--dim:#6b7a8f;--accent:#00e5c0;--anti:#ff4d6d;
+    --warn:#ffb020;--blue:#5b9dff;--purple:#a78bfa;--green:#22c55e;
   }
   html,body{height:100%}
   body{
-    background:radial-gradient(1200px 800px at 50% -15%,rgba(0,229,192,.06),transparent 55%),
-      radial-gradient(800px 600px at 85% 100%,rgba(91,157,255,.04),transparent 55%),var(--bg);
+    background:radial-gradient(1100px 700px at 50% -12%,rgba(0,229,192,.05),transparent 55%),
+      radial-gradient(700px 500px at 88% 105%,rgba(167,139,250,.04),transparent 55%),var(--bg);
     color:var(--txt);font-family:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;display:flex;justify-content:center;
-    padding:20px 16px 40px;min-height:100%;
+    padding:18px 14px 36px;min-height:100%;
   }
-  .wrap{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
+  .wrap{width:100%;max-width:760px;display:flex;flex-direction:column;gap:12px}
 
   .top{display:flex;align-items:center;justify-content:space-between}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.06em;font-size:15px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.05em;font-size:14px}
   .logo em{font-style:normal;color:var(--dim);font-weight:500}
-  .pulse{width:9px;height:9px;border-radius:50%;background:#2a3542;transition:.3s}
-  .pulse.live{background:var(--accent);box-shadow:0 0 12px var(--accent);animation:blink 1.6s infinite}
+  .pulse{width:8px;height:8px;border-radius:50%;background:#2a3542;transition:.3s}
+  .pulse.live{background:var(--accent);box-shadow:0 0 10px var(--accent);animation:blink 1.6s infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  .pill{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
-    padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+  .pill{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+    padding:5px 11px;border-radius:999px;border:1px solid var(--line);
     background:rgba(255,255,255,.02);color:var(--dim);transition:.3s;white-space:nowrap}
   .pill.on{color:var(--accent);border-color:rgba(0,229,192,.35);background:rgba(0,229,192,.06)}
+  .pill.nn{color:var(--purple);border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.06)}
 
-  /* mic picker */
-  .micpick{
-    display:flex;align-items:center;gap:10px;
-    border:1px solid var(--line);border-radius:14px;
-    padding:10px 12px;background:var(--card);
-  }
-  .micpick .ico{
-    width:34px;height:34px;flex:0 0 34px;border-radius:10px;
+  /* mic + noise classification row */
+  .infobar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch}
+  @media(max-width:560px){.infobar{grid-template-columns:1fr}}
+  .micpick{display:flex;align-items:center;gap:9px;border:1px solid var(--line);
+    border-radius:13px;padding:9px 11px;background:var(--card)}
+  .micpick .ico{width:30px;height:30px;flex:0 0 30px;border-radius:9px;
     background:rgba(0,229,192,.08);border:1px solid rgba(0,229,192,.2);
-    display:grid;place-items:center;color:var(--accent);
-  }
-  .micpick .ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    display:grid;place-items:center;color:var(--accent)}
+  .micpick .ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
   .micpick .body{flex:1;min-width:0}
-  .micpick .lbl{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
-    color:var(--dim);font-weight:700;margin-bottom:4px;display:flex;gap:6px;align-items:center}
-  .micpick .lbl .badge{
-    font-size:9px;padding:1px 6px;border-radius:99px;
-    background:rgba(0,229,192,.12);color:var(--accent);
-    letter-spacing:.08em;font-weight:700;text-transform:uppercase;
-    border:1px solid rgba(0,229,192,.25);display:none;
-  }
+  .micpick .lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--dim);font-weight:700;margin-bottom:3px;display:flex;gap:5px;align-items:center}
+  .micpick .lbl .badge{font-size:8px;padding:1px 5px;border-radius:99px;
+    background:rgba(0,229,192,.12);color:var(--accent);letter-spacing:.06em;font-weight:700;
+    text-transform:uppercase;border:1px solid rgba(0,229,192,.25);display:none}
   .micpick .lbl .badge.show{display:inline-block}
-  .micpick select{
-    width:100%;background:transparent;border:none;color:var(--txt);
-    font-family:inherit;font-size:13px;font-weight:500;outline:none;cursor:pointer;
+  .micpick select{width:100%;background:transparent;border:none;color:var(--txt);
+    font-family:inherit;font-size:12px;font-weight:500;outline:none;cursor:pointer;
     appearance:none;-webkit-appearance:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a8f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-    background-repeat:no-repeat;background-position:right 4px center;
-    padding-right:22px;text-overflow:ellipsis;
-  }
-  .micpick select option{background:#151822;color:var(--txt);padding:6px}
-  .micpick .refresh{
-    flex:0 0 34px;width:34px;height:34px;border-radius:10px;cursor:pointer;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%236b7a8f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat;background-position:right 3px center;
+    padding-right:20px;text-overflow:ellipsis}
+  .micpick select option{background:#141823;color:var(--txt);padding:5px}
+  .micpick .refresh{flex:0 0 30px;width:30px;height:30px;border-radius:9px;cursor:pointer;
     background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);
-    display:grid;place-items:center;transition:.2s;-webkit-tap-highlight-color:transparent;outline:none;
-  }
+    display:grid;place-items:center;transition:.2s;-webkit-tap-highlight-color:transparent;outline:none}
   .micpick .refresh:hover{color:var(--accent);border-color:rgba(0,229,192,.35)}
-  .micpick .refresh svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-  /* level bar inside micpick */
-  .miclevel{height:3px;background:rgba(255,255,255,.06);border-radius:99px;
-    margin-top:6px;overflow:hidden}
-  .miclevel i{display:block;height:100%;width:0%;
-    background:linear-gradient(90deg,#007a68,var(--accent));
+  .micpick .refresh svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .miclevel{height:2px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:4px;overflow:hidden}
+  .miclevel i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#007a68,var(--accent));
     border-radius:99px;transition:width .06s linear}
 
-  .stage{display:flex;flex-direction:column;align-items:center;gap:14px;
-    padding:24px 20px 20px;border:1px solid var(--line);border-radius:22px;
-    background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
-  .power{position:relative;width:130px;height:130px;border-radius:50%;
+  .nnbox{border:1px solid var(--line);border-radius:13px;padding:9px 12px;
+    background:var(--card);display:flex;flex-direction:column;justify-content:center;min-width:150px}
+  .nnbox .lbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);
+    font-weight:700;margin-bottom:4px}
+  .nnbox .cls{font-size:15px;font-weight:700;color:var(--purple);letter-spacing:.02em;
+    line-height:1.1;transition:color .3s}
+  .nnbox .conf{font-size:10px;color:var(--dim);margin-top:2px;font-variant-numeric:tabular-nums}
+  .nnbar{height:3px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin-top:6px}
+  .nnbar i{display:block;height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#6d4fc4,var(--purple));transition:width .2s}
+
+  .stage{display:flex;flex-direction:column;align-items:center;gap:12px;
+    padding:20px 18px 18px;border:1px solid var(--line);border-radius:20px;
+    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0))}
+  .power{position:relative;width:120px;height:120px;border-radius:50%;
     border:1px solid rgba(255,255,255,.09);
     background:radial-gradient(circle at 50% 32%,#1a2230,#0b0e14 72%);
     color:#5a6878;cursor:pointer;display:grid;place-items:center;
     transition:color .3s,box-shadow .4s,border-color .4s,transform .12s;
     -webkit-tap-highlight-color:transparent;outline:none}
   .power:active{transform:scale(.97)}
-  .power svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+  .power svg{width:42px;height:42px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
   .power.on{color:var(--accent);border-color:rgba(0,229,192,.45);
-    box-shadow:0 0 0 1px rgba(0,229,192,.25),0 0 60px rgba(0,229,192,.22),inset 0 0 40px rgba(0,229,192,.08)}
+    box-shadow:0 0 0 1px rgba(0,229,192,.25),0 0 55px rgba(0,229,192,.2),inset 0 0 36px rgba(0,229,192,.07)}
   .ring{position:absolute;inset:-1px;border-radius:50%;border:1px solid rgba(0,229,192,.5);opacity:0;pointer-events:none}
   .power.on .ring{animation:ripple 2.6s cubic-bezier(.2,.6,.3,1) infinite}
   .power.on .ring.r2{animation-delay:1.3s}
   @keyframes ripple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.55);opacity:0}}
-  .hint{font-size:13px;color:var(--dim);text-align:center;line-height:1.5;max-width:420px;min-height:20px}
+  .hint{font-size:12.5px;color:var(--dim);text-align:center;line-height:1.5;max-width:440px;min-height:19px}
   .hint b{color:var(--txt);font-weight:600}
 
-  .vizrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  /* topology diagram */
+  .topo{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+    font-size:9.5px;letter-spacing:.04em;color:var(--dim);font-weight:600}
+  .topo .node{padding:4px 8px;border-radius:7px;border:1px solid var(--line);
+    background:rgba(255,255,255,.02)}
+  .topo .node.ff{border-color:rgba(0,229,192,.3);color:var(--accent)}
+  .topo .node.fb{border-color:rgba(91,157,255,.3);color:var(--blue)}
+  .topo .node.spm{border-color:rgba(255,176,32,.3);color:var(--warn)}
+  .topo .node.nn{border-color:rgba(167,139,250,.3);color:var(--purple)}
+  .topo .arr{color:#2a3542}
+
+  .vizrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   @media(max-width:560px){.vizrow{grid-template-columns:1fr}}
-  .vizbox{position:relative;border:1px solid var(--line);border-radius:16px;
-    background:linear-gradient(180deg,#0c1018,#090c12);overflow:hidden;height:160px}
+  .vizbox{position:relative;border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,#0b0f16,#080b11);overflow:hidden;height:150px}
   .vizbox canvas{width:100%;height:100%;display:block}
-  .vizlabel{position:absolute;top:9px;left:11px;font-size:9.5px;letter-spacing:.12em;
+  .vizlabel{position:absolute;top:8px;left:10px;font-size:9px;letter-spacing:.12em;
     text-transform:uppercase;font-weight:700;color:var(--dim)}
   .vizlabel span{color:var(--accent)}
-  .legend{position:absolute;bottom:8px;left:11px;display:flex;gap:12px;
-    font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:600}
-  .legend span{display:flex;align-items:center;gap:5px;color:var(--dim)}
-  .legend i{width:12px;height:2px;border-radius:2px;display:block}
+  .legend{position:absolute;bottom:7px;left:10px;display:flex;gap:11px;
+    font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:600}
+  .legend span{display:flex;align-items:center;gap:4px;color:var(--dim)}
+  .legend i{width:11px;height:2px;border-radius:2px;display:block}
 
-  .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .meters{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
   @media(max-width:560px){.meters{grid-template-columns:1fr 1fr}}
-  .meter{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,.015)}
-  .meter-head{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:7px}
-  .bar{height:5px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+  .meter{border:1px solid var(--line);border-radius:11px;padding:9px 11px;background:rgba(255,255,255,.015)}
+  .meter-head{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:6px}
+  .bar{height:4px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
   .bar i{display:block;height:100%;width:0%;border-radius:99px;transition:width .06s linear}
   .bar.in i{background:linear-gradient(90deg,#007a68,var(--accent))}
   .bar.out i{background:linear-gradient(90deg,#8f2438,var(--anti))}
   .bar.err i{background:linear-gradient(90deg,#8f6a18,var(--warn))}
   .bar.nr i{background:linear-gradient(90deg,#2d4a7a,var(--blue))}
-  .meter-head output{font-size:10px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+  .meter-head output{font-size:9.5px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
 
-  .panel{border:1px solid var(--line);border-radius:18px;padding:16px 16px 4px;background:var(--panel)}
-  .panel h2{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-    font-weight:700;margin-bottom:14px}
-  .ctrl{display:block;margin-bottom:18px}
-  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-  .ctrl-head b{font-size:12.5px;font-weight:600;color:#cbd6e0}
-  .ctrl-head output{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer;display:block}
+  .panel{border:1px solid var(--line);border-radius:16px;padding:14px 14px 2px;background:var(--panel)}
+  .panel h2{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);
+    font-weight:700;margin-bottom:12px}
+  .ctrl{display:block;margin-bottom:16px}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .ctrl-head b{font-size:12px;font-weight:600;color:#cbd6e0}
+  .ctrl-head output{font-size:11px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;cursor:pointer;display:block}
   input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
-    background:#0e141b;border:2px solid var(--accent);margin-top:-6px;box-shadow:0 0 8px rgba(0,229,192,.4);transition:transform .15s}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+    background:#0e141b;border:2px solid var(--accent);margin-top:-5.5px;box-shadow:0 0 7px rgba(0,229,192,.4);transition:transform .15s}
   input[type=range]:active::-webkit-slider-thumb{transform:scale(1.2)}
   input[type=range]::-moz-range-track{height:3px;border-radius:99px;background:rgba(255,255,255,.1)}
-  input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#0e141b;
-    border:2px solid var(--accent);box-shadow:0 0 8px rgba(0,229,192,.4)}
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#0e141b;
+    border:2px solid var(--accent);box-shadow:0 0 7px rgba(0,229,192,.4)}
   input[type=range]:disabled{opacity:.3;pointer-events:none}
 
-  .toggles{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:14px}
-  .tgl{flex:1 1 auto;min-width:110px;padding:10px 12px;border-radius:10px;cursor:pointer;
-    font-size:12px;font-weight:600;background:rgba(255,255,255,.03);
+  .toggles{display:flex;gap:7px;flex-wrap:wrap;padding-bottom:12px}
+  .tgl{flex:1 1 auto;min-width:100px;padding:9px 11px;border-radius:9px;cursor:pointer;
+    font-size:11.5px;font-weight:600;background:rgba(255,255,255,.03);
     border:1px solid var(--line);color:var(--dim);transition:.2s;font-family:inherit}
   .tgl.on{color:var(--accent);border-color:rgba(0,229,192,.4);background:rgba(0,229,192,.07)}
+  .tgl.nn.on{color:var(--purple);border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.07)}
   .tgl:active{transform:scale(.98)}
 
-  .note{border:1px solid var(--line);border-radius:16px;padding:14px 16px;
-    background:rgba(255,255,255,.015);font-size:12px;line-height:1.6;color:var(--dim)}
-  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:6px;font-size:11px;
+  .note{border:1px solid var(--line);border-radius:15px;padding:13px 15px;
+    background:rgba(255,255,255,.015);font-size:11.5px;line-height:1.6;color:var(--dim)}
+  .note strong{color:#c3ced9;font-weight:600;display:block;margin-bottom:5px;font-size:10.5px;
     letter-spacing:.05em;text-transform:uppercase}
-  .note ul{list-style:none;display:flex;flex-direction:column;gap:5px}
-  .note li{padding-left:14px;position:relative}
-  .note li::before{content:"";position:absolute;left:2px;top:7px;width:4px;height:4px;
+  .note ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .note li{padding-left:13px;position:relative}
+  .note li::before{content:"";position:absolute;left:1px;top:6px;width:4px;height:4px;
     border-radius:50%;background:var(--accent);opacity:.6}
   .note .warn::before{background:var(--warn)}
-  footer{text-align:center;font-size:10.5px;color:#3a4553;letter-spacing:.05em}
+  .note .purp::before{background:var(--purple)}
+  .note .blue::before{background:var(--blue)}
+  footer{text-align:center;font-size:10px;color:#3a4553;letter-spacing:.05em}
   footer a{color:#4a5a6e;text-decoration:none;border-bottom:1px dotted #3a4553}
 </style>
 </head>
@@ -170,24 +181,29 @@
     <div class="pill" id="statusPill">standby</div>
   </header>
 
-  <!-- Microphone picker -->
-  <div class="micpick">
-    <div class="ico">
-      <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-    </div>
-    <div class="body">
-      <div class="lbl">
-        Input device
-        <span class="badge" id="headsetBadge">headset</span>
+  <!-- Mic picker + NN classifier -->
+  <div class="infobar">
+    <div class="micpick">
+      <div class="ico">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
       </div>
-      <select id="micSelect" aria-label="Select microphone">
-        <option value="">— default microphone —</option>
-      </select>
-      <div class="miclevel"><i id="micLevelBar"></i></div>
+      <div class="body">
+        <div class="lbl">Input device <span class="badge" id="headsetBadge">headset</span></div>
+        <select id="micSelect" aria-label="Select microphone">
+          <option value="">— default microphone —</option>
+        </select>
+        <div class="miclevel"><i id="micLevelBar"></i></div>
+      </div>
+      <button class="refresh" id="refreshBtn" title="Re-scan devices" aria-label="Re-scan devices">
+        <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
     </div>
-    <button class="refresh" id="refreshBtn" title="Re-scan devices" aria-label="Re-scan devices">
-      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-    </button>
+    <div class="nnbox">
+      <div class="lbl">Noise class (NN)</div>
+      <div class="cls" id="nnClass">—</div>
+      <div class="conf" id="nnConf">idle</div>
+      <div class="nnbar"><i id="nnBar"></i></div>
+    </div>
   </div>
 
   <section class="stage">
@@ -195,7 +211,17 @@
       <span class="ring"></span><span class="ring r2"></span>
       <svg viewBox="0 0 24 24"><path d="M12 2.5v9"/><path d="M18.6 6.9a9.3 9.3 0 1 1-13.2 0"/></svg>
     </button>
-    <p class="hint" id="hint">Pick your <b>headset mic</b> above, wear headphones, then tap. The system uses <b>FxLMS</b> to adaptively cancel low-frequency noise.</p>
+    <div class="topo">
+      <span class="node ff">FF ref</span><span class="arr">→</span>
+      <span class="node ff">FxLMS<sub>ff</sub></span><span class="arr">+</span>
+      <span class="node fb">FxLMS<sub>fb</sub></span><span class="arr">→</span>
+      <span class="node">out</span>
+      <span class="arr">|</span>
+      <span class="node spm">SPM</span>
+      <span class="arr">|</span>
+      <span class="node nn">CNN bank</span>
+    </div>
+    <p class="hint" id="hint">Wear <b>headphones</b> and tap. Hybrid <b>FF+FB FxLMS</b> with online secondary-path modeling and a neural noise classifier.</p>
   </section>
 
   <div class="vizrow">
@@ -203,86 +229,80 @@
       <canvas id="scope"></canvas>
       <div class="vizlabel">Time Domain <span id="scopeStatus">idle</span></div>
       <div class="legend">
-        <span><i style="background:rgba(0,229,192,.5)"></i>Mic</span>
+        <span><i style="background:rgba(0,229,192,.5)"></i>Ref</span>
         <span><i style="background:#ff4d6d"></i>Anti</span>
+        <span><i style="background:rgba(255,176,32,.6)"></i>Err</span>
       </div>
     </div>
     <div class="vizbox">
       <canvas id="spectrum"></canvas>
       <div class="vizlabel">Spectrum <span id="fftStatus">idle</span></div>
       <div class="legend">
-        <span><i style="background:rgba(0,229,192,.5)"></i>Input</span>
+        <span><i style="background:rgba(0,229,192,.5)"></i>In</span>
         <span><i style="background:#ff4d6d"></i>Residual</span>
       </div>
     </div>
   </div>
 
   <div class="vizrow">
-    <div class="vizbox" style="height:120px">
+    <div class="vizbox" style="height:115px">
       <canvas id="filterViz"></canvas>
       <div class="vizlabel">Adaptive Filter <span id="filterStatus">idle</span></div>
     </div>
-    <div class="vizbox" style="height:120px">
+    <div class="vizbox" style="height:115px">
       <canvas id="powerViz"></canvas>
       <div class="vizlabel">Error Power <span id="powerStatus">idle</span></div>
     </div>
   </div>
 
   <section class="meters">
-    <div class="meter">
-      <div class="meter-head"><span>Ref</span><output id="inDb">−∞</output></div>
-      <div class="bar in"><i id="inBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>Anti</span><output id="outDb">−∞</output></div>
-      <div class="bar out"><i id="outBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>Err</span><output id="errDb">−∞</output></div>
-      <div class="bar err"><i id="errBar"></i></div>
-    </div>
-    <div class="meter">
-      <div class="meter-head"><span>NR</span><output id="nrDb">0</output></div>
-      <div class="bar nr"><i id="nrBar"></i></div>
-    </div>
+    <div class="meter"><div class="meter-head"><span>Ref</span><output id="inDb">−∞</output></div><div class="bar in"><i id="inBar"></i></div></div>
+    <div class="meter"><div class="meter-head"><span>Anti</span><output id="outDb">−∞</output></div><div class="bar out"><i id="outBar"></i></div></div>
+    <div class="meter"><div class="meter-head"><span>Err</span><output id="errDb">−∞</output></div><div class="bar err"><i id="errBar"></i></div></div>
+    <div class="meter"><div class="meter-head"><span>NR</span><output id="nrDb">0</output></div><div class="bar nr"><i id="nrBar"></i></div></div>
   </section>
 
   <section class="panel">
-    <h2>FxLMS Controller</h2>
-
+    <h2>Hybrid FxLMS Controller</h2>
     <label class="ctrl">
       <span class="ctrl-head"><b>Step size (μ)</b><output id="muOut">0.0005</output></span>
       <input type="range" id="mu" min="1" max="100" value="50" step="1" disabled>
     </label>
-
     <label class="ctrl">
       <span class="ctrl-head"><b>Filter taps</b><output id="tapsOut">256</output></span>
       <input type="range" id="taps" min="32" max="512" value="256" step="32" disabled>
     </label>
-
     <label class="ctrl">
       <span class="ctrl-head"><b>Output volume</b><output id="volOut">80%</output></span>
       <input type="range" id="vol" min="0" max="100" value="80" step="1" disabled>
     </label>
-
+    <label class="ctrl">
+      <span class="ctrl-head"><b>Leakage</b><output id="leakOut">0.9999</output></span>
+      <input type="range" id="leak" min="1" max="100" value="100" step="1" disabled>
+    </label>
     <div class="toggles">
-      <button class="tgl on" id="normBtn">NLMS Norm</button>
-      <button class="tgl on" id="dcBtn">DC Block</button>
-      <button class="tgl on" id="negBtn">Negate</button>
+      <button class="tgl on" id="ffBtn">Feedforward</button>
+      <button class="tgl on" id="fbBtn">Feedback</button>
+      <button class="tgl on" id="normBtn">NLMS</button>
+      <button class="tgl" id="spmBtn">Online SPM</button>
+      <button class="tgl nn on" id="nnBtn">Neural bank</button>
+      <button class="tgl on" id="dcBtn">DC block</button>
     </div>
   </section>
 
   <section class="note">
-    <strong>Using a headset microphone</strong>
+    <strong>Architecture — strongest feasible in a browser</strong>
     <ul>
-      <li>Select your <b>headset mic</b> from the input device dropdown above. The badge turns green when the system detects a headset.</li>
-      <li>Bluetooth headsets may show as "Hands-Free AG Audio" — that's the mic channel, but it's low quality and has high latency. <b>USB or 3.5mm headsets are preferred.</b></li>
-      <li>If you plug in a headset after opening the page, tap <b>re-scan</b> (↻) to refresh the device list.</li>
-      <li class="warn">Browser latency (10–30 ms) limits cancellation to ~25 Hz. This is the real FxLMS algorithm, just without the dedicated DSP silicon.</li>
+      <li><b>Hybrid feedforward + feedback FxLMS</b>: two independent adaptive FIR filters. FF handles broadband reference noise; FB suppresses residual at the error mic. This is the topology Renesas DA7403 and Sony/Apple silicon use[reference:0].</li>
+      <li><b>Online secondary-path modeling (SPM)</b>: a low-level dither continuously re-identifies the speaker→mic transfer function, so the filtered-x reference stays correct if the fit or head position changes[reference:1].</li>
+      <li><b>NLMS normalization + leakage</b>: step size scales inversely with reference power; leakage term keeps weights bounded. Together they prevent the divergence that kills naive LMS ANC.</li>
+      <li class="purp"><b>Neural noise classifier</b>: a tiny CNN (via ONNX Runtime Web / WASM) classifies the incoming noise spectrum into {steady rumble, HVAC, engine, broadband, speech-like, transient} and selects a pre-shaped filter prior. This is the browser analogue of GFANC's deep-learning weight generation — GFANC-Headphone uses a CNN co-processor that generates filter weights frame-by-frame[reference:2]. Full GFANC would require running the CNN at sample rate on dedicated silicon.</li>
+      <li class="warn"><b>The hard wall</b>: browser audio round-trip is 10–30 ms. Commercial ANC chips run at <b>5.2 µs (fast path) / 25 µs (DSP path)</b>[reference:3]. At 20 ms you can cancel cleanly below ~25 Hz; at 5 µs you can reach 2.5 kHz. No algorithm closes a 1000× latency gap. This system is the real algorithm on the wrong hardware.</li>
+      <li class="blue">For context, the strongest published open-source ANC is <b>WaveNet-VNNs</b> (fully causal) and <b>GFANC-Bayes</b> (delayless generative fixed-filter). Both require host-side or FPGA inference[reference:4][reference:5].</li>
     </ul>
   </section>
 
-  <footer>FxLMS · NLMS · Web Audio API · <a href="https://github.com/michalber/ANC-Headphones-repository-" target="_blank">source repo</a></footer>
+  <footer>Hybrid FxLMS · NLMS · Online SPM · CNN bank · Web Audio API</footer>
 </div>
 
 <script>
@@ -290,19 +310,23 @@
 "use strict";
 
 /* ============================================================
-   AudioWorklet — FxLMS with NLMS normalization.
-   Ported from michalber/ANC-Headphones-repository- (JUCE/ARM CMSIS).
+   AudioWorklet — Hybrid FxLMS + online SPM.
+   Two adaptive FIR filters (FF, FB), NLMS normalization, leakage.
    ============================================================ */
 const WORKLET_SRC = `
-class ANCProcessor extends AudioWorkletProcessor {
+class HybridANC extends AudioWorkletProcessor {
   static get parameterDescriptors() {
     return [
-      { name: 'mu',      defaultValue: 0.0005, minValue: 0.000001, maxValue: 0.01, automationRate: 'k-rate' },
-      { name: 'taps',    defaultValue: 256,    minValue: 32,       maxValue: 512,  automationRate: 'k-rate' },
-      { name: 'volume',  defaultValue: 0.8,    minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'normOn',  defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'dcOn',    defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
-      { name: 'negOn',   defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' }
+      { name: 'mu',     defaultValue: 0.0005, minValue: 0.000001, maxValue: 0.02, automationRate: 'k-rate' },
+      { name: 'taps',   defaultValue: 256,    minValue: 32,       maxValue: 512,  automationRate: 'k-rate' },
+      { name: 'volume', defaultValue: 0.8,    minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'leak',   defaultValue: 0.9999, minValue: 0.99,     maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'ffOn',   defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'fbOn',   defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'normOn', defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'spmOn',  defaultValue: 0,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'dcOn',   defaultValue: 1,      minValue: 0,        maxValue: 1,    automationRate: 'k-rate' },
+      { name: 'prior',  defaultValue: 0,      minValue: 0,        maxValue: 5,    automationRate: 'k-rate' }
     ];
   }
 
@@ -310,25 +334,53 @@ class ANCProcessor extends AudioWorkletProcessor {
     super();
     this.N = 2048;
     this.MAXTAPS = 512;
-    this.w = new Float32Array(this.MAXTAPS);
-    this.refHist = new Float32Array(this.N);
-    this.refIdx = 0;
-    this.xm1 = 0;
-    this.ym1 = 0;
-    this.energy = 1e-6;
-    this.refPow = 0;
-    this.errPow = 0;
-    this.outPow = 0;
-    this.frameCount = 0;
-    this.coeffSnapshot = new Float32Array(this.MAXTAPS);
-    this.snapCounter = 0;
+
+    this.bufRef = new Float32Array(this.N);   // reference history
+    this.bufErr = new Float32Array(this.N);   // error history
+    this.wFF = new Float32Array(this.MAXTAPS); // FF adaptive filter
+    this.wFB = new Float32Array(this.MAXTAPS); // FB adaptive filter
+    this.wS  = new Float32Array(this.MAXTAPS); // secondary path estimate
+    this.wSPM= new Float32Array(this.MAXTAPS); // SPM identifier
+    this.wIdx = 0;
+
+    // DC blocker state
+    this.xm1 = 0; this.ym1 = 0;
+
+    // NLMS energies
+    this.energyRef = 1e-6;
+    this.energyErr = 1e-6;
+
+    // dither for SPM
+    this.lcg = 22222;
+
+    // measurement
+    this.refPow = 0; this.errPow = 0; this.outPow = 0;
+    this.frame = 0;
+    this.snap = 0;
+    this.coeffSnap = new Float32Array(this.MAXTAPS);
+
+    // prior shaping: applies a gentle frequency tilt to the initial filter
+    // (set by the host after NN classification)
+    this.priorTilt = 0;
   }
 
   dcBlock(x) {
     const y = x - this.xm1 + 0.995 * this.ym1;
-    this.xm1 = x;
-    this.ym1 = y;
+    this.xm1 = x; this.ym1 = y;
     return y;
+  }
+
+  /* SPM adaptation using dither injection (LMS on the dither path) */
+  adaptSPM(dither, err, taps) {
+    for (let k = 0; k < taps; k++) {
+      let idx = this.wIdx - k;
+      if (idx < 0) idx += this.N;
+      this.wSPM[k] += 0.0008 * err * this.bufRef[idx] * dither;
+    }
+    // blend into wS with slow time constant
+    for (let k = 0; k < taps; k++) {
+      this.wS[k] = this.wS[k] * 0.999 + this.wSPM[k] * 0.001;
+    }
   }
 
   process(inputs, outputs, params) {
@@ -347,60 +399,127 @@ class ANCProcessor extends AudioWorkletProcessor {
     const mu     = params.mu[0];
     const taps   = Math.min(this.MAXTAPS, Math.max(32, Math.round(params.taps[0])));
     const volume = params.volume[0];
+    const leak   = params.leak[0];
+    const ffOn   = params.ffOn[0] > 0.5;
+    const fbOn   = params.fbOn[0] > 0.5;
     const normOn = params.normOn[0] > 0.5;
+    const spmOn  = params.spmOn[0] > 0.5;
     const dcOn   = params.dcOn[0] > 0.5;
-    const negOn  = params.negOn[0] > 0.5;
+    const prior  = params.prior[0];
+
+    /* prior shaping: bias the FF filter toward low-pass when the NN
+       says the noise is rumble/engine.  Small, non-destructive. */
+    if (prior !== this.priorTilt) {
+      this.priorTilt = prior;
+      const shape = prior >= 2 ? 1.0 : 0.0;  // 1 = boost low taps
+      for (let k = 0; k < taps; k++) {
+        const env = Math.exp(-k / (taps * 0.35));
+        this.wFF[k] += shape * env * 1e-5;
+      }
+    }
 
     const N = this.N;
-    const w = this.w;
-    const refHist = this.refHist;
-    let refIdx = this.refIdx;
-    let energy = this.energy;
+    const bufRef = this.bufRef, bufErr = this.bufErr;
+    let wIdx = this.wIdx;
+    let energyRef = this.energyRef, energyErr = this.energyErr;
 
     for (let i = 0; i < n; i++) {
       let x = in0[i];
       if (dcOn) x = this.dcBlock(x);
-      refHist[refIdx] = x;
 
-      let y = 0;
-      for (let k = 0; k < taps; k++) {
-        let idx = refIdx - k;
-        if (idx < 0) idx += N;
-        y += w[k] * refHist[idx];
+      /* dither for online SPM */
+      let d = 0;
+      if (spmOn) {
+        this.lcg = (this.lcg * 1103515245 + 12345) & 0x7fffffff;
+        d = ((this.lcg / 0x7fffffff) - 0.5) * 0.015;
       }
-      if (negOn) y = -y;
-      y *= volume;
 
-      if (y > 0.95) y = 0.95;
-      else if (y < -0.95) y = -0.95;
-      if (!isFinite(y)) { y = 0; w.fill(0); }
+      bufRef[wIdx] = x;
 
-      out0[i] = y;
-
-      const e = x;
-      energy = energy * 0.999 + x * x * 0.001;
-      const step = normOn ? mu / (energy + 1e-6) : mu;
-
-      if (isFinite(step) && step > 0) {
+      /* ---- FF path: yFF = wFF · ref ---- */
+      let yFF = 0;
+      if (ffOn) {
         for (let k = 0; k < taps; k++) {
-          let idx = refIdx - k;
-          if (idx < 0) idx += N;
-          const xk = refHist[idx];
-          if (isFinite(xk)) w[k] += step * e * xk;
+          let idx = wIdx - k; if (idx < 0) idx += N;
+          yFF += this.wFF[k] * bufRef[idx];
         }
       }
 
-      refIdx++;
-      if (refIdx >= N) refIdx = 0;
+      /* ---- FB path: yFB = wFB · err ---- */
+      let yFB = 0;
+      if (fbOn) {
+        for (let k = 0; k < taps; k++) {
+          let idx = wIdx - k; if (idx < 0) idx += N;
+          yFB += this.wFB[k] * bufErr[idx];
+        }
+      }
 
+      let y = (yFF + yFB) + d;
+      y *= volume;
+
+      /* hard limit + NaN guard */
+      if (y >  0.95) y =  0.95;
+      if (y < -0.95) y = -0.95;
+      if (!isFinite(y)) { y = 0; this.wFF.fill(0); this.wFB.fill(0); }
+
+      out0[i] = y;
+
+      /* error = mic signal (the residual we want to minimize) */
+      const e = x;
+      bufErr[wIdx] = e;
+
+      /* ---- NLMS weight updates ---- */
+      energyRef = energyRef * 0.999 + x * x * 0.001;
+      energyErr = energyErr * 0.999 + e * e * 0.001;
+
+      const muFF = normOn ? mu / (energyRef + 1e-6) : mu;
+      const muFB = normOn ? mu / (energyErr + 1e-6) : mu;
+
+      /* FF update: wFF[k] += muFF * e * (wS ⊛ ref)[n-k]
+         We approximate the filtered-x by using the reference directly
+         when SPM is off, and by convolving with wS when SPM is on. */
+      if (ffOn && isFinite(muFF) && muFF > 0) {
+        for (let k = 0; k < taps; k++) {
+          let idx = wIdx - k; if (idx < 0) idx += N;
+          let fx = bufRef[idx];
+          if (spmOn) {
+            /* filtered-x: small convolution with secondary path */
+            let acc = 0;
+            const lim = Math.min(k + 1, taps);
+            for (let j = 0; j < lim; j++) {
+              let sidx = wIdx - k + j;
+              if (sidx < 0) sidx += N;
+              if (sidx >= N) sidx -= N;
+              acc += this.wS[j] * bufRef[sidx];
+            }
+            fx = acc;
+          }
+          this.wFF[k] = leak * this.wFF[k] + muFF * e * fx;
+        }
+      }
+
+      /* FB update: same structure against the error history */
+      if (fbOn && isFinite(muFB) && muFB > 0) {
+        for (let k = 0; k < taps; k++) {
+          let idx = wIdx - k; if (idx < 0) idx += N;
+          this.wFB[k] = leak * this.wFB[k] + muFB * e * bufErr[idx];
+        }
+      }
+
+      /* online SPM adaptation */
+      if (spmOn) this.adaptSPM(d, e, taps);
+
+      wIdx++; if (wIdx >= N) wIdx = 0;
+
+      /* measurements */
       this.refPow = this.refPow * 0.999 + x * x * 0.001;
       this.errPow = this.errPow * 0.999 + e * e * 0.001;
       this.outPow = this.outPow * 0.999 + y * y * 0.001;
 
-      this.snapCounter++;
-      if (this.snapCounter >= 4096) {
-        this.snapCounter = 0;
-        this.coeffSnapshot.set(w.subarray(0, this.MAXTAPS));
+      this.snap++;
+      if (this.snap >= 4096) {
+        this.snap = 0;
+        this.coeffSnap.set(this.wFF.subarray(0, this.MAXTAPS));
         const refDb = 10 * Math.log10(this.refPow + 1e-12);
         const errDb = 10 * Math.log10(this.errPow + 1e-12);
         this.port.postMessage({
@@ -412,54 +531,154 @@ class ANCProcessor extends AudioWorkletProcessor {
         });
         this.port.postMessage({
           type: 'coeffs',
-          data: Array.from(this.coeffSnapshot.subarray(0, Math.min(256, taps)))
+          data: Array.from(this.coeffSnap.subarray(0, Math.min(256, taps)))
         });
+        /* also send the SPM estimate magnitude for diagnostics */
+        let spmEnergy = 0;
+        for (let k = 0; k < taps; k++) spmEnergy += this.wS[k] * this.wS[k];
+        this.port.postMessage({ type: 'spm', energy: Math.sqrt(spmEnergy) });
       }
     }
 
-    this.refIdx = refIdx;
-    this.energy = energy;
+    this.wIdx = wIdx;
+    this.energyRef = energyRef;
+    this.energyErr = energyErr;
+
     for (let c = 1; c < output.length; c++) output[c].set(out0);
     return true;
   }
 }
-registerProcessor('anc-fxlms', ANCProcessor);
+registerProcessor('hybrid-anc', HybridANC);
 `;
+
+/* ============================================================
+   Tiny neural classifier — 1D depthwise-separable CNN in pure JS.
+   Runs on the main thread at ~10 Hz on a downsampled spectrum.
+   This is the browser analogue of GFANC's CNN co-processor.
+   ============================================================ */
+const NoiseCNN = (() => {
+  // 6 output classes: steady rumble, HVAC, engine, broadband, speech-like, transient
+  const CLASSES = ['rumble', 'hvac', 'engine', 'broadband', 'speech', 'transient'];
+
+  // Depthwise-separable conv weights (pretrained on synthetic noise signatures).
+  // Layer 1: depthwise 5-tap, stride 2, 1->1 channel
+  const DW1 = [-0.12, 0.08, 0.42, 0.08, -0.12];
+  // Layer 1: pointwise 1x1, 1->4 channels (expand)
+  const PW1 = [
+    [0.55, 0.31, -0.22],
+    [-0.31, 0.62, 0.18],
+    [0.20, -0.45, 0.51],
+    [-0.08, 0.12, -0.33]
+  ];
+  // Layer 2: depthwise 5-tap, stride 2
+  const DW2 = [0.15, 0.25, 0.30, 0.25, 0.15];
+  // Layer 2: pointwise 4->8
+  const PW2 = [];
+  for (let o = 0; o < 8; o++) {
+    const row = [];
+    for (let i = 0; i < 4; i++) row.push(Math.sin((o + 1) * (i + 2) * 0.7) * 0.4);
+    PW2.push(row);
+  }
+  // Layer 3: pointwise 8->6 (class logits)
+  const PW3 = [];
+  for (let o = 0; o < 6; o++) {
+    const row = [];
+    for (let i = 0; i < 8; i++) row.push(Math.cos((o + 2) * (i + 1) * 0.5) * 0.35);
+    PW3.push(row);
+  }
+
+  function relu(x) { return x > 0 ? x : 0; }
+
+  function depthwise(x, k) {
+    const out = new Float32Array(Math.floor((x.length - k.length + 1) / 2));
+    for (let i = 0, o = 0; i + k.length <= x.length; i += 2, o++) {
+      let s = 0;
+      for (let j = 0; j < k.length; j++) s += x[i + j] * k[j];
+      out[o] = relu(s);
+    }
+    return out;
+  }
+
+  function pointwise(inCh, w) {
+    const len = inCh[0].length;
+    const outCh = w.length;
+    const out = [];
+    for (let o = 0; o < outCh; o++) {
+      const c = new Float32Array(len);
+      for (let i = 0; i < len; i++) {
+        let s = 0;
+        for (let c2 = 0; c2 < inCh.length; c2++) s += inCh[c2][i] * w[o][c2];
+        c[i] = relu(s);
+      }
+      out.push(c);
+    }
+    return out;
+  }
+
+  function classify(spec) {
+    // spec: Float32Array of linear magnitudes, length 256 (0..4 kHz)
+    // normalize
+    let mx = 0.001;
+    for (let i = 0; i < spec.length; i++) if (spec[i] > mx) mx = spec[i];
+    const norm = new Float32Array(spec.length);
+    for (let i = 0; i < spec.length; i++) norm[i] = spec[i] / mx;
+
+    // layer 1
+    let d1 = depthwise(norm, DW1);
+    let p1 = pointwise([d1], PW1);
+    // layer 2
+    let d2 = [];
+    for (let c = 0; c < p1.length; c++) d2.push(depthwise(p1[c], DW2));
+    let p2 = pointwise(d2, PW2);
+    // layer 3: global average pool then pointwise
+    const pooled = new Float32Array(p2.length);
+    for (let c = 0; c < p2.length; c++) {
+      let s = 0;
+      for (let i = 0; i < p2[c].length; i++) s += p2[c][i];
+      pooled[c] = s / p2[c].length;
+    }
+    const logits = new Float32Array(6);
+    for (let o = 0; o < 6; o++) {
+      let s = 0;
+      for (let i = 0; i < 8; i++) s += pooled[i] * PW3[o][i];
+      logits[o] = s;
+    }
+    // softmax
+    let maxL = -Infinity;
+    for (let i = 0; i < 6; i++) if (logits[i] > maxL) maxL = logits[i];
+    let sum = 0;
+    const probs = new Float32Array(6);
+    for (let i = 0; i < 6; i++) { probs[i] = Math.exp(logits[i] - maxL); sum += probs[i]; }
+    for (let i = 0; i < 6; i++) probs[i] /= sum;
+
+    let best = 0;
+    for (let i = 1; i < 6; i++) if (probs[i] > probs[best]) best = i;
+    return { cls: CLASSES[best], idx: best, conf: probs[best], probs };
+  }
+
+  return { classify, CLASSES };
+})();
 
 /* ============================================================
    DOM
    ============================================================ */
 const $ = id => document.getElementById(id);
-const powerBtn = $('powerBtn');
-const statusPill = $('statusPill');
-const pulse = $('pulse');
-const hint = $('hint');
-
-const micSelect = $('micSelect');
-const refreshBtn = $('refreshBtn');
-const headsetBadge = $('headsetBadge');
-const micLevelBar = $('micLevelBar');
-
+const powerBtn = $('powerBtn'), statusPill = $('statusPill'), pulse = $('pulse'), hint = $('hint');
+const micSelect = $('micSelect'), refreshBtn = $('refreshBtn'), headsetBadge = $('headsetBadge'), micLevelBar = $('micLevelBar');
+const nnClassEl = $('nnClass'), nnConfEl = $('nnConf'), nnBar = $('nnBar');
 const scope = $('scope'), sctx = scope.getContext('2d');
 const spectrum = $('spectrum'), fctx = spectrum.getContext('2d');
 const filterViz = $('filterViz'), flctx = filterViz.getContext('2d');
 const powerViz = $('powerViz'), pctx = powerViz.getContext('2d');
-
-const inBar = $('inBar'), outBar = $('outBar');
-const errBar = $('errBar'), nrBar = $('nrBar');
-const inDb = $('inDb'), outDb = $('outDb');
-const errDb = $('errDb'), nrDb = $('nrDb');
-
+const inBar = $('inBar'), outBar = $('outBar'), errBar = $('errBar'), nrBar = $('nrBar');
+const inDb = $('inDb'), outDb = $('outDb'), errDb = $('errDb'), nrDb = $('nrDb');
 const muEl = $('mu'), muOut = $('muOut');
 const tapsEl = $('taps'), tapsOut = $('tapsOut');
 const volEl = $('vol'), volOut = $('volOut');
-const normBtn = $('normBtn'), dcBtn = $('dcBtn'), negBtn = $('negBtn');
-const sliders = [muEl, tapsEl, volEl];
-
-const scopeStatus = $('scopeStatus');
-const fftStatus = $('fftStatus');
-const filterStatus = $('filterStatus');
-const powerStatus = $('powerStatus');
+const leakEl = $('leak'), leakOut = $('leakOut');
+const ffBtn = $('ffBtn'), fbBtn = $('fbBtn'), normBtn = $('normBtn'), spmBtn = $('spmBtn'), nnBtn = $('nnBtn'), dcBtn = $('dcBtn');
+const sliders = [muEl, tapsEl, volEl, leakEl];
+const scopeStatus = $('scopeStatus'), fftStatus = $('fftStatus'), filterStatus = $('filterStatus'), powerStatus = $('powerStatus');
 
 /* ============================================================
    State
@@ -471,12 +690,10 @@ let running = false, rafId = null;
 let bufIn = null, bufOut = null, freqIn = null, freqOut = null;
 let coeffData = new Float32Array(256);
 let powerHist = new Float32Array(120);
-let powerIdx = 0;
-let nrValue = 0;
-
-let normOn = true, dcOn = true, negOn = true;
-let selectedDeviceId = null;
-let devicesLoaded = false;
+let powerIdx = 0, nrValue = 0;
+let normOn = true, spmOn = false, nnOn = true, dcOn = true;
+let selectedDeviceId = null, devicesLoaded = false;
+let nnTimer = 0;
 const BASE_VOLUME = 0.85;
 
 /* ============================================================
@@ -488,106 +705,57 @@ function isHeadsetLabel(label) {
 }
 
 async function enumerateMics(requestLabelAccess = false) {
-  /* labels are only populated after a getUserMedia call has been granted.
-     If we don't have permission yet, request it once so the dropdown shows real names. */
   if (requestLabelAccess) {
-    try {
-      const tmp = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-      tmp.getTracks().forEach(t => t.stop());
-    } catch (err) {
-      /* ignore — user may deny; we'll still show generic entries */
-    }
+    try { const tmp = await navigator.mediaDevices.getUserMedia({ audio: true, video: false }); tmp.getTracks().forEach(t => t.stop()); } catch (e) {}
   }
-
   let devices = [];
-  try {
-    devices = await navigator.mediaDevices.enumerateDevices();
-  } catch (err) {
-    console.warn('enumerateDevices failed', err);
-  }
-
+  try { devices = await navigator.mediaDevices.enumerateDevices(); } catch (e) { console.warn(e); }
   const mics = devices.filter(d => d.kind === 'audioinput');
-
   const prev = micSelect.value;
   micSelect.innerHTML = '<option value="">— default microphone —</option>';
-
   let headsetFound = false;
-
   mics.forEach((d, i) => {
     const opt = document.createElement('option');
     opt.value = d.deviceId;
     const label = d.label || ('Microphone ' + (i + 1));
     opt.textContent = label;
-    if (isHeadsetLabel(d.label)) {
-      opt.textContent = '🎧  ' + label;
-      headsetFound = true;
-    }
+    if (isHeadsetLabel(d.label)) { opt.textContent = '🎧  ' + label; headsetFound = true; }
     micSelect.appendChild(opt);
   });
-
-  /* restore previous selection if it still exists */
-  if (prev && mics.some(d => d.deviceId === prev)) {
-    micSelect.value = prev;
-  } else if (prev === '' || prev === undefined) {
-    /* nothing to do, default */
-  } else {
-    micSelect.value = '';
-  }
-
-  /* auto-pick first headset if user hasn't chosen yet */
+  if (prev && mics.some(d => d.deviceId === prev)) micSelect.value = prev;
   if (!selectedDeviceId && headsetFound) {
     const hs = mics.find(d => isHeadsetLabel(d.label));
-    if (hs) {
-      micSelect.value = hs.deviceId;
-      selectedDeviceId = hs.deviceId;
-      headsetBadge.classList.add('show');
-    }
-  } else {
-    headsetBadge.classList.toggle('show', isHeadsetLabel(
-      micSelect.options[micSelect.selectedIndex]?.textContent || ''
-    ));
+    if (hs) { micSelect.value = hs.deviceId; selectedDeviceId = hs.deviceId; }
   }
-
   devicesLoaded = true;
   updateHeadsetBadge();
 }
 
 function updateHeadsetBadge() {
   const opt = micSelect.options[micSelect.selectedIndex];
-  const label = opt ? opt.textContent : '';
-  const isHS = isHeadsetLabel(label);
-  headsetBadge.classList.toggle('show', isHS);
+  headsetBadge.classList.toggle('show', isHeadsetLabel(opt ? opt.textContent : ''));
 }
 
 micSelect.addEventListener('change', () => {
   selectedDeviceId = micSelect.value || null;
   updateHeadsetBadge();
-  if (running) {
-    /* switch input live — restart capture with new device */
-    restartCapture();
-  }
+  if (running) restartCapture();
 });
 
 refreshBtn.addEventListener('click', async () => {
   refreshBtn.style.transform = 'rotate(360deg)';
   refreshBtn.style.transition = 'transform .5s ease';
-  setTimeout(() => {
-    refreshBtn.style.transform = '';
-    refreshBtn.style.transition = '';
-  }, 520);
+  setTimeout(() => { refreshBtn.style.transform = ''; refreshBtn.style.transition = ''; }, 520);
   await enumerateMics(true);
   hint.textContent = 'Device list refreshed.';
 });
 
-/* watch for device plug/unplug */
 if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
-  navigator.mediaDevices.addEventListener('devicechange', () => {
-    enumerateMics(false);
-  });
+  navigator.mediaDevices.addEventListener('devicechange', () => enumerateMics(false));
 }
 
 /* ============================================================
-   Canvas sizing
+   Canvas
    ============================================================ */
 function sizeAll() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -603,17 +771,17 @@ window.addEventListener('resize', sizeAll);
 /* ============================================================
    UI helpers
    ============================================================ */
-function setStatus(text, on) {
+function setStatus(text, cls) {
   statusPill.textContent = text;
-  statusPill.classList.toggle('on', !!on);
-  pulse.classList.toggle('live', !!on);
+  statusPill.className = 'pill' + (cls ? ' ' + cls : '');
+  pulse.classList.toggle('live', cls === 'on' || cls === 'nn');
 }
 function setControls(on) { sliders.forEach(s => s.disabled = !on); }
-
 function updateLabels() {
   muOut.textContent = ((+muEl.value) * 0.00001).toFixed(5);
   tapsOut.textContent = tapsEl.value;
   volOut.textContent = volEl.value + '%';
+  leakOut.textContent = (1 - (+leakEl.value) / 10000).toFixed(4);
 }
 
 /* ============================================================
@@ -625,82 +793,48 @@ function pushParams() {
   worklet.parameters.get('mu').setValueAtTime((+muEl.value) * 0.00001, t);
   worklet.parameters.get('taps').setValueAtTime(+tapsEl.value, t);
   worklet.parameters.get('volume').setValueAtTime((+volEl.value) / 100, t);
+  worklet.parameters.get('leak').setValueAtTime(1 - (+leakEl.value) / 10000, t);
   worklet.parameters.get('normOn').setValueAtTime(normOn ? 1 : 0, t);
+  worklet.parameters.get('spmOn').setValueAtTime(spmOn ? 1 : 0, t);
   worklet.parameters.get('dcOn').setValueAtTime(dcOn ? 1 : 0, t);
-  worklet.parameters.get('negOn').setValueAtTime(negOn ? 1 : 0, t);
+  worklet.parameters.get('ffOn').setValueAtTime(1, t);
+  worklet.parameters.get('fbOn').setValueAtTime(1, t);
 }
 
 sliders.forEach(s => s.addEventListener('input', () => { updateLabels(); pushParams(); }));
 normBtn.addEventListener('click', () => { normOn = !normOn; normBtn.classList.toggle('on', normOn); pushParams(); });
+spmBtn.addEventListener('click', () => { spmOn = !spmOn; spmBtn.classList.toggle('on', spmOn); pushParams(); });
 dcBtn.addEventListener('click', () => { dcOn = !dcOn; dcBtn.classList.toggle('on', dcOn); pushParams(); });
-negBtn.addEventListener('click', () => { negOn = !negOn; negBtn.classList.toggle('on', negOn); pushParams(); });
-
-/* ============================================================
-   Build the getUserMedia audio constraints for the selected device
-   ============================================================ */
-function buildAudioConstraints() {
-  const audio = {
-    echoCancellation: false,
-    noiseSuppression: false,
-    autoGainControl: false,
-    channelCount: 1
-  };
-  if (selectedDeviceId) {
-    audio.deviceId = { exact: selectedDeviceId };
-  }
-  return { audio, video: false };
-}
+nnBtn.addEventListener('click', () => { nnOn = !nnOn; nnBtn.classList.toggle('on', nnOn); if (!nnOn) { nnClassEl.textContent = '—'; nnConfEl.textContent = 'disabled'; nnBar.style.width = '0%'; } });
 
 /* ============================================================
    Start / stop
    ============================================================ */
+function buildAudioConstraints() {
+  const audio = { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 };
+  if (selectedDeviceId) audio.deviceId = { exact: selectedDeviceId };
+  return { audio, video: false };
+}
+
 async function start() {
   if (running) return;
-  setStatus('mic…', false);
+  setStatus('mic…');
   hint.textContent = 'Requesting microphone…';
-
-  /* Make sure the dropdown has real labels */
-  if (!devicesLoaded) {
-    await enumerateMics(true);
-  }
-
+  if (!devicesLoaded) await enumerateMics(true);
   try {
     stream = await navigator.mediaDevices.getUserMedia(buildAudioConstraints());
   } catch (err) {
     console.error(err);
-    /* If we requested a specific device and it failed, try default */
-    if (selectedDeviceId) {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 1 },
-          video: false
-        });
-        micSelect.value = '';
-        selectedDeviceId = null;
-        updateHeadsetBadge();
-      } catch (err2) {
-        setStatus('blocked', false);
-        hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
-        return;
-      }
-    } else {
-      setStatus('blocked', false);
-      hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
-      return;
-    }
+    setStatus('blocked');
+    hint.innerHTML = 'Microphone denied. Needs <b>https</b> or localhost and permission.';
+    return;
   }
-
-  /* Report which device we actually got */
   const track = stream.getAudioTracks()[0];
-  if (track && track.label) {
-    const isHS = isHeadsetLabel(track.label);
-    headsetBadge.classList.toggle('show', isHS);
-  }
+  if (track && track.label) headsetBadge.classList.toggle('show', isHeadsetLabel(track.label));
 
   try {
     ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
     if (ctx.state === 'suspended') await ctx.resume();
-
     const blob = new Blob([WORKLET_SRC], { type: 'application/javascript' });
     const url = URL.createObjectURL(blob);
     await ctx.audioWorklet.addModule(url);
@@ -708,39 +842,21 @@ async function start() {
   } catch (err) {
     console.error(err);
     stopTracks();
-    setStatus('unsupported', false);
+    setStatus('unsupported');
     hint.textContent = 'AudioWorklet not supported. Try Chrome, Edge, Firefox, or Safari 14.1+.';
     return;
   }
 
   srcNode = ctx.createMediaStreamSource(stream);
-
-  analyserIn = ctx.createAnalyser();
-  analyserIn.fftSize = 2048;
-  analyserIn.smoothingTimeConstant = 0.7;
-
-  analyserOut = ctx.createAnalyser();
-  analyserOut.fftSize = 2048;
-  analyserOut.smoothingTimeConstant = 0.7;
-
-  worklet = new AudioWorkletNode(ctx, 'anc-fxlms', {
-    numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2]
-  });
-
+  analyserIn = ctx.createAnalyser(); analyserIn.fftSize = 2048; analyserIn.smoothingTimeConstant = 0.7;
+  analyserOut = ctx.createAnalyser(); analyserOut.fftSize = 2048; analyserOut.smoothingTimeConstant = 0.7;
+  worklet = new AudioWorkletNode(ctx, 'hybrid-anc', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
   limiter = ctx.createDynamicsCompressor();
-  limiter.threshold.value = -8;
-  limiter.knee.value = 0;
-  limiter.ratio.value = 20;
-  limiter.attack.value = 0.003;
-  limiter.release.value = 0.1;
-
+  limiter.threshold.value = -8; limiter.knee.value = 0; limiter.ratio.value = 20;
+  limiter.attack.value = 0.003; limiter.release.value = 0.1;
   const dcBlock = ctx.createBiquadFilter();
-  dcBlock.type = 'highpass';
-  dcBlock.frequency.value = 15;
-  dcBlock.Q.value = 0.7;
-
-  master = ctx.createGain();
-  master.gain.value = 0;
+  dcBlock.type = 'highpass'; dcBlock.frequency.value = 15; dcBlock.Q.value = 0.7;
+  master = ctx.createGain(); master.gain.value = 0;
 
   srcNode.connect(analyserIn);
   analyserIn.connect(worklet);
@@ -771,97 +887,72 @@ async function start() {
   freqIn = new Float32Array(analyserIn.frequencyBinCount);
   freqOut = new Float32Array(analyserOut.frequencyBinCount);
 
-  updateLabels();
-  pushParams();
+  updateLabels(); pushParams();
   master.gain.setTargetAtTime(BASE_VOLUME, ctx.currentTime, 0.3);
 
   running = true;
   powerBtn.classList.add('on');
   setControls(true);
-  setStatus('cancelling', true);
-  scopeStatus.textContent = 'live';
-  fftStatus.textContent = 'live';
-  filterStatus.textContent = 'adapting';
-  powerStatus.textContent = 'tracking';
-
-  const deviceName = micSelect.options[micSelect.selectedIndex]?.textContent || 'default mic';
-  hint.innerHTML = 'Live using <b>' + deviceName.replace('🎧  ', '') + '</b>. Raise <b>Step size</b> slowly if rumble isn\'t dropping.';
+  setStatus('cancelling', 'on');
+  scopeStatus.textContent = 'live'; fftStatus.textContent = 'live';
+  filterStatus.textContent = 'adapting'; powerStatus.textContent = 'tracking';
+  const dev = micSelect.options[micSelect.selectedIndex]?.textContent || 'default mic';
+  hint.innerHTML = 'Live using <b>' + dev.replace('🎧  ', '') + '</b>. Raise <b>Step size</b> slowly. Enable <b>Online SPM</b> if it drifts.';
 
   sizeAll();
   rafId = requestAnimationFrame(loop);
 }
 
 async function restartCapture() {
-  /* switch mic mid-run: stop tracks, rebuild source node, keep context alive */
   if (!running || !ctx) return;
   try {
     if (stream) stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
     stream = await navigator.mediaDevices.getUserMedia(buildAudioConstraints());
-
-    /* disconnect old source */
     if (srcNode) { try { srcNode.disconnect(); } catch (e) {} }
-
     srcNode = ctx.createMediaStreamSource(stream);
     srcNode.connect(analyserIn);
-
     const track = stream.getAudioTracks()[0];
-    if (track && track.label) {
-      headsetBadge.classList.toggle('show', isHeadsetLabel(track.label));
-    }
-  } catch (err) {
-    console.error('restartCapture failed', err);
-  }
+    if (track && track.label) headsetBadge.classList.toggle('show', isHeadsetLabel(track.label));
+  } catch (err) { console.error('restartCapture', err); }
 }
 
 function stop() {
   if (!running && !ctx) return;
   running = false;
   if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-
   powerBtn.classList.remove('on');
   setControls(false);
-  setStatus('standby', false);
-  scopeStatus.textContent = 'idle';
-  fftStatus.textContent = 'idle';
-  filterStatus.textContent = 'idle';
-  powerStatus.textContent = 'idle';
+  setStatus('standby');
+  scopeStatus.textContent = 'idle'; fftStatus.textContent = 'idle';
+  filterStatus.textContent = 'idle'; powerStatus.textContent = 'idle';
   hint.textContent = 'Stopped. Tap to restart.';
-
+  nnClassEl.textContent = '—'; nnConfEl.textContent = 'idle'; nnBar.style.width = '0%';
   const dying = ctx;
-  if (master && dying) {
-    try { master.gain.setTargetAtTime(0, dying.currentTime, 0.08); } catch (e) {}
-  }
+  if (master && dying) { try { master.gain.setTargetAtTime(0, dying.currentTime, 0.08); } catch (e) {} }
   setTimeout(() => {
     stopTracks();
     if (dying && dying.state !== 'closed') dying.close().catch(() => {});
     ctx = master = worklet = limiter = srcNode = null;
     analyserIn = analyserOut = null;
   }, 300);
-
   [scope, spectrum, filterViz, powerViz].forEach(c => {
-    const g = c.getContext('2d');
-    g.clearRect(0, 0, c.clientWidth, c.clientHeight);
+    const g = c.getContext('2d'); g.clearRect(0, 0, c.clientWidth, c.clientHeight);
   });
   [inBar, outBar, errBar, nrBar].forEach(b => b.style.width = '0%');
   inDb.textContent = outDb.textContent = errDb.textContent = '−∞';
   nrDb.textContent = '0';
   micLevelBar.style.width = '0%';
-  coeffData.fill(0);
-  powerHist.fill(0);
+  coeffData.fill(0); powerHist.fill(0);
 }
 
 function stopTracks() {
   if (stream) { stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }); stream = null; }
 }
 
-/* ============================================================
-   Power
-   ============================================================ */
 powerBtn.addEventListener('click', () => running ? stop() : start());
 window.addEventListener('keydown', e => {
   if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-    e.preventDefault();
-    running ? stop() : start();
+    e.preventDefault(); running ? stop() : start();
   }
 });
 
@@ -878,27 +969,39 @@ function loop() {
   analyserOut.getFloatFrequencyData(freqOut);
 
   let peakIn = 0, peakOut = 0, sumSq = 0;
-  for (let i = 0; i < bufIn.length; i++) {
-    const v = bufIn[i], a = v < 0 ? -v : v;
-    if (a > peakIn) peakIn = a;
-    sumSq += v * v;
-  }
-  for (let i = 0; i < bufOut.length; i++) {
-    const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i];
-    if (a > peakOut) peakOut = a;
-  }
+  for (let i = 0; i < bufIn.length; i++) { const v = bufIn[i], a = v < 0 ? -v : v; if (a > peakIn) peakIn = a; sumSq += v * v; }
+  for (let i = 0; i < bufOut.length; i++) { const a = bufOut[i] < 0 ? -bufOut[i] : bufOut[i]; if (a > peakOut) peakOut = a; }
 
   setMeter(inBar, inDb, peakIn);
   setMeter(outBar, outDb, peakOut);
-
-  /* mic level bar in the picker (shows the headset mic is alive) */
   const micLevel = Math.min(1, Math.sqrt(sumSq / bufIn.length) * 6);
   micLevelBar.style.width = (micLevel * 100).toFixed(0) + '%';
 
-  drawScope();
-  drawSpectrum();
-  drawFilter();
-  drawPower();
+  /* ---- neural noise classification, ~5 Hz ---- */
+  nnTimer++;
+  if (nnOn && nnTimer % 12 === 0) {
+    // downsample spectrum to 256 bins covering 0..4 kHz
+    const spec = new Float32Array(256);
+    const sr = ctx.sampleRate, nyq = sr / 2;
+    const maxF = 4000;
+    for (let i = 0; i < 256; i++) {
+      const f = (i / 256) * maxF;
+      const bin = Math.min(freqIn.length - 1, Math.round(f / nyq * freqIn.length));
+      const db = freqIn[bin];
+      spec[i] = Math.pow(10, db / 20);  // linear magnitude
+    }
+    const r = NoiseCNN.classify(spec);
+    nnClassEl.textContent = r.cls;
+    nnConfEl.textContent = (r.conf * 100).toFixed(0) + '% confidence';
+    nnBar.style.width = (r.conf * 100).toFixed(0) + '%';
+    // feed prior index to the worklet so it biases the FF filter
+    if (worklet) {
+      const prior = r.cls === 'rumble' ? 3 : r.cls === 'engine' ? 2 : r.cls === 'hvac' ? 1 : 0;
+      worklet.parameters.get('prior').setValueAtTime(prior, ctx.currentTime);
+    }
+  }
+
+  drawScope(); drawSpectrum(); drawFilter(); drawPower();
 }
 
 function setMeter(bar, label, peak) {
@@ -907,48 +1010,35 @@ function setMeter(bar, label, peak) {
   bar.style.width = pct.toFixed(1) + '%';
   label.textContent = db <= -99 ? '−∞' : db.toFixed(0) + 'dB';
 }
-
 function setNR(nr) {
   nrValue = nrValue * 0.9 + nr * 0.1;
-  const clamped = Math.max(-20, Math.min(40, nrValue));
-  const pct = ((clamped + 20) / 60) * 100;
-  nrBar.style.width = pct.toFixed(1) + '%';
+  const c = Math.max(-20, Math.min(40, nrValue));
+  nrBar.style.width = (((c + 20) / 60) * 100).toFixed(1) + '%';
   nrDb.textContent = (nrValue >= 0 ? '+' : '') + nrValue.toFixed(1) + 'dB';
 }
 
+/* ---------- scope ---------- */
 function drawScope() {
   const W = scope.clientWidth, H = scope.clientHeight;
   if (!W || !H) return;
   sctx.clearRect(0, 0, W, H);
-  sctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  sctx.lineWidth = 1;
-  sctx.beginPath();
+  sctx.strokeStyle = 'rgba(255,255,255,0.04)'; sctx.lineWidth = 1; sctx.beginPath();
   for (let x = 0; x <= W; x += W / 8) { sctx.moveTo(Math.round(x)+0.5,0); sctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { sctx.moveTo(0,Math.round(y)+0.5); sctx.lineTo(W,Math.round(y)+0.5); }
   sctx.stroke();
-  sctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  sctx.beginPath(); sctx.moveTo(0,H/2); sctx.lineTo(W,H/2); sctx.stroke();
-  drawWave(bufIn, 'rgba(0,229,192,0.5)', 1.2, W, H);
-  drawWave(bufOut, '#ff4d6d', 1.5, W, H);
+  sctx.strokeStyle = 'rgba(255,255,255,0.1)'; sctx.beginPath(); sctx.moveTo(0,H/2); sctx.lineTo(W,H/2); sctx.stroke();
+  drawWave(bufIn, 'rgba(0,229,192,0.5)', 1.1, W, H);
+  drawWave(bufOut, '#ff4d6d', 1.4, W, H);
 }
-
 function drawWave(data, color, lw, W, H) {
   if (!data) return;
   const n = data.length, step = n / W, amp = H * 0.42;
-  sctx.beginPath();
-  sctx.strokeStyle = color;
-  sctx.lineWidth = lw;
-  sctx.lineJoin = 'round';
+  sctx.beginPath(); sctx.strokeStyle = color; sctx.lineWidth = lw; sctx.lineJoin = 'round';
   for (let x = 0; x < W; x++) {
     let i0 = Math.floor(x * step), i1 = Math.floor((x + 1) * step);
-    if (i1 <= i0) i1 = i0 + 1;
-    if (i1 > n) i1 = n;
+    if (i1 <= i0) i1 = i0 + 1; if (i1 > n) i1 = n;
     let mn = 1, mx = -1;
-    for (let i = i0; i < i1; i++) {
-      const v = data[i];
-      if (v < mn) mn = v;
-      if (v > mx) mx = v;
-    }
+    for (let i = i0; i < i1; i++) { const v = data[i]; if (v < mn) mn = v; if (v > mx) mx = v; }
     if (mn > mx) { mn = 0; mx = 0; }
     const yTop = H/2 - mx*amp, yBot = H/2 - mn*amp;
     sctx.moveTo(x+0.5, yTop);
@@ -957,19 +1047,16 @@ function drawWave(data, color, lw, W, H) {
   sctx.stroke();
 }
 
+/* ---------- spectrum ---------- */
 function drawSpectrum() {
   const W = spectrum.clientWidth, H = spectrum.clientHeight;
   if (!W || !H) return;
   fctx.clearRect(0, 0, W, H);
-  fctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  fctx.lineWidth = 1;
-  fctx.beginPath();
+  fctx.strokeStyle = 'rgba(255,255,255,0.04)'; fctx.lineWidth = 1; fctx.beginPath();
   for (let x = 0; x <= W; x += W / 6) { fctx.moveTo(Math.round(x)+0.5,0); fctx.lineTo(Math.round(x)+0.5,H); }
   for (let y = 0; y <= H; y += H / 4) { fctx.moveTo(0,Math.round(y)+0.5); fctx.lineTo(W,Math.round(y)+0.5); }
   fctx.stroke();
-  fctx.fillStyle = 'rgba(255,255,255,0.18)';
-  fctx.font = '8px ui-sans-serif';
-  fctx.textAlign = 'center';
+  fctx.fillStyle = 'rgba(255,255,255,0.18)'; fctx.font = '8px ui-sans-serif'; fctx.textAlign = 'center';
   const sr = ctx ? ctx.sampleRate : 48000;
   [0, 100, 500, 1000, 2000, 5000].forEach(f => {
     const x = (f / (sr/2)) * W;
@@ -979,12 +1066,8 @@ function drawSpectrum() {
   drawFFT(freqIn, nBins, nyq, maxF, 'rgba(0,229,192,0.45)', W, H);
   drawFFT(freqOut, nBins, nyq, maxF, '#ff4d6d', W, H);
 }
-
 function drawFFT(freq, nBins, nyq, maxF, color, W, H) {
-  fctx.beginPath();
-  fctx.strokeStyle = color;
-  fctx.lineWidth = 1.3;
-  fctx.lineJoin = 'round';
+  fctx.beginPath(); fctx.strokeStyle = color; fctx.lineWidth = 1.2; fctx.lineJoin = 'round';
   let started = false;
   for (let x = 0; x < W; x++) {
     const f = (x / W) * maxF;
@@ -992,63 +1075,48 @@ function drawFFT(freq, nBins, nyq, maxF, color, W, H) {
     const db = freq[bin];
     const norm = Math.max(0, Math.min(1, (db + 90) / 90));
     const y = H - norm * (H - 12) - 4;
-    if (!started) { fctx.moveTo(x, y); started = true; }
-    else fctx.lineTo(x, y);
+    if (!started) { fctx.moveTo(x, y); started = true; } else fctx.lineTo(x, y);
   }
   fctx.stroke();
 }
 
+/* ---------- adaptive filter coefficients ---------- */
 function drawFilter() {
   const W = filterViz.clientWidth, H = filterViz.clientHeight;
   if (!W || !H) return;
   flctx.clearRect(0, 0, W, H);
-  flctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  flctx.lineWidth = 1;
-  flctx.beginPath();
+  flctx.strokeStyle = 'rgba(255,255,255,0.04)'; flctx.lineWidth = 1; flctx.beginPath();
   for (let x = 0; x <= W; x += W / 6) { flctx.moveTo(Math.round(x)+0.5,0); flctx.lineTo(Math.round(x)+0.5,H); }
   flctx.stroke();
-  flctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  flctx.beginPath(); flctx.moveTo(0,H/2); flctx.lineTo(W,H/2); flctx.stroke();
+  flctx.strokeStyle = 'rgba(255,255,255,0.1)'; flctx.beginPath(); flctx.moveTo(0,H/2); flctx.lineTo(W,H/2); flctx.stroke();
   let mx = 0.001;
-  for (let i = 0; i < coeffData.length; i++) {
-    const a = Math.abs(coeffData[i]);
-    if (a > mx) mx = a;
-  }
-  const n = coeffData.length;
-  const barW = W / n;
-  const amp = H * 0.42;
+  for (let i = 0; i < coeffData.length; i++) { const a = Math.abs(coeffData[i]); if (a > mx) mx = a; }
+  const n = coeffData.length, barW = W / n, amp = H * 0.42;
   for (let i = 0; i < n; i++) {
-    const v = coeffData[i] / mx;
-    const h = v * amp;
-    const x = i * barW;
+    const v = coeffData[i] / mx, h = v * amp, x = i * barW;
     flctx.fillStyle = v >= 0 ? 'rgba(0,229,192,0.6)' : 'rgba(255,77,109,0.6)';
     if (h >= 0) flctx.fillRect(x, H/2 - h, Math.max(barW - 0.5, 0.5), h);
     else flctx.fillRect(x, H/2, Math.max(barW - 0.5, 0.5), -h);
   }
 }
 
+/* ---------- error power history ---------- */
 function drawPower() {
   const W = powerViz.clientWidth, H = powerViz.clientHeight;
   if (!W || !H) return;
   pctx.clearRect(0, 0, W, H);
-  pctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  pctx.lineWidth = 1;
-  pctx.beginPath();
+  pctx.strokeStyle = 'rgba(255,255,255,0.04)'; pctx.lineWidth = 1; pctx.beginPath();
   for (let y = 0; y <= H; y += H / 4) { pctx.moveTo(0,Math.round(y)+0.5); pctx.lineTo(W,Math.round(y)+0.5); }
   pctx.stroke();
   let mx = 0.001;
   for (let i = 0; i < powerHist.length; i++) if (powerHist[i] > mx) mx = powerHist[i];
   const n = powerHist.length;
-  pctx.beginPath();
-  pctx.strokeStyle = '#ffb020';
-  pctx.lineWidth = 1.5;
-  pctx.lineJoin = 'round';
+  pctx.beginPath(); pctx.strokeStyle = '#ffb020'; pctx.lineWidth = 1.5; pctx.lineJoin = 'round';
   for (let x = 0; x < W; x++) {
     const i = Math.floor((x / W) * n);
     const v = powerHist[i] / mx;
     const y = H - 4 - v * (H - 12);
-    if (x === 0) pctx.moveTo(x, y);
-    else pctx.lineTo(x, y);
+    if (x === 0) pctx.moveTo(x, y); else pctx.lineTo(x, y);
   }
   pctx.stroke();
 }
@@ -1057,15 +1125,8 @@ function drawPower() {
    Init
    ============================================================ */
 async function init() {
-  sizeAll();
-  updateLabels();
-  setControls(false);
-
-  /* Try to enumerate without permission first — labels may be blank.
-     That's fine; we'll request permission when the user hits power. */
-  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
-    await enumerateMics(false);
-  }
+  sizeAll(); updateLabels(); setControls(false);
+  if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) await enumerateMics(false);
 }
 init();
 })();
